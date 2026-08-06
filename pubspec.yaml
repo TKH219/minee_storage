@@ -1,0 +1,129 @@
+name: mine_storage
+description: "Mine Storage mobile app."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  #
+  # Riverpod stays on 2.x: BaseStateNotifier extends AutoDisposeNotifier, which
+  # is a v2 API. Providers are declared by hand (see providers.dart), so
+  # riverpod_generator is intentionally absent — it pins build/source_gen 2 and
+  # would hold back every other generator in this project.
+  flutter_riverpod: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Network
+  dio: ^5.8.0+1
+  retrofit: ^4.9.2
+  pretty_dio_logger: ^1.4.0
+
+  # Serialization
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
+
+  # Storage
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.3.5
+
+  # Config
+  envied: ^1.3.8
+
+  # UI
+  flutter_svg: ^2.1.0
+  cached_network_image: ^3.4.1
+
+  # Utils
+  equatable: ^2.0.7
+  intl: ^0.20.2
+  logger: ^2.5.0
+  package_info_plus: ^8.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  build_runner: ^2.9.0
+  freezed: ^3.2.5
+  json_serializable: ^6.14.1
+  retrofit_generator: ^10.2.8
+  envied_generator: ^1.3.8
+  flutter_gen_runner: ^5.15.0
+
+  # riverpod_lint/custom_lint are deliberately absent: riverpod_lint 2.x (the
+  # only line compatible with riverpod 2) pins analyzer 7, while the code
+  # generators above require analyzer 8+. Re-add both if this project ever
+  # migrates to riverpod 3.
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Weights are declared explicitly so a TextStyle asking for w500/w600/w700
+  # gets the real cut instead of a synthetically emboldened regular.
+  fonts:
+    - family: DMMono
+      fonts:
+        - asset: fonts/DM_Mono/DMMono-Light.ttf
+          weight: 300
+        - asset: fonts/DM_Mono/DMMono-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: fonts/DM_Mono/DMMono-Regular.ttf
+          weight: 400
+        - asset: fonts/DM_Mono/DMMono-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: fonts/DM_Mono/DMMono-Medium.ttf
+          weight: 500
+        - asset: fonts/DM_Mono/DMMono-MediumItalic.ttf
+          weight: 500
+          style: italic
+    - family: DMSans
+      fonts:
+        - asset: fonts/DM_Sans/static/DMSans-Light.ttf
+          weight: 300
+        - asset: fonts/DM_Sans/static/DMSans-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: fonts/DM_Sans/static/DMSans-Regular.ttf
+          weight: 400
+        - asset: fonts/DM_Sans/static/DMSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: fonts/DM_Sans/static/DMSans-Medium.ttf
+          weight: 500
+        - asset: fonts/DM_Sans/static/DMSans-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: fonts/DM_Sans/static/DMSans-SemiBold.ttf
+          weight: 600
+        - asset: fonts/DM_Sans/static/DMSans-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: fonts/DM_Sans/static/DMSans-Bold.ttf
+          weight: 700
+        - asset: fonts/DM_Sans/static/DMSans-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: pinyinok
+      fonts:
+        - asset: fonts/pinyinok/pinyinok.ttf
+
+flutter_gen:
+  integrations:
+    flutter_svg: true
