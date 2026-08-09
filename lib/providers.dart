@@ -24,6 +24,23 @@ final supabaseClientProvider = Provider<SupabaseClient>(
   (ref) => Supabase.instance.client,
 );
 
+/// Bridges the auth stream into the Listenable go_router wants.
+final authStateListenableProvider = Provider<ValueNotifier<bool>>((ref) {
+  final notifier = ValueNotifier<bool>(
+    ref.read(supabaseClientProvider).auth.currentSession != null,
+  );
+  final subscription = ref
+      .watch(authRepositoryProvider)
+      .authStateChanges
+      .listen((loggedIn) => notifier.value = loggedIn);
+
+  ref.onDispose(() {
+    subscription.cancel();
+    notifier.dispose();
+  });
+  return notifier;
+});
+
 /// Network
 ///
 /// Two Dio instances: [publicDioProvider] for anonymous endpoints (login,
