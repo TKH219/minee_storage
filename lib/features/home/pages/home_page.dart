@@ -1,122 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:mine_storage/app/router/app_router.dart';
-import 'package:mine_storage/app/router/app_routes.dart';
-import 'package:mine_storage/core/base/base_page.dart';
-import 'package:mine_storage/features/home/states/home_state.dart';
-import 'package:mine_storage/features/home/widgets/post_item.dart';
-import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
-import 'package:mine_storage/shared/ui/error_aware_container.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
 
-/// Reference screen for the architecture: Retrofit → model → repository →
-/// entity → notifier → page, covering loading, error, empty and loaded.
-class HomePage extends BasePage {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifier> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    // This screen renders loading inline, so the shared blocking overlay would
-    // only dim an empty scaffold.
-    allowToShowLoading = false;
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final position = _scrollController.position;
-    if (position.pixels >= position.maxScrollExtent - 240) {
-      notifier.loadMore();
-    }
-  }
-
-  @override
-  void setCurrentState() => currentState = ref.watch(homeStateProvider);
-
-  @override
-  void setNotifier() => notifier = ref.read(homeStateProvider.notifier);
-
-  @override
-  void initDataFromConstructor() => notifier.loadInitial();
-
-  @override
-  Widget buildPageContent(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mine Storage'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: 'Sign out',
-            onPressed: () async {
-              await ref.read(authRepositoryProvider).signOut();
-              if (context.mounted) {
-                ref.read(routerProvider).goNamed(AppRoutes.signInName);
-              }
-            },
-          ),
-          const ThemeModeButton(),
-        ],
+        title: const Text('Home'),
+        actions: const [ThemeModeButton()],
       ),
-      body: SafeArea(child: _buildBody(context)),
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    if (currentState.isLoading && currentState.posts.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (currentState.showFullScreenError) {
-      return ErrorAwareContainer(
-        message: currentState.errorMessage ?? 'Unable to load items.',
-        onRetry: notifier.loadInitial,
-      );
-    }
-
-    if (currentState.isEmpty) {
-      return EmptyView(
-        title: 'No items yet',
-        subtitle: 'Items you add will show up here.',
-        actionLabel: 'Reload',
-        onAction: notifier.loadInitial,
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: notifier.refresh,
-      child: ListView.separated(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        itemCount: currentState.posts.length + (currentState.isLoadingMore ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          if (index >= currentState.posts.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-            );
-          }
-          return PostItem(post: currentState.posts[index]);
-        },
+      body: const SafeArea(
+        child: EmptyView(
+          icon: Icons.home_rounded,
+          title: 'Home is not built yet',
+          subtitle: 'Your inventory will live here.',
+        ),
       ),
     );
   }
