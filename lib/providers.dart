@@ -7,9 +7,7 @@ import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
-import 'package:mine_storage/core/network/interceptors/refresh_token_interceptor.dart';
-import 'package:mine_storage/data/data_sources/local/user_local_data_source.dart';
-import 'package:mine_storage/data/data_sources/remote/auth_api.dart';
+import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
@@ -36,18 +34,17 @@ final publicDioProvider = Provider<Dio>((ref) {
 });
 
 final authorizedDioProvider = Provider<Dio>((ref) {
-  final userLocalDataSource = ref.watch(userLocalDataSourceProvider);
-
   final dio = buildDio(
     baseUrl: Env.apiUrl,
     interceptors: (dio) => [
-      AuthInterceptor(userLocalDataSource: userLocalDataSource),
-      RefreshTokenInterceptor(
-        dio: dio,
-        apiUrl: Env.apiUrl,
-        userLocalDataSource: userLocalDataSource,
-        onSessionExpired: () async {
-          ref.read(routerProvider).goNamed(AppRoutes.loginName);
+      AuthInterceptor(
+        accessToken: () =>
+            ref.read(supabaseClientProvider).auth.currentSession?.accessToken,
+      ),
+      UnauthorizedInterceptor(
+        onUnauthorized: () async {
+          await ref.read(authRepositoryProvider).signOut();
+          ref.read(routerProvider).goNamed(AppRoutes.signInName);
         },
       ),
     ],
@@ -58,16 +55,8 @@ final authorizedDioProvider = Provider<Dio>((ref) {
 });
 
 /// Data sources
-final userLocalDataSourceProvider = Provider<UserLocalDataSource>(
-  (ref) => UserLocalDataSource(),
-);
-
-final authApiProvider = Provider<AuthApi>(
-  (ref) => AuthApi(ref.watch(publicDioProvider)),
-);
-
-final authorizedAuthApiProvider = Provider<AuthorizedAuthApi>(
-  (ref) => AuthorizedAuthApi(ref.watch(authorizedDioProvider)),
+final authDataSourceProvider = Provider<AuthDataSource>(
+  (ref) => AuthDataSourceImpl(ref.watch(supabaseClientProvider)),
 );
 
 final postApiProvider = Provider<PostApi>(
@@ -76,11 +65,7 @@ final postApiProvider = Provider<PostApi>(
 
 /// Repositories
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => AuthRepositoryImpl(
-    authApi: ref.watch(authApiProvider),
-    authorizedAuthApi: ref.watch(authorizedAuthApiProvider),
-    userLocalDataSource: ref.watch(userLocalDataSourceProvider),
-  ),
+  (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
 );
 
 final postRepositoryProvider = Provider<PostRepository>(
