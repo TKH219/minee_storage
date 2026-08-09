@@ -19,4 +19,10 @@ class AppRoutes {
 
   static const String home = '/home';
   static const String homeName = 'home';
+
+  static const String reports = '/reports';
+  static const String reportsName = 'reports';
+
+  static const String settings = '/settings';
+  static const String settingsName = 'settings';
 }

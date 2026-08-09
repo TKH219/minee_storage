@@ -88,3 +88,7 @@ final authDataSourceProvider = Provider<AuthDataSource>(
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
 );
+
+/// UI-only placeholder for a real account preference. Not persisted and not
+/// sent anywhere.
+final allowProfileUpdatesProvider = StateProvider<bool>((ref) => true);
