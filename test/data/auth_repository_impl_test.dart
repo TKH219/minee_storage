@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
+import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
 import '../support/fake_auth_data_source.dart';
 
@@ -75,6 +76,86 @@ void main() {
     await expectLater(
       () => repository.signIn(email: 'a@b.com', password: 'secret'),
       throwsA(isA<AppException>()),
+    );
+  });
+
+  test('checkEmail maps each rpc string to EmailStatus', () async {
+    for (final entry in {
+      'none': EmailStatus.none,
+      'unconfirmed': EmailStatus.unconfirmed,
+      'confirmed': EmailStatus.confirmed,
+    }.entries) {
+      final source = FakeAuthDataSource(status: entry.key);
+      final repository = AuthRepositoryImpl(source);
+
+      expect(await repository.checkEmail('a@b.com'), entry.value);
+    }
+  });
+
+  test('checkEmail treats an unrecognised rpc value as none', () async {
+    final repository = AuthRepositoryImpl(FakeAuthDataSource(status: 'weird'));
+
+    expect(await repository.checkEmail('a@b.com'), EmailStatus.none);
+  });
+
+  test('startSignUp forwards a normalised email and the shop name', () async {
+    final source = FakeAuthDataSource();
+    final repository = AuthRepositoryImpl(source);
+
+    await repository.startSignUp(
+      email: ' A@B.com ',
+      password: 'secret',
+      shopName: 'Minee Storage',
+    );
+
+    expect(source.calls, contains('signUp:a@b.com'));
+    expect(source.lastShopName, 'Minee Storage');
+  });
+
+  test('confirmSignUp returns the user without touching shop_name', () async {
+    final source = FakeAuthDataSource(row: row(shop: 'Original'));
+    final repository = AuthRepositoryImpl(source);
+
+    final user = await repository.confirmSignUp(
+      email: 'a@b.com',
+      token: '12345678',
+      shopName: 'Original',
+      wasResumed: false,
+    );
+
+    expect(user.shopName, 'Original');
+    expect(source.calls.where((c) => c.startsWith('updateShopName')), isEmpty);
+  });
+
+  test('a resumed signup overwrites the shop name the trigger stored', () async {
+    final source = FakeAuthDataSource(row: row(shop: 'Old Name'));
+    final repository = AuthRepositoryImpl(source);
+
+    final user = await repository.confirmSignUp(
+      email: 'a@b.com',
+      token: '12345678',
+      shopName: 'New Name',
+      wasResumed: true,
+    );
+
+    expect(source.calls, contains('updateShopName:New Name'));
+    expect(user.shopName, 'New Name');
+  });
+
+  test('confirmSignUp maps a bad code', () async {
+    final source = FakeAuthDataSource(
+      verifyError: const AuthException('Token has expired or is invalid'),
+    );
+    final repository = AuthRepositoryImpl(source);
+
+    await expectLater(
+      () => repository.confirmSignUp(
+        email: 'a@b.com',
+        token: '00000000',
+        shopName: 'S',
+        wasResumed: false,
+      ),
+      throwsA(isA<BadRequestException>()),
     );
   });
 }

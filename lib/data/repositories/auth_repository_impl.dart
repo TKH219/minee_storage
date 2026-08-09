@@ -2,12 +2,64 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 class AuthRepositoryImpl {
   AuthRepositoryImpl(this._dataSource);
 
   final AuthDataSource _dataSource;
+
+  Future<EmailStatus> checkEmail(String email) {
+    return _guard(() async {
+      final raw = await _dataSource.emailStatus(_normalise(email));
+      return switch (raw) {
+        'unconfirmed' => EmailStatus.unconfirmed,
+        'confirmed' => EmailStatus.confirmed,
+        _ => EmailStatus.none,
+      };
+    });
+  }
+
+  Future<void> startSignUp({
+    required String email,
+    required String password,
+    required String shopName,
+  }) {
+    return _guard(
+      () => _dataSource.signUp(
+        email: _normalise(email),
+        password: password,
+        shopName: shopName.trim(),
+      ),
+    );
+  }
+
+  Future<void> resendSignUpCode(String email) =>
+      _guard(() => _dataSource.resendSignUpCode(_normalise(email)));
+
+  Future<UserEntity> confirmSignUp({
+    required String email,
+    required String token,
+    required String shopName,
+    required bool wasResumed,
+  }) {
+    return _guard(() async {
+      final userId = await _dataSource.verifySignUpCode(
+        email: _normalise(email),
+        token: token.trim(),
+      );
+
+      // The trigger read raw_user_meta_data from the *first* attempt, so a
+      // resumed signup would otherwise silently discard the name just typed.
+      if (wasResumed) {
+        await _dataSource.updateShopName(userId: userId, shopName: shopName.trim());
+      }
+
+      final user = await _requireUser(userId);
+      return wasResumed ? _withShopName(user, shopName.trim()) : user;
+    });
+  }
 
   Future<UserEntity> signIn({required String email, required String password}) {
     return _guard(() async {
@@ -59,6 +111,14 @@ class AuthRepositoryImpl {
     }
     return UserEntity.fromRow(row);
   }
+
+  UserEntity _withShopName(UserEntity user, String shopName) => UserEntity(
+    id: user.id,
+    email: user.email,
+    shopName: shopName,
+    isDeactivated: user.isDeactivated,
+    lastSignedInAt: user.lastSignedInAt,
+  );
 
   String _normalise(String email) => email.trim().toLowerCase();
 
