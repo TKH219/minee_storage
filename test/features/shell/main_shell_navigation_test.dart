@@ -8,6 +8,7 @@ import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/features/shell/pages/main_shell_page.dart';
+import 'package:mine_storage/features/shell/widgets/add_action_button.dart';
 import 'package:mine_storage/providers.dart';
 
 import '../../support/fake_auth_repository.dart';
@@ -83,5 +84,28 @@ void main() {
       tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
       isFalse,
     );
+  });
+
+  testWidgets('the bar switches branches', (tester) async {
+    await pumpShell(tester);
+
+    await tester.tap(find.text('Report'));
+    await tester.pumpAndSettle();
+    expect(find.text('No reports yet'), findsOneWidget);
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('My profile'), findsOneWidget);
+  });
+
+  testWidgets('the Add button announces that adding is coming soon', (
+    tester,
+  ) async {
+    await pumpShell(tester);
+
+    await tester.tap(find.byType(AddActionButton));
+    await tester.pump();
+
+    expect(find.text('Adding items is coming soon'), findsOneWidget);
   });
 }
