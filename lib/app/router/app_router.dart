@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mine_storage/features/auth/sign_in/pages/sign_in_page.dart';
+import 'package:mine_storage/features/auth/sign_up/pages/sign_up_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
 import 'package:mine_storage/providers.dart';
@@ -36,6 +37,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           state,
           SignInPage(prefilledEmail: state.uri.queryParameters['email']),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.signUp,
+        name: AppRoutes.signUpName,
+        pageBuilder: (context, state) => _fadePage(state, const SignUpPage()),
       ),
       GoRoute(
         path: AppRoutes.home,
