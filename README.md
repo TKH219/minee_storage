@@ -60,8 +60,9 @@ Then `fvm dart run build_runner build --delete-conflicting-outputs`.
 
 Two Dio instances, built in `providers.dart`:
 
-- `publicDioProvider` — anonymous endpoints (login, token refresh)
-- `authorizedDioProvider` — adds `AuthInterceptor` and `RefreshTokenInterceptor`
+- `publicDioProvider` — anonymous endpoints
+- `authorizedDioProvider` — adds `AuthInterceptor` (attaches the Supabase access
+  token) and `UnauthorizedInterceptor` (signs out and returns to sign-in on 401)
 
 Error handling is centralised in `ErrorInterceptor`, which turns any
 `DioException` into a typed `AppException` (`NetworkException`,
@@ -87,11 +88,54 @@ To rebrand, edit the ramps in `app/theme/app_colors.dart` — nothing else chang
 Theme mode is tri-state (system/light/dark), persisted in `SharedPreferences` via
 `themeModeProvider`, and toggled by `ThemeModeButton`.
 
+## Authentication
+
+Supabase (GoTrue) owns authentication; nothing else. Every flow is email +
+one-time code, and no Supabase type ever crosses into `lib/features/` — the
+domain contract in `domain/repositories/auth_repository.dart` returns only
+`UserEntity`, `EmailStatus` and `bool`.
+
+- **Sign up** — email + shop name → password → 8-digit code. The account row in
+  `public.users` is written by a database trigger on confirmation, so an
+  abandoned signup leaves no row and can be resumed: re-entering an unconfirmed
+  address skips the password step, resends a code, and overwrites the shop name.
+- **Sign in** — email + password. A row flagged `is_deactivated` is refused and
+  signed straight back out; `last_signed_in_at` is stamped on success.
+- **Password reset** — email → 8-digit code → new password, after which the app
+  signs out and returns to sign-in with the email prefilled.
+
+Each multi-step flow is **one route with one notifier** stepping an enum held in
+state, because `BaseStateNotifier` extends `AutoDisposeNotifier` and a provider
+shared across sibling routes can be disposed mid-flow.
+
+The session is persisted to the platform keychain by `SecureLocalStorage`, not
+SharedPreferences — the package default would leave a long-lived refresh token in
+plaintext. `SupabaseErrorMapper` is the boundary that turns a Supabase failure
+into an `AppException`, since those never pass through `ErrorInterceptor`.
+
+Routes are guarded by `resolveRedirect` in `app/router/app_router.dart`.
+`/forgot-password` stays reachable while signed in: verifying the recovery code
+creates a session one step before the new password is set.
+
+**Scope is the staging project.** See `supabase/README.md` for the migrations and
+the production-readiness gaps.
+
 ## Environments
 
 `lib/env/<staging|production>/.env` hold the per-environment values. `build.sh`
 copies the chosen one to the root `.env`, which `envied` compiles into
 `lib/env/env.g.dart`. The root `.env` is gitignored.
+
+| Variable | Purpose |
+| --- | --- |
+| `ENV_NAME` | `staging` or `production`; drives `Env.isProduction` |
+| `API_URL` | Base URL for Dio **and** the URL `Supabase.initialize` uses |
+| `MEDIA_URL` | Base URL for media assets |
+| `ANON_KEY` | Supabase publishable (anon) key |
+
+`ANON_KEY` is a publishable key that ships inside the app binary regardless, and
+is only as safe as the RLS policies behind it. The service-role key and the
+`SUPABASE_ACCESS_TOKEN` PAT must never go in these files.
 
 > Do not put real secrets in the committed env files — inject them in CI instead.
 
@@ -101,6 +145,28 @@ copies the chosen one to the root `.env`, which `envied` compiles into
 fvm flutter test
 fvm flutter analyze
 ```
+
+Tests use hand-written fakes; this project has no mocking package.
+
+```
+test/app/router_redirect_test.dart
+test/core/exceptions/supabase_error_mapper_test.dart
+test/core/network/auth_interceptor_test.dart
+test/core/network/error_interceptor_test.dart
+test/core/storage/secure_local_storage_test.dart
+test/data/auth_repository_impl_test.dart
+test/data/post_repository_impl_test.dart
+test/domain/user_entity_test.dart
+test/features/auth/forgot_password_state_test.dart
+test/features/auth/sign_in_state_test.dart
+test/features/auth/sign_up_state_test.dart
+test/features/home_page_test.dart
+test/features/splash_state_test.dart
+test/support/                     # shared fakes + router harness
+```
+
+`BaseStateNotifier.build()` reads `routerProvider`, so every notifier test needs
+a router in scope — use `buildTestRouter()` from `test/support/`.
 
 ## Notes on dependency choices
 
