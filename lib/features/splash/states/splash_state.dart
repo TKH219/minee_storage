@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_state.dart';
+import 'package:mine_storage/domain/repositories/auth_repository.dart';
+import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/shared/utils/logger.dart';
 
 final splashStateProvider = AutoDisposeNotifierProvider<SplashStateNotifier, SplashState>(
   SplashStateNotifier.new,
@@ -24,17 +27,25 @@ class SplashState extends BaseState with Equatable {
 }
 
 class SplashStateNotifier extends BaseStateNotifier<SplashState> {
-  @override
-  SplashState createInitialState() => const SplashState();
+  late final AuthRepository _authRepository;
 
-  /// Decides the first real screen.
-  ///
-  /// The demo slice is public, so it always lands on home. Swap the branch back
-  /// on once the real API requires a session.
+  @override
+  SplashState createInitialState() {
+    _authRepository = ref.read(authRepositoryProvider);
+    return const SplashState();
+  }
+
+  /// Decides the first real screen from the restored Supabase session.
   Future<void> bootstrap() async {
     showLoading();
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    showLoaded();
-    router()?.goNamed(AppRoutes.homeName);
+    try {
+      final user = await _authRepository.currentUser();
+      showLoaded();
+      router()?.goNamed(user == null ? AppRoutes.signInName : AppRoutes.homeName);
+    } on Object catch (e) {
+      logger.e('Splash bootstrap failed', error: e);
+      showLoaded();
+      router()?.goNamed(AppRoutes.signInName);
+    }
   }
 }

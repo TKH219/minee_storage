@@ -12,6 +12,13 @@ GoRouter buildTestRouter() {
     initialLocation: AppRoutes.splash,
     routes: [
       GoRoute(path: AppRoutes.splash, name: AppRoutes.splashName, builder: stub),
+      GoRoute(path: AppRoutes.signIn, name: AppRoutes.signInName, builder: stub),
+      GoRoute(path: AppRoutes.signUp, name: AppRoutes.signUpName, builder: stub),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        name: AppRoutes.forgotPasswordName,
+        builder: stub,
+      ),
       GoRoute(path: AppRoutes.home, name: AppRoutes.homeName, builder: stub),
     ],
   );
