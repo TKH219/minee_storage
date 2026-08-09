@@ -5,11 +5,12 @@ import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
-class AuthRepositoryImpl {
+class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._dataSource);
 
   final AuthDataSource _dataSource;
 
+  @override
   Future<EmailStatus> checkEmail(String email) {
     return _guard(() async {
       final raw = await _dataSource.emailStatus(_normalise(email));
@@ -21,6 +22,7 @@ class AuthRepositoryImpl {
     });
   }
 
+  @override
   Future<void> startSignUp({
     required String email,
     required String password,
@@ -35,9 +37,11 @@ class AuthRepositoryImpl {
     );
   }
 
+  @override
   Future<void> resendSignUpCode(String email) =>
       _guard(() => _dataSource.resendSignUpCode(_normalise(email)));
 
+  @override
   Future<UserEntity> confirmSignUp({
     required String email,
     required String token,
@@ -61,6 +65,7 @@ class AuthRepositoryImpl {
     });
   }
 
+  @override
   Future<UserEntity> signIn({required String email, required String password}) {
     return _guard(() async {
       final userId = await _dataSource.signInWithPassword(
@@ -89,8 +94,37 @@ class AuthRepositoryImpl {
     });
   }
 
+  @override
+  Future<void> startPasswordReset(String email) =>
+      _guard(() => _dataSource.sendPasswordResetCode(_normalise(email)));
+
+  @override
+  Future<void> verifyPasswordResetCode({
+    required String email,
+    required String token,
+  }) {
+    return _guard(
+      () => _dataSource.verifyRecoveryCode(
+        email: _normalise(email),
+        token: token.trim(),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setNewPassword(String password) {
+    return _guard(() async {
+      await _dataSource.updatePassword(password);
+      // verifyOTP(recovery) leaves the user signed in. The spec deliberately
+      // discards that session and sends them back through sign-in.
+      await _dataSource.signOut();
+    });
+  }
+
+  @override
   Future<void> signOut() => _guard(() => _dataSource.signOut());
 
+  @override
   Future<UserEntity?> currentUser() {
     return _guard(() async {
       final id = _dataSource.currentUserId;
@@ -100,6 +134,7 @@ class AuthRepositoryImpl {
     });
   }
 
+  @override
   Stream<bool> get authStateChanges => _dataSource.authStateChanges;
 
   Future<UserEntity> _requireUser(String userId) async {
