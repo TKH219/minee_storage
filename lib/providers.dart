@@ -7,6 +7,7 @@ import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
+import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
