@@ -1,24 +1,19 @@
 import 'package:dio/dio.dart';
 
-import 'package:mine_storage/data/data_sources/local/user_local_data_source.dart';
-
-/// Attaches the stored bearer token to every outgoing request.
+/// Attaches the current Supabase access token to every outgoing request.
 ///
-/// Endpoints that must stay anonymous (login, refresh) go through the public
-/// Dio instance, which does not install this interceptor.
+/// Takes a getter rather than a client so it can be unit-tested without
+/// initialising Supabase.
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor({required this.userLocalDataSource});
+  AuthInterceptor({required this.accessToken});
 
-  final UserLocalDataSource userLocalDataSource;
+  final String? Function() accessToken;
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    final auth = await userLocalDataSource.getAppAuth();
-    if (auth != null && auth.accessToken.isNotEmpty) {
-      options.headers['Authorization'] = auth.accessTokenHeader;
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final token = accessToken();
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);
   }
