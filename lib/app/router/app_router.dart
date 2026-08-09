@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mine_storage/features/auth/sign_in/pages/sign_in_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
 import 'package:mine_storage/providers.dart';
@@ -27,6 +28,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.splash,
         name: AppRoutes.splashName,
         builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.signIn,
+        name: AppRoutes.signInName,
+        pageBuilder: (context, state) => _fadePage(
+          state,
+          SignInPage(prefilledEmail: state.uri.queryParameters['email']),
+        ),
       ),
       GoRoute(
         path: AppRoutes.home,
