@@ -1,56 +1,73 @@
 import 'package:mine_storage/core/exceptions/exceptions.dart';
-import 'package:mine_storage/data/data_sources/local/user_local_data_source.dart';
-import 'package:mine_storage/data/data_sources/remote/auth_api.dart';
-import 'package:mine_storage/data/models/models.dart';
+import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
+import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
-import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
-class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl({
-    required this.authApi,
-    required this.authorizedAuthApi,
-    required this.userLocalDataSource,
-  });
+class AuthRepositoryImpl {
+  AuthRepositoryImpl(this._dataSource);
 
-  final AuthApi authApi;
-  final AuthorizedAuthApi authorizedAuthApi;
-  final UserLocalDataSource userLocalDataSource;
+  final AuthDataSource _dataSource;
 
-  @override
-  Future<AuthenticationEntity> logIn({
-    required String username,
-    required String password,
-  }) async {
-    final response = await authApi.login(
-      LoginRequest(username: username, password: password),
-    );
+  Future<UserEntity> signIn({required String email, required String password}) {
+    return _guard(() async {
+      final userId = await _dataSource.signInWithPassword(
+        email: _normalise(email),
+        password: password,
+      );
 
-    final payload = response.data;
-    if (payload == null) {
-      throw const ServerException(message: 'Login succeeded but returned no session.');
-    }
+      final user = await _requireUser(userId);
 
-    final entity = payload.toEntity();
-    await userLocalDataSource.saveAuthenticationEntity(entity);
-    return entity;
+      // Deactivation only marks the row; the Supabase account stays valid and
+      // still authenticates, so the refusal has to happen here.
+      if (user.isDeactivated) {
+        await _dataSource.signOut();
+        throw const ForbiddenException(
+          message: 'This account has been deactivated. Please contact us for support.',
+        );
+      }
+
+      try {
+        await _dataSource.touchLastSignedIn(userId);
+      } on Object catch (e) {
+        logger.w('Failed to stamp last_signed_in_at', error: e);
+      }
+
+      return user;
+    });
   }
 
-  @override
-  Future<void> logOut() async {
+  Future<void> signOut() => _guard(() => _dataSource.signOut());
+
+  Future<UserEntity?> currentUser() {
+    return _guard(() async {
+      final id = _dataSource.currentUserId;
+      if (id == null) return null;
+      final row = await _dataSource.fetchUserRow(id);
+      return row == null ? null : UserEntity.fromRow(row);
+    });
+  }
+
+  Stream<bool> get authStateChanges => _dataSource.authStateChanges;
+
+  Future<UserEntity> _requireUser(String userId) async {
+    final row = await _dataSource.fetchUserRow(userId);
+    if (row == null) {
+      throw const ServerException(
+        message: 'Your profile could not be loaded. Please try again.',
+      );
+    }
+    return UserEntity.fromRow(row);
+  }
+
+  String _normalise(String email) => email.trim().toLowerCase();
+
+  /// Single boundary where a Supabase failure becomes an [AppException].
+  Future<T> _guard<T>(Future<T> Function() action) async {
     try {
-      await authorizedAuthApi.logout();
+      return await action();
     } on Object catch (e) {
-      // Never trap the user in a signed-in state because the server is down.
-      logger.w('Remote logout failed, clearing local session anyway', error: e);
-    } finally {
-      await userLocalDataSource.logout();
+      throw SupabaseErrorMapper.map(e);
     }
   }
-
-  @override
-  Future<AuthenticationEntity?> currentSession() => userLocalDataSource.getAppAuth();
-
-  @override
-  Future<bool> isLoggedIn() => userLocalDataSource.hasSession();
 }
