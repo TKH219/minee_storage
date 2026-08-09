@@ -7,35 +7,35 @@ import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/providers.dart';
 
-final loginStateProvider = AutoDisposeNotifierProvider<LoginStateNotifier, LoginState>(
-  LoginStateNotifier.new,
+final signInStateProvider = AutoDisposeNotifierProvider<SignInStateNotifier, SignInState>(
+  SignInStateNotifier.new,
 );
 
-class LoginState extends BaseState with Equatable {
-  const LoginState({
-    this.username = '',
+class SignInState extends BaseState with Equatable {
+  const SignInState({
+    this.email = '',
     this.password = '',
     this.obscurePassword = true,
     super.status,
     super.errorMessage,
   });
 
-  final String username;
+  final String email;
   final String password;
   final bool obscurePassword;
 
-  bool get canSubmit => username.isNotBlank && password.isNotBlank && !isLoading;
+  bool get canSubmit => email.isNotBlank && password.isNotBlank && !isLoading;
 
   @override
-  LoginState copyWith({
+  SignInState copyWith({
     StateLifeCycle? status,
     String? errorMessage,
-    String? username,
+    String? email,
     String? password,
     bool? obscurePassword,
   }) {
-    return LoginState(
-      username: username ?? this.username,
+    return SignInState(
+      email: email ?? this.email,
       password: password ?? this.password,
       obscurePassword: obscurePassword ?? this.obscurePassword,
       status: status ?? this.status,
@@ -44,37 +44,36 @@ class LoginState extends BaseState with Equatable {
   }
 
   @override
-  List<Object?> get props => [username, password, obscurePassword, status, errorMessage];
+  List<Object?> get props => [email, password, obscurePassword, status, errorMessage];
 }
 
-class LoginStateNotifier extends BaseStateNotifier<LoginState> {
+class SignInStateNotifier extends BaseStateNotifier<SignInState> {
   late final AuthRepository _authRepository;
 
   @override
-  LoginState createInitialState() {
+  SignInState createInitialState() {
     _authRepository = ref.read(authRepositoryProvider);
-    return const LoginState();
+    return const SignInState();
   }
 
-  void updateUsername(String value) => updateState(state.copyWith(username: value));
+  void prefillEmail(String email) => updateState(state.copyWith(email: email));
+
+  void updateEmail(String value) => updateState(state.copyWith(email: value));
 
   void updatePassword(String value) => updateState(state.copyWith(password: value));
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
 
-  Future<void> login() async {
+  Future<void> signIn() async {
     if (!state.canSubmit) {
-      showSnackError(msg: 'Please enter your username and password.');
+      showSnackError(msg: 'Please enter your email and password.');
       return;
     }
 
     try {
       showLoading();
-      await _authRepository.logIn(
-        username: state.username.trim().toLowerCase(),
-        password: state.password.trim(),
-      );
+      await _authRepository.signIn(email: state.email, password: state.password);
       showLoaded();
       router()?.goNamed(AppRoutes.homeName);
     } on Object catch (e) {
