@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
@@ -18,6 +19,11 @@ import 'package:mine_storage/.env/env.dart';
 
 /// Global keys
 final snackbarKey = GlobalKey<ScaffoldMessengerState>();
+
+/// Supabase
+final supabaseClientProvider = Provider<SupabaseClient>(
+  (ref) => Supabase.instance.client,
+);
 
 /// Network
 ///
