@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mine_storage/app/router/app_router.dart';
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/home/states/home_state.dart';
 import 'package:mine_storage/features/home/widgets/post_item.dart';
+import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
@@ -58,7 +61,19 @@ class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifie
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mine Storage'),
-        actions: const [ThemeModeButton()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sign out',
+            onPressed: () async {
+              await ref.read(authRepositoryProvider).signOut();
+              if (context.mounted) {
+                ref.read(routerProvider).goNamed(AppRoutes.signInName);
+              }
+            },
+          ),
+          const ThemeModeButton(),
+        ],
       ),
       body: SafeArea(child: _buildBody(context)),
     );
