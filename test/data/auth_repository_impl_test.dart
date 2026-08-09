@@ -158,4 +158,38 @@ void main() {
       throwsA(isA<BadRequestException>()),
     );
   });
+
+  test('startPasswordReset sends to a normalised email', () async {
+    final source = FakeAuthDataSource();
+    final repository = AuthRepositoryImpl(source);
+
+    await repository.startPasswordReset(' A@B.com ');
+
+    expect(source.calls, contains('reset:a@b.com'));
+  });
+
+  test('verifyPasswordResetCode maps an expired code', () async {
+    final source = FakeAuthDataSource(
+      verifyError: const AuthException('Token has expired or is invalid'),
+    );
+    final repository = AuthRepositoryImpl(source);
+
+    await expectLater(
+      () => repository.verifyPasswordResetCode(email: 'a@b.com', token: '00000000'),
+      throwsA(isA<BadRequestException>()),
+    );
+  });
+
+  test('setNewPassword updates then signs out, in that order', () async {
+    final source = FakeAuthDataSource();
+    final repository = AuthRepositoryImpl(source);
+
+    await repository.setNewPassword('brand-new');
+
+    expect(source.lastPassword, 'brand-new');
+    expect(
+      source.calls.indexOf('updatePassword') < source.calls.indexOf('signOut'),
+      isTrue,
+    );
+  });
 }
