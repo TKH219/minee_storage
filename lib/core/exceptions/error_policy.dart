@@ -34,6 +34,11 @@ class ErrorPolicy {
       return error.errorCode != null ? const ErrorAction.inline() : const ErrorAction.snack();
     }
 
+    // Category fallbacks, so a leaf added later behaves sensibly without
+    // anyone remembering to add a row above.
+    if (error is DatabaseException) return const ErrorAction.silent();
+    if (error is HttpException) return const ErrorAction.snack();
+
     return const ErrorAction.snack();
   }
 }
