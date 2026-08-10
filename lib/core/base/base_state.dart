@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/shared/ui/app_snack.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 enum StateLifeCycle { init, loading, loaded, error }
@@ -64,46 +67,34 @@ abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifie
     updateState(state.copyWith(status: StateLifeCycle.loaded) as T);
   }
 
-  /// Converts anything thrown by the data layer into a user-facing message,
-  /// parks it on the state and (optionally) surfaces a snack bar.
-  void onError(Object error, {bool showSnack = true}) {
-    final message = resolveErrorMessage(error);
-    updateState(state.copyWith(status: StateLifeCycle.error, errorMessage: message) as T);
-    if (showSnack) {
-      showSnackError(msg: message);
-    }
-    logger.e('Error: $message', error: error);
+  /// Parks the message on the state, then hands the error to `AppErrorHandler`,
+  /// which owns every side effect the app takes about it.
+  ///
+  /// [present] suppresses the snack for this one call so a screen can render
+  /// the error itself. It cannot suppress a purge or a redirect.
+  void onError(Object error, {bool present = true}) {
+    final exception = resolveException(error);
+    updateState(
+      state.copyWith(status: StateLifeCycle.error, errorMessage: exception.displayMessage) as T,
+    );
+    unawaited(ref.read(appErrorHandlerProvider).handle(exception, present: present));
+    logger.e('Error: ${exception.displayMessage}', error: error);
   }
 
   /// [ErrorInterceptor] rejects with a `DioException` carrying the typed
-  /// [AppException] in `.error`, so unwrap one level before formatting.
+  /// [AppException] in `.error`, so unwrap one level before classifying.
   @protected
-  String resolveErrorMessage(Object error) {
+  AppException resolveException(Object error) {
     final resolved = error is DioException ? (error.error ?? error) : error;
 
-    if (resolved is AppException) return resolved.displayMessage;
+    if (resolved is AppException) return resolved;
     if (resolved is DioException) {
-      return resolved.message ?? 'An unknown network error occurred.';
+      return ServerException(message: resolved.message ?? 'An unknown network error occurred.');
     }
-    return 'An unknown error occurred: $resolved';
+    return ServerException(message: 'An unknown error occurred: $resolved');
   }
 
-  void showSnackError({required String msg}) {
-    final context = snackbarKey.currentContext;
-    final snackBar = SnackBar(
-      content: Text(
-        msg,
-        style: context?.textStyles.sansBody.copyWith(color: context.colors.white),
-      ),
-      showCloseIcon: true,
-      backgroundColor: context?.colors.red5 ?? Colors.red,
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 3),
-    );
-    snackbarKey.currentState
-      ?..clearSnackBars()
-      ..showSnackBar(snackBar);
-  }
+  void showSnackError({required String msg}) => showErrorSnack(msg);
 
   void showBannerSuccess({required String title, String? subtitle}) {
     final context = snackbarKey.currentContext;
