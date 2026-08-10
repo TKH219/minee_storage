@@ -68,10 +68,10 @@ void main() {
       expect((result as BadRequestException).errors, {'email': 'required'});
     });
 
-    test('401 maps to UnauthorizedException', () {
+    test('401 maps to SessionExpiredException', () {
       expect(
         ErrorInterceptor.mapError(badResponse(statusCode: 401)),
-        isA<UnauthorizedException>(),
+        isA<SessionExpiredException>(),
       );
     });
 
@@ -106,14 +106,26 @@ void main() {
       expect(result.message, 'Invalid email or password');
     });
 
-    test('tokenExpired maps to UnauthorizedException', () {
+    test('tokenExpired maps to SessionExpiredException', () {
       final result = ErrorInterceptor.mapError(
         badResponse(statusCode: 400, data: {'code': ServerErrorCodes.tokenExpired}),
       );
 
-      expect(result, isA<UnauthorizedException>());
+      expect(result, isA<SessionExpiredException>());
       expect(result.errorCode, ServerErrorCodes.tokenExpired);
     });
+
+    for (final code in [
+      ServerErrorCodes.tokenInvalid,
+      ServerErrorCodes.unauthorised,
+    ]) {
+      test('$code maps to SessionExpiredException', () {
+        expect(
+          ErrorInterceptor.mapError(badResponse(statusCode: 401, data: {'code': code})),
+          isA<SessionExpiredException>(),
+        );
+      });
+    }
 
     test('an unknown business code falls through to status mapping', () {
       final result = ErrorInterceptor.mapError(

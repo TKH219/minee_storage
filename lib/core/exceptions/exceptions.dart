@@ -63,6 +63,17 @@ class UnauthorizedException extends AppException {
   const UnauthorizedException({super.message, super.errorCode, super.statusCode});
 
   @override
+  String get displayMessage => message ?? 'Those credentials were not accepted.';
+}
+
+/// The session itself is gone, as opposed to credentials being rejected at
+/// sign-in — both are 401-shaped, but only this one may purge user state and
+/// bounce to sign-in. Keeping them apart is what stops a wrong password on the
+/// sign-in form from wiping the device.
+class SessionExpiredException extends UnauthorizedException {
+  const SessionExpiredException({super.message, super.errorCode, super.statusCode});
+
+  @override
   String get displayMessage => message ?? 'Your session has expired. Please sign in again.';
 }
 
