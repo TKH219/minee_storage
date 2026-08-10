@@ -11,11 +11,8 @@ import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.
 import 'package:mine_storage/core/storage/user_state_purger.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
-import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
-import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
-import 'package:mine_storage/domain/repositories/post_repository.dart';
 import 'package:mine_storage/.env/env.dart';
 
 export 'package:mine_storage/shared/ui/app_snack.dart' show snackbarKey;
@@ -87,15 +84,11 @@ final authDataSourceProvider = Provider<AuthDataSource>(
   (ref) => AuthDataSourceImpl(ref.watch(supabaseClientProvider)),
 );
 
-final postApiProvider = Provider<PostApi>(
-  (ref) => PostApi(ref.watch(publicDioProvider)),
-);
-
 /// Repositories
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
 );
 
-final postRepositoryProvider = Provider<PostRepository>(
-  (ref) => PostRepositoryImpl(postApi: ref.watch(postApiProvider)),
-);
+/// UI-only placeholder for a real account preference. Not persisted and not
+/// sent anywhere.
+final allowProfileUpdatesProvider = StateProvider<bool>((ref) => true);

@@ -6,8 +6,6 @@ part 'base_response.g.dart';
 ///
 /// Declare a Retrofit endpoint as `Future<BaseResponse<LoginResponse>>` and the
 /// generator wires the nested `fromJson` automatically.
-///
-/// The demo `PostApi` does not use this — jsonplaceholder returns bare arrays.
 @JsonSerializable(genericArgumentFactories: true)
 class BaseResponse<T> {
   const BaseResponse({this.code, this.message, this.data});
