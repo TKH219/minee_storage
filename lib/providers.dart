@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:mine_storage/app/router/app_router.dart';
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
 import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
@@ -26,12 +28,14 @@ final supabaseClientProvider = Provider<SupabaseClient>(
   (ref) => Supabase.instance.client,
 );
 
-/// Bridges the auth stream into the Listenable go_router wants, and is the one
-/// place stored user state gets cleared.
+/// Watches the session, and is the one place a lost session is acted on.
 ///
 /// Every way a session can end lands here — an explicit sign-out, a 401 from
 /// the REST API, or a token refresh failing in the background with nothing in
 /// flight — so the purge is written once and cannot be forgotten.
+///
+/// It routes back to splash rather than straight to sign-in: splash is the only
+/// session gate, so sending the user through it keeps that rule in one place.
 final authStateListenableProvider = Provider<ValueNotifier<bool>>((ref) {
   final notifier = ValueNotifier<bool>(
     ref.read(supabaseClientProvider).auth.currentSession != null,
@@ -40,6 +44,7 @@ final authStateListenableProvider = Provider<ValueNotifier<bool>>((ref) {
     notifier.value = loggedIn;
     if (!loggedIn) {
       ref.read(userStatePurgerProvider).purge();
+      ref.read(routerProvider).goNamed(AppRoutes.splashName);
     }
   });
 

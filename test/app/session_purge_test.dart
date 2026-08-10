@@ -1,13 +1,16 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/theme/theme_mode_provider.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
 import 'package:mine_storage/providers.dart';
 
+import '../support/auth_test_harness.dart';
 import '../support/fake_auth_repository.dart';
 
 void main() {
@@ -31,10 +34,14 @@ void main() {
     repository = FakeAuthRepository();
   });
 
+  late GoRouter router;
+
   ProviderContainer buildContainer() {
+    router = buildTestRouter();
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        routerProvider.overrideWithValue(router),
         // Only read for the initial value; never issues a request here.
         supabaseClientProvider.overrideWithValue(
           SupabaseClient('http://localhost', 'test-anon-key'),
@@ -56,6 +63,16 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     expect(secureStore, isEmpty);
     expect(prefs.getKeys(), {ThemeModeNotifier.storageKey});
+  });
+
+  test('losing the session sends the user back through the gate', () async {
+    buildContainer();
+    router.goNamed('home');
+
+    repository.authStateController.add(false);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(currentPath(router), '/');
   });
 
   test('signing in does not purge', () async {
