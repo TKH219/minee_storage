@@ -7,7 +7,6 @@ import 'package:mine_storage/features/auth/sign_in/pages/sign_in_page.dart';
 import 'package:mine_storage/features/auth/sign_up/pages/sign_up_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
-import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 import 'app_routes.dart';
@@ -20,11 +19,6 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
-    refreshListenable: ref.watch(authStateListenableProvider),
-    redirect: (context, state) => resolveRedirect(
-      loggedIn: ref.read(supabaseClientProvider).auth.currentSession != null,
-      location: state.matchedLocation,
-    ),
     routes: [
       GoRoute(
         path: AppRoutes.splash,
@@ -62,22 +56,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Pure so it can be unit-tested without a router or a session.
-///
-/// `/forgot-password` is deliberately reachable while signed in: verifying the
-/// recovery code creates a session one step before the new password is set.
-String? resolveRedirect({required bool loggedIn, required String location}) {
-  if (location == AppRoutes.splash) return null;
-
-  const authOnly = {AppRoutes.signIn, AppRoutes.signUp};
-
-  if (!loggedIn) {
-    return authOnly.contains(location) || location == AppRoutes.forgotPassword
-        ? null
-        : AppRoutes.signIn;
-  }
-  return authOnly.contains(location) ? AppRoutes.home : null;
-}
 
 /// Replaces popular_sg_mobile's `FadePageRoute` — same transition, expressed as
 /// a go_router page.

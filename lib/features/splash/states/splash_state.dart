@@ -26,6 +26,14 @@ class SplashState extends BaseState with Equatable {
   List<Object?> get props => [status, errorMessage];
 }
 
+/// The app's only session gate. The router has no `redirect`, so every decision
+/// about where a session may take the user is made here.
+///
+/// Losing a session mid-use routes back to splash, which re-runs this — that is
+/// what keeps the rule in one place instead of duplicating it in a redirect.
+String resolveStartRoute({required bool loggedIn}) =>
+    loggedIn ? AppRoutes.homeName : AppRoutes.signInName;
+
 class SplashStateNotifier extends BaseStateNotifier<SplashState> {
   late final AuthRepository _authRepository;
 
@@ -41,11 +49,11 @@ class SplashStateNotifier extends BaseStateNotifier<SplashState> {
     try {
       final user = await _authRepository.currentUser();
       showLoaded();
-      router()?.goNamed(user == null ? AppRoutes.signInName : AppRoutes.homeName);
+      router()?.goNamed(resolveStartRoute(loggedIn: user != null));
     } on Object catch (e) {
       logger.e('Splash bootstrap failed', error: e);
       showLoaded();
-      router()?.goNamed(AppRoutes.signInName);
+      router()?.goNamed(resolveStartRoute(loggedIn: false));
     }
   }
 }
