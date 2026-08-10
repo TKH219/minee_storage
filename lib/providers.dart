@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/app/router/app_router.dart';
-import 'package:mine_storage/app/router/app_routes.dart';
+import 'package:mine_storage/core/exceptions/app_error_handler.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
-import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
+import 'package:mine_storage/core/storage/user_state_purger.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
@@ -15,9 +15,23 @@ import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
 import 'package:mine_storage/.env/env.dart';
+import 'package:mine_storage/shared/ui/app_snack.dart';
 
-/// Global keys
-final snackbarKey = GlobalKey<ScaffoldMessengerState>();
+export 'package:mine_storage/shared/ui/app_snack.dart' show snackbarKey;
+
+/// Errors
+///
+/// One handler for every failure in the app, whichever stack it came from:
+/// `ErrorPolicy` decides, this executes.
+final appErrorHandlerProvider = Provider<AppErrorHandler>((ref) {
+  return AppErrorHandler(
+    purger: UserStatePurger(
+      signOut: () => ref.read(authRepositoryProvider).signOut(),
+    ),
+    showSnack: showErrorSnack,
+    redirect: (routeName) => ref.read(routerProvider).goNamed(routeName),
+  );
+});
 
 /// Supabase
 final supabaseClientProvider = Provider<SupabaseClient>(
@@ -58,12 +72,6 @@ final authorizedDioProvider = Provider<Dio>((ref) {
       AuthInterceptor(
         accessToken: () =>
             ref.read(supabaseClientProvider).auth.currentSession?.accessToken,
-      ),
-      UnauthorizedInterceptor(
-        onUnauthorized: () async {
-          await ref.read(authRepositoryProvider).signOut();
-          ref.read(routerProvider).goNamed(AppRoutes.signInName);
-        },
       ),
     ],
   );
