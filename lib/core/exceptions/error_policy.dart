@@ -1,5 +1,6 @@
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/exceptions/error_action.dart';
+import 'package:mine_storage/core/exceptions/error_codes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 
 /// The single table of what the app does about each failure.
@@ -10,35 +11,47 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 class ErrorPolicy {
   const ErrorPolicy._();
 
-  static ErrorAction resolve(AppException error) {
-    // Ordered subtype-first: SessionExpiredException is an UnauthorizedException.
-    if (error is SessionExpiredException) {
-      return const ErrorAction(
-        presentation: ErrorPresentation.snack,
-        purgesUserState: true,
-        redirectRouteName: AppRoutes.signInName,
-      );
-    }
+  static const ErrorAction _sessionEnded = ErrorAction(
+    presentation: ErrorPresentation.snack,
+    purgesUserState: true,
+    redirectRouteName: AppRoutes.signInName,
+  );
 
-    if (error is UnauthorizedException) return const ErrorAction.snack();
-    if (error is ForbiddenException) return const ErrorAction.snack();
-    if (error is BadRequestException) return const ErrorAction.inline();
-    if (error is NotFoundException) return const ErrorAction.inline();
-    if (error is NetworkException) return const ErrorAction.snack();
-    if (error is CancelledException) return const ErrorAction.silent();
-    if (error is CacheException) return const ErrorAction.silent();
+  /// The API's own code is the most specific thing the server told us, so it is
+  /// consulted before the exception type. Anything Supabase raises carries no
+  /// code and falls straight through to [_byType].
+  static ErrorAction resolve(AppException error) =>
+      _byErrorCode(error.errorCode) ?? _byType(error);
 
-    // A business code is always something the user acts on in a form; a bare
-    // server failure is not.
-    if (error is ServerException) {
-      return error.errorCode != null ? const ErrorAction.inline() : const ErrorAction.snack();
-    }
+  static ErrorAction? _byErrorCode(String? errorCode) => switch (errorCode) {
+    ServerErrorCodes.tokenExpired ||
+    ServerErrorCodes.tokenInvalid ||
+    ServerErrorCodes.unauthorised => _sessionEnded,
+
+    ServerErrorCodes.wrongEmailOrPassword ||
+    ServerErrorCodes.wrongPassword ||
+    ServerErrorCodes.userWasLocked ||
+    ServerErrorCodes.emailAlreadyExists ||
+    ServerErrorCodes.userNameAlreadyExists => const ErrorAction.inline(),
+
+    _ => null,
+  };
+
+  static ErrorAction _byType(AppException error) => switch (error) {
+    // Ordered subtype-first: SessionExpiredException is an UnauthorizedException,
+    // and the two category cases below match every leaf under them.
+    SessionExpiredException() => _sessionEnded,
+    UnauthorizedException() => const ErrorAction.snack(),
+    ForbiddenException() => const ErrorAction.snack(),
+    BadRequestException() || NotFoundException() => const ErrorAction.inline(),
+    NetworkException() => const ErrorAction.snack(),
+    CancelledException() => const ErrorAction.silent(),
 
     // Category fallbacks, so a leaf added later behaves sensibly without
     // anyone remembering to add a row above.
-    if (error is DatabaseException) return const ErrorAction.silent();
-    if (error is HttpException) return const ErrorAction.snack();
+    DatabaseException() => const ErrorAction.silent(),
+    HttpException() => const ErrorAction.snack(),
 
-    return const ErrorAction.snack();
-  }
+    _ => const ErrorAction.snack(),
+  };
 }
