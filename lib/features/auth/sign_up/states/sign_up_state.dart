@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
+import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/features/auth/widgets/otp_field.dart';
@@ -142,7 +143,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
           updateState(state.copyWith(step: SignUpStep.password, wasResumed: false));
       }
     } on Object catch (e) {
-      onError(e);
+      _handleError(e);
     }
   }
 
@@ -162,7 +163,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       showLoaded();
       updateState(state.copyWith(step: SignUpStep.code));
     } on Object catch (e) {
-      onError(e);
+      _handleError(e);
     }
   }
 
@@ -183,7 +184,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       showLoaded();
       router()?.goNamed(AppRoutes.homeName);
     } on Object catch (e) {
-      onError(e);
+      _handleError(e);
     }
   }
 
@@ -194,7 +195,28 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       showLoaded();
       showBannerSuccess(title: 'Code sent', subtitle: 'Check your inbox.');
     } on Object catch (e) {
-      onError(e);
+      _handleError(e);
+    }
+  }
+
+  /// The page renders `state.errorMessage` above the form, so anything the user
+  /// fixes there stays inline. Everything else would otherwise be invisible on
+  /// a step that has already moved on, so it snacks.
+  void _handleError(Object error) {
+    onError(error);
+
+    final exception = resolveException(error);
+    final rendersInline = switch (exception) {
+      EmailAlreadyRegisteredException() ||
+      WeakPasswordException() ||
+      InvalidCodeException() ||
+      EmailNotConfirmedException() ||
+      InvalidCredentialsException() => true,
+      _ => false,
+    };
+
+    if (!rendersInline) {
+      showSnackError(msg: exception.displayMessage);
     }
   }
 }

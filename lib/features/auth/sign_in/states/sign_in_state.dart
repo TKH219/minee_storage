@@ -77,7 +77,14 @@ class SignInStateNotifier extends BaseStateNotifier<SignInState> {
       showLoaded();
       router()?.goNamed(AppRoutes.homeName);
     } on Object catch (e) {
-      onError(e);
+      _handleError(e);
     }
+  }
+
+  /// This screen has no inline error surface, so every failure is a snack —
+  /// rejected credentials included, which is the common case here.
+  void _handleError(Object error) {
+    onError(error);
+    showSnackError(msg: resolveException(error).displayMessage);
   }
 }

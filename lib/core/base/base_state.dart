@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
-import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/app_snack.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
@@ -67,17 +66,16 @@ abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifie
     updateState(state.copyWith(status: StateLifeCycle.loaded) as T);
   }
 
-  /// Parks the message on the state, then hands the error to `AppErrorHandler`,
-  /// which owns every side effect the app takes about it.
+  /// Parks the error on the state and logs it — nothing else.
   ///
-  /// [present] suppresses the snack for this one call so a screen can render
-  /// the error itself. It cannot suppress a purge or a redirect.
-  void onError(Object error, {bool present = true}) {
+  /// How an error reaches the user is the feature's call: a notifier with an
+  /// inline surface just renders `state.errorMessage`, one without calls
+  /// [showSnackError] itself.
+  void onError(Object error) {
     final exception = resolveException(error);
     updateState(
       state.copyWith(status: StateLifeCycle.error, errorMessage: exception.displayMessage) as T,
     );
-    unawaited(ref.read(appErrorHandlerProvider).handle(exception, present: present));
     logger.e('Error: ${exception.displayMessage}', error: error);
   }
 

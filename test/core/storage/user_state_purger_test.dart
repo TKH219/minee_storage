@@ -28,15 +28,11 @@ void main() {
         });
   });
 
-  UserStatePurger purger({Future<void> Function()? signOut}) {
-    return UserStatePurger(signOut: signOut ?? () async {});
-  }
+  UserStatePurger purger() => UserStatePurger();
 
-  test('signs out, then empties secure storage', () async {
-    var signedOut = false;
-    await purger(signOut: () async => signedOut = true).purge();
+  test('empties secure storage', () async {
+    await purger().purge();
 
-    expect(signedOut, isTrue);
     expect(secureStore, isEmpty);
   });
 
@@ -63,13 +59,4 @@ void main() {
     expect(prefs.getKeys(), isEmpty);
   });
 
-  test('a failing sign-out still clears local state', () async {
-    SharedPreferences.setMockInitialValues({'cached_products': '[]'});
-
-    await purger(signOut: () async => throw Exception('network down')).purge();
-
-    final prefs = await SharedPreferences.getInstance();
-    expect(secureStore, isEmpty);
-    expect(prefs.getKeys(), isEmpty);
-  });
 }

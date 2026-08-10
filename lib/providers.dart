@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:mine_storage/app/router/app_router.dart';
-import 'package:mine_storage/core/exceptions/app_error_handler.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
+import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
@@ -20,34 +19,29 @@ import 'package:mine_storage/shared/ui/app_snack.dart';
 
 export 'package:mine_storage/shared/ui/app_snack.dart' show snackbarKey;
 
-/// Errors
-///
-/// One handler for every failure in the app, whichever stack it came from:
-/// `ErrorPolicy` decides, this executes.
-final appErrorHandlerProvider = Provider<AppErrorHandler>((ref) {
-  return AppErrorHandler(
-    purger: UserStatePurger(
-      signOut: () => ref.read(authRepositoryProvider).signOut(),
-    ),
-    showSnack: showErrorSnack,
-    redirect: (routeName) => ref.read(routerProvider).goNamed(routeName),
-  );
-});
+final userStatePurgerProvider = Provider<UserStatePurger>((ref) => UserStatePurger());
 
 /// Supabase
 final supabaseClientProvider = Provider<SupabaseClient>(
   (ref) => Supabase.instance.client,
 );
 
-/// Bridges the auth stream into the Listenable go_router wants.
+/// Bridges the auth stream into the Listenable go_router wants, and is the one
+/// place stored user state gets cleared.
+///
+/// Every way a session can end lands here — an explicit sign-out, a 401 from
+/// the REST API, or a token refresh failing in the background with nothing in
+/// flight — so the purge is written once and cannot be forgotten.
 final authStateListenableProvider = Provider<ValueNotifier<bool>>((ref) {
   final notifier = ValueNotifier<bool>(
     ref.read(supabaseClientProvider).auth.currentSession != null,
   );
-  final subscription = ref
-      .watch(authRepositoryProvider)
-      .authStateChanges
-      .listen((loggedIn) => notifier.value = loggedIn);
+  final subscription = ref.watch(authRepositoryProvider).authStateChanges.listen((loggedIn) {
+    notifier.value = loggedIn;
+    if (!loggedIn) {
+      ref.read(userStatePurgerProvider).purge();
+    }
+  });
 
   ref.onDispose(() {
     subscription.cancel();
@@ -73,6 +67,9 @@ final authorizedDioProvider = Provider<Dio>((ref) {
       AuthInterceptor(
         accessToken: () =>
             ref.read(supabaseClientProvider).auth.currentSession?.accessToken,
+      ),
+      UnauthorizedInterceptor(
+        onUnauthorized: () => ref.read(authRepositoryProvider).signOut(),
       ),
     ],
   );

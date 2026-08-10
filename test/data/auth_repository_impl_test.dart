@@ -65,7 +65,7 @@ void main() {
 
     await expectLater(
       () => repository.signIn(email: 'a@b.com', password: 'wrong'),
-      throwsA(isA<UnauthorizedException>()),
+      throwsA(isA<InvalidCredentialsException>()),
     );
   });
 
@@ -155,7 +155,7 @@ void main() {
         shopName: 'S',
         wasResumed: false,
       ),
-      throwsA(isA<BadRequestException>()),
+      throwsA(isA<InvalidCodeException>()),
     );
   });
 
@@ -176,7 +176,7 @@ void main() {
 
     await expectLater(
       () => repository.verifyPasswordResetCode(email: 'a@b.com', token: '00000000'),
-      throwsA(isA<BadRequestException>()),
+      throwsA(isA<InvalidCodeException>()),
     );
   });
 
