@@ -5,14 +5,28 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 
 void main() {
-  test('maps invalid credentials to UnauthorizedException', () {
+  test('maps invalid credentials to UnauthorizedException, not a dead session', () {
     final result = SupabaseErrorMapper.map(
       const AuthException('Invalid login credentials'),
     );
 
     expect(result, isA<UnauthorizedException>());
+    expect(result, isNot(isA<SessionExpiredException>()));
     expect(result.displayMessage, 'Incorrect email or password.');
   });
+
+  for (final message in [
+    'JWT expired',
+    'Session from session_id claim in JWT does not exist',
+    'invalid claim: missing sub claim',
+  ]) {
+    test('maps "$message" to SessionExpiredException', () {
+      expect(
+        SupabaseErrorMapper.map(AuthException(message)),
+        isA<SessionExpiredException>(),
+      );
+    });
+  }
 
   test('maps an expired or wrong code to BadRequestException', () {
     final result = SupabaseErrorMapper.map(

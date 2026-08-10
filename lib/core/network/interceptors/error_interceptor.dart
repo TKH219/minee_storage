@@ -69,7 +69,7 @@ class ErrorInterceptor extends Interceptor {
         statusCode: statusCode,
         errors: errors,
       ),
-      401 => UnauthorizedException(message: message, statusCode: statusCode),
+      401 => SessionExpiredException(message: message, statusCode: statusCode),
       403 => ForbiddenException(message: message, statusCode: statusCode),
       404 => NotFoundException(message: message, statusCode: statusCode),
       409 => ServerException(message: message, statusCode: statusCode),
@@ -107,15 +107,15 @@ class ErrorInterceptor extends Interceptor {
         message: 'Username already exists',
         errorCode: ServerErrorCodes.userNameAlreadyExists,
       ),
-      ServerErrorCodes.tokenExpired => const UnauthorizedException(
+      ServerErrorCodes.tokenExpired => const SessionExpiredException(
         message: 'Token has expired',
         errorCode: ServerErrorCodes.tokenExpired,
       ),
-      ServerErrorCodes.tokenInvalid => const UnauthorizedException(
+      ServerErrorCodes.tokenInvalid => const SessionExpiredException(
         message: 'Invalid token provided',
         errorCode: ServerErrorCodes.tokenInvalid,
       ),
-      ServerErrorCodes.unauthorised => UnauthorizedException(
+      ServerErrorCodes.unauthorised => SessionExpiredException(
         message: 'Unauthorised',
         errorCode: ServerErrorCodes.unauthorised,
         statusCode: statusCode,

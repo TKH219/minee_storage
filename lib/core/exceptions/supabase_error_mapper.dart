@@ -16,6 +16,14 @@ class SupabaseErrorMapper {
       if (message.contains('invalid login credentials')) {
         return const UnauthorizedException(message: 'Incorrect email or password.');
       }
+      // Checked before the OTP branch below: both mention expiry, but only
+      // these mean the stored session is dead rather than a typed code stale.
+      if (message.contains('jwt expired') ||
+          message.contains('session from session_id') ||
+          message.contains('missing sub claim') ||
+          message.contains('session not found')) {
+        return const SessionExpiredException();
+      }
       if (message.contains('token has expired') ||
           message.contains('invalid token') ||
           message.contains('otp') && message.contains('expired')) {
