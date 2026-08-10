@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/app/theme/theme.dart';
-import 'package:mine_storage/shared/ui/nav_metrics.dart';
 
 class AddActionButton extends StatelessWidget {
   const AddActionButton({super.key, required this.onPressed});
@@ -24,8 +24,8 @@ class AddActionButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           child: SizedBox(
-            width: kNavBarHeight,
-            height: kNavBarHeight,
+            width: NavBarMetrics.height,
+            height: NavBarMetrics.height,
             child: Icon(
               Icons.add_rounded,
               size: 30,

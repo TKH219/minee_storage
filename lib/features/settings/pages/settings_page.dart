@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/coming_soon_snack.dart';
-import 'package:mine_storage/shared/ui/nav_metrics.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -22,7 +22,7 @@ class SettingsPage extends ConsumerWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(bottom: kNavBarReservedSpace),
+          padding: const EdgeInsets.only(bottom: NavBarMetrics.reservedSpace),
           children: [
             const _AccountHeader(),
             const Divider(),

@@ -13,6 +13,8 @@ import 'package:mine_storage/providers.dart';
 
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/auth_test_harness.dart';
+
 void main() {
   late SharedPreferences preferences;
 
@@ -31,6 +33,7 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(preferences),
+          routerProvider.overrideWithValue(buildTestRouter()),
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
         ],
         child: MaterialApp.router(

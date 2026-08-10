@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/features/shell/widgets/add_action_button.dart';
 import 'package:mine_storage/features/shell/widgets/floating_nav_bar.dart';
 import 'package:mine_storage/shared/ui/coming_soon_snack.dart';
-import 'package:mine_storage/shared/ui/nav_metrics.dart';
 
 class MainShellPage extends StatelessWidget {
   const MainShellPage({super.key, required this.navigationShell});
@@ -28,9 +28,9 @@ class MainShellPage extends StatelessWidget {
           children: [
             navigationShell,
             Positioned(
-              left: kNavBarHorizontalInset,
-              right: kNavBarHorizontalInset,
-              bottom: MediaQuery.paddingOf(context).bottom + kNavBarBottomGap,
+              left: NavBarMetrics.horizontalInset,
+              right: NavBarMetrics.horizontalInset,
+              bottom: MediaQuery.paddingOf(context).bottom + NavBarMetrics.bottomGap,
               child: Row(
                 children: [
                   Expanded(
@@ -39,7 +39,7 @@ class MainShellPage extends StatelessWidget {
                       onDestinationSelected: _goToBranch,
                     ),
                   ),
-                  const SizedBox(width: kNavBarButtonGap),
+                  const SizedBox(width: NavBarMetrics.buttonGap),
                   AddActionButton(
                     onPressed: () =>
                         showComingSoonSnack(context, 'Adding items'),

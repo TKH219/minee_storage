@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
+
+import '../support/auth_test_harness.dart';
 
 void main() {
   late SharedPreferences preferences;
@@ -21,6 +24,7 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(preferences),
+          routerProvider.overrideWithValue(buildTestRouter()),
         ],
         child: MaterialApp(
           theme: AppTheme.light(),

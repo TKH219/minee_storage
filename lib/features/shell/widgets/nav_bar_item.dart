@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/app/theme/theme.dart';
-import 'package:mine_storage/shared/ui/nav_metrics.dart';
 
 class NavBarDestination {
   const NavBarDestination({
@@ -44,14 +44,14 @@ class NavBarItem extends StatelessWidget {
       label: destination.label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(kNavBarItemHeight / 2),
+        borderRadius: BorderRadius.circular(NavBarMetrics.itemHeight / 2),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
-          height: kNavBarItemHeight,
+          height: NavBarMetrics.itemHeight,
           decoration: BoxDecoration(
             color: highlight,
-            borderRadius: BorderRadius.circular(kNavBarItemHeight / 2),
+            borderRadius: BorderRadius.circular(NavBarMetrics.itemHeight / 2),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

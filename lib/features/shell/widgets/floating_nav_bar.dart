@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/features/shell/widgets/nav_bar_item.dart';
-import 'package:mine_storage/shared/ui/nav_metrics.dart';
 
 /// Tab order matches the shell branch order in `buildAppShellRoute()`.
 const List<NavBarDestination> kNavBarDestinations = [
@@ -45,10 +45,10 @@ class FloatingNavBar extends StatelessWidget {
       color: surface,
       elevation: 8,
       shadowColor: colors.black.withValues(alpha: 0.20),
-      borderRadius: BorderRadius.circular(kNavBarHeight / 2),
+      borderRadius: BorderRadius.circular(NavBarMetrics.height / 2),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
-        height: kNavBarHeight,
+        height: NavBarMetrics.height,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6),
           child: Row(
