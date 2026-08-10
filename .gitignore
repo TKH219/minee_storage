@@ -63,6 +63,7 @@ android/app/staging/release/app-staging-release.aab
 .env
 ios/Runner/keys.plist
 lib/.env
+lib/env/*/.env
 # Claude Code personal project settings (contains secrets)
 .claude/settings.local.json
 firebase_admin_sdk_service_account.json
