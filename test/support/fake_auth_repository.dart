@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
@@ -9,6 +11,7 @@ class FakeAuthRepository implements AuthRepository {
   Object? error;
 
   final List<String> calls = [];
+  final StreamController<bool> authStateController = StreamController<bool>.broadcast();
 
   void _maybeThrow() {
     if (error != null) throw error!;
@@ -87,5 +90,5 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Stream<bool> get authStateChanges => const Stream<bool>.empty();
+  Stream<bool> get authStateChanges => authStateController.stream;
 }

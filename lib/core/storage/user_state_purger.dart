@@ -2,7 +2,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mine_storage/app/theme/theme_mode_provider.dart';
-import 'package:mine_storage/shared/utils/logger.dart';
 
 /// Wipes everything belonging to the signed-in user.
 ///
@@ -12,29 +11,21 @@ import 'package:mine_storage/shared/utils/logger.dart';
 /// one account's data from surfacing under the next account on a shared device.
 class UserStatePurger {
   UserStatePurger({
-    required Future<void> Function() signOut,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     Future<SharedPreferences> Function() preferences = SharedPreferences.getInstance,
-  }) : _signOut = signOut,
-       _secureStorage = secureStorage,
+  }) : _secureStorage = secureStorage,
        _preferences = preferences;
 
   /// Device settings that outlive whoever is signed in.
   static const Set<String> keptPreferenceKeys = {ThemeModeNotifier.storageKey};
 
-  final Future<void> Function() _signOut;
   final FlutterSecureStorage _secureStorage;
   final Future<SharedPreferences> Function() _preferences;
 
+  /// Signing out triggers this rather than being part of it: the auth state
+  /// stream fires once GoTrue has already dropped the session, which is also
+  /// what covers a background token refresh failing with nothing in flight.
   Future<void> purge() async {
-    // A dead session is exactly when sign-out is most likely to fail, and
-    // local state must be cleared either way.
-    try {
-      await _signOut();
-    } on Object catch (e) {
-      logger.e('Sign-out during purge failed', error: e);
-    }
-
     await _secureStorage.deleteAll();
 
     final prefs = await _preferences();

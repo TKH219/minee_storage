@@ -103,3 +103,73 @@ class CancelledException extends AppException {
   @override
   String get displayMessage => message ?? 'Request was cancelled.';
 }
+
+/// A failure raised by Supabase rather than by the REST API.
+///
+/// Supabase reports failures as prose, never as an error code, so these are the
+/// codes: the mapper turns each recognised message into one leaf, and features
+/// switch on the type instead of matching strings. Deliberately not an
+/// [HttpException] — nothing here carries a status code worth reasoning about.
+abstract class SupabaseException extends AppException {
+  const SupabaseException({super.message});
+}
+
+class InvalidCredentialsException extends SupabaseException {
+  const InvalidCredentialsException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'Incorrect email or password.';
+}
+
+class InvalidCodeException extends SupabaseException {
+  const InvalidCodeException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'That code is invalid or has expired.';
+}
+
+class EmailAlreadyRegisteredException extends SupabaseException {
+  const EmailAlreadyRegisteredException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'That email is already registered.';
+}
+
+class WeakPasswordException extends SupabaseException {
+  const WeakPasswordException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'Password must be at least 6 characters.';
+}
+
+class RateLimitedException extends SupabaseException {
+  const RateLimitedException({super.message});
+
+  @override
+  String get displayMessage =>
+      message ?? 'Too many emails sent. Please wait a minute and try again.';
+}
+
+class EmailNotConfirmedException extends SupabaseException {
+  const EmailNotConfirmedException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'Please confirm your email first.';
+}
+
+/// The stored session is gone. The purge is driven by the auth state stream,
+/// not by anyone catching this — it exists so a feature can word its own
+/// message when a call fails for this reason.
+class SupabaseSessionExpiredException extends SupabaseException {
+  const SupabaseSessionExpiredException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'Your session has expired. Please sign in again.';
+}
+
+class UnknownSupabaseException extends SupabaseException {
+  const UnknownSupabaseException({super.message});
+
+  @override
+  String get displayMessage => message ?? 'Something went wrong. Please try again.';
+}
