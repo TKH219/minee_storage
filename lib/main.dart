@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mine_storage/app.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/storage/secure_local_storage.dart';
-import 'package:mine_storage/env/env.dart';
+import 'package:mine_storage/.env/env.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
