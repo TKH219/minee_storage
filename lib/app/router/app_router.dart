@@ -5,7 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:mine_storage/features/auth/forgot_password/pages/forgot_password_page.dart';
 import 'package:mine_storage/features/auth/sign_in/pages/sign_in_page.dart';
 import 'package:mine_storage/features/auth/sign_up/pages/sign_up_page.dart';
+import 'package:mine_storage/features/dashboard/pages/dashboard_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
+import 'package:mine_storage/features/products/pages/product_list_page.dart';
+import 'package:mine_storage/features/reports/pages/reports_page.dart';
+import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
+import 'package:mine_storage/features/shell/pages/main_shell_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
@@ -47,6 +52,40 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.home,
         name: AppRoutes.homeName,
         pageBuilder: (context, state) => _fadePage(state, const HomePage()),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShellPage(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.dashboard,
+              name: AppRoutes.dashboardName,
+              builder: (context, state) => const DashboardPage(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.products,
+              name: AppRoutes.productsName,
+              builder: (context, state) => const ProductListPage(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.sales,
+              name: AppRoutes.salesName,
+              builder: (context, state) => const SalesListPage(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.reports,
+              name: AppRoutes.reportsName,
+              builder: (context, state) => const ReportsPage(),
+            ),
+          ]),
+        ],
       ),
     ],
     errorBuilder: (context, state) {
