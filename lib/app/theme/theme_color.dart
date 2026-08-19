@@ -33,12 +33,23 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
     required this.green5,
     required this.red0,
     required this.red5,
+    required this.orange0,
     required this.orange5,
+    required this.orange6,
     required this.blue5,
+    required this.fillPrimary,
+    required this.onPrimary,
+    required this.inkPrimary,
+    required this.tintPrimary,
+    required this.highlight,
+    required this.barSurface,
+    required this.scrim,
+    required this.shimmer,
+    required this.elevation,
   });
 
   factory ColorThemeExt.light() {
-    return const ColorThemeExt(
+    return ColorThemeExt(
       brightness: Brightness.light,
       white: AppColors.white,
       black: AppColors.black,
@@ -63,13 +74,27 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
       green5: AppColors.green5Light,
       red0: AppColors.red0Light,
       red5: AppColors.red5Light,
+      orange0: AppColors.orange0Light,
       orange5: AppColors.orange5Light,
+      orange6: AppColors.orange6Light,
       blue5: AppColors.blue5Light,
+      fillPrimary: AppColors.primary1Light,
+      onPrimary: AppColors.neutral9Light,
+      inkPrimary: AppColors.primary4Light,
+      tintPrimary: AppColors.primary0Light,
+      highlight: AppColors.primary1Light,
+      barSurface: AppColors.neutral0Light,
+      scrim: Color(0x6B1F2328),
+      shimmer: Color(0x9EFFFFFF),
+      elevation: const [
+        BoxShadow(color: Color(0x141F2328), offset: Offset(0, 2), blurRadius: 6),
+        BoxShadow(color: Color(0x241F2328), offset: Offset(0, 10), blurRadius: 28),
+      ],
     );
   }
 
   factory ColorThemeExt.dark() {
-    return const ColorThemeExt(
+    return ColorThemeExt(
       brightness: Brightness.dark,
       white: AppColors.white,
       black: AppColors.black,
@@ -94,8 +119,22 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
       green5: AppColors.green5Dark,
       red0: AppColors.red0Dark,
       red5: AppColors.red5Dark,
+      orange0: AppColors.orange0Dark,
       orange5: AppColors.orange5Dark,
+      orange6: AppColors.orange6Dark,
       blue5: AppColors.blue5Dark,
+      fillPrimary: AppColors.primary4Dark,
+      onPrimary: AppColors.neutral0Dark,
+      inkPrimary: AppColors.primary4Dark,
+      tintPrimary: AppColors.primary1Dark,
+      highlight: AppColors.primary1Dark,
+      barSurface: AppColors.neutral2Dark,
+      scrim: Color(0x99000000),
+      shimmer: Color(0x1AFFFFFF),
+      elevation: const [
+        BoxShadow(color: Color(0x80000000), offset: Offset(0, 2), blurRadius: 6),
+        BoxShadow(color: Color(0x99000000), offset: Offset(0, 10), blurRadius: 28),
+      ],
     );
   }
 
@@ -103,14 +142,12 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
 
   final Color white;
   final Color black;
-
   final Color primary0;
   final Color primary1;
   final Color primary2;
   final Color primary3;
   final Color primary4;
   final Color primary5;
-
   final Color neutral0;
   final Color neutral1;
   final Color neutral2;
@@ -121,16 +158,27 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
   final Color neutral7;
   final Color neutral8;
   final Color neutral9;
-
   final Color green0;
   final Color green1;
   final Color green5;
-
   final Color red0;
   final Color red5;
-
+  final Color orange0;
   final Color orange5;
+  final Color orange6;
   final Color blue5;
+  final Color fillPrimary;
+  final Color onPrimary;
+  final Color inkPrimary;
+  final Color tintPrimary;
+  final Color highlight;
+  final Color barSurface;
+  final Color scrim;
+  final Color shimmer;
+
+  /// The design's two-layer lift, used by the navigation bar's centre action
+  /// and every raised surface.
+  final List<BoxShadow> elevation;
 
   bool get isDark => brightness == Brightness.dark;
 
@@ -160,8 +208,19 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
     Color? green5,
     Color? red0,
     Color? red5,
+    Color? orange0,
     Color? orange5,
+    Color? orange6,
     Color? blue5,
+    Color? fillPrimary,
+    Color? onPrimary,
+    Color? inkPrimary,
+    Color? tintPrimary,
+    Color? highlight,
+    Color? barSurface,
+    Color? scrim,
+    Color? shimmer,
+    List<BoxShadow>? elevation,
   }) {
     return ColorThemeExt(
       brightness: brightness ?? this.brightness,
@@ -188,8 +247,19 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
       green5: green5 ?? this.green5,
       red0: red0 ?? this.red0,
       red5: red5 ?? this.red5,
+      orange0: orange0 ?? this.orange0,
       orange5: orange5 ?? this.orange5,
+      orange6: orange6 ?? this.orange6,
       blue5: blue5 ?? this.blue5,
+      fillPrimary: fillPrimary ?? this.fillPrimary,
+      onPrimary: onPrimary ?? this.onPrimary,
+      inkPrimary: inkPrimary ?? this.inkPrimary,
+      tintPrimary: tintPrimary ?? this.tintPrimary,
+      highlight: highlight ?? this.highlight,
+      barSurface: barSurface ?? this.barSurface,
+      scrim: scrim ?? this.scrim,
+      shimmer: shimmer ?? this.shimmer,
+      elevation: elevation ?? this.elevation,
     );
   }
 
@@ -221,8 +291,19 @@ class ColorThemeExt extends ThemeExtension<ColorThemeExt> {
       green5: Color.lerp(green5, other.green5, t)!,
       red0: Color.lerp(red0, other.red0, t)!,
       red5: Color.lerp(red5, other.red5, t)!,
+      orange0: Color.lerp(orange0, other.orange0, t)!,
       orange5: Color.lerp(orange5, other.orange5, t)!,
+      orange6: Color.lerp(orange6, other.orange6, t)!,
       blue5: Color.lerp(blue5, other.blue5, t)!,
+      fillPrimary: Color.lerp(fillPrimary, other.fillPrimary, t)!,
+      onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
+      inkPrimary: Color.lerp(inkPrimary, other.inkPrimary, t)!,
+      tintPrimary: Color.lerp(tintPrimary, other.tintPrimary, t)!,
+      highlight: Color.lerp(highlight, other.highlight, t)!,
+      barSurface: Color.lerp(barSurface, other.barSurface, t)!,
+      scrim: Color.lerp(scrim, other.scrim, t)!,
+      shimmer: Color.lerp(shimmer, other.shimmer, t)!,
+      elevation: BoxShadow.lerpList(elevation, other.elevation, t)!,
     );
   }
 }
