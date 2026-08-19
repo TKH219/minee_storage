@@ -62,15 +62,17 @@ class AppNavBar extends StatelessWidget {
             children: [
               for (var slot = 0; slot < destinations.length + 1; slot++)
                 Expanded(
-                  child: slot == _actionSlot
-                      ? Center(child: NewSaleAction(onTap: onNewSale))
-                      : Center(
-                          child: NavBarItem(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    heightFactor: 1,
+                    child: slot == _actionSlot
+                        ? NewSaleAction(onTap: onNewSale)
+                        : NavBarItem(
                             destination: destinations[_branchFor(slot)],
                             selected: currentIndex == _branchFor(slot),
                             onTap: () => onTap(_branchFor(slot)),
                           ),
-                        ),
+                  ),
                 ),
             ],
           ),
