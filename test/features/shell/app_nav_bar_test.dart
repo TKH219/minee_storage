@@ -97,4 +97,18 @@ void main() {
     expect(decoration.color, const Color(0xFF1E252E));
     expect(decoration.border!.top.color, const Color(0xFF2A313C));
   });
+
+  testWidgets('items are top-aligned 9px into the bar, not centred in it', (tester) async {
+    await tester.pumpWidget(host(navBar()));
+    final barTop = tester.getTopLeft(find.byType(AppNavBar)).dy;
+    final iconTop = tester.getTopLeft(find.byIcon(Icons.inventory_2_outlined)).dy;
+    expect(iconTop - barTop, closeTo(9, 0.5));
+  });
+
+  testWidgets('the bar leaves room below the labels for the home indicator', (tester) async {
+    await tester.pumpWidget(host(navBar()));
+    final barBottom = tester.getBottomLeft(find.byType(AppNavBar)).dy;
+    final labelBottom = tester.getBottomLeft(find.text('Products')).dy;
+    expect(barBottom - labelBottom, greaterThan(20));
+  });
 }
