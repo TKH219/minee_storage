@@ -9,21 +9,22 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 
-  /// Primary — indigo/teal blend chosen as a neutral placeholder brand.
-  /// Swap these eight values for the real brand and the whole app follows.
-  static const Color primary0Light = Color(0xFFEEF2FF);
-  static const Color primary1Light = Color(0xFFDCE3FD);
-  static const Color primary2Light = Color(0xFFA9B8F8);
-  static const Color primary3Light = Color(0xFF6C82E8);
-  static const Color primary4Light = Color(0xFF4356C9);
-  static const Color primary5Light = Color(0xFF2E3C96);
+  /// Primary — the cyan system. `primary1` (#D4F5FC) is 91% light, so it is a
+  /// fill carrying dark ink; `primary4` is the derived deep cyan that carries
+  /// text, links and icons. The roles invert in dark.
+  static const Color primary0Light = Color(0xFFF0FFFF);
+  static const Color primary1Light = Color(0xFFD4F5FC);
+  static const Color primary2Light = Color(0xFFB1EDFF);
+  static const Color primary3Light = Color(0xFF87CEFA);
+  static const Color primary4Light = Color(0xFF0F72B0);
+  static const Color primary5Light = Color(0xFF08506F);
 
-  static const Color primary0Dark = Color(0xFF1A1E33);
-  static const Color primary1Dark = Color(0xFF232A47);
-  static const Color primary2Dark = Color(0xFF3A4478);
-  static const Color primary3Dark = Color(0xFF7185E8);
-  static const Color primary4Dark = Color(0xFF8E9EF2);
-  static const Color primary5Dark = Color(0xFFB9C3F8);
+  static const Color primary0Dark = Color(0xFF0C2A33);
+  static const Color primary1Dark = Color(0xFF0E3A47);
+  static const Color primary2Dark = Color(0xFF16505F);
+  static const Color primary3Dark = Color(0xFF4FB4DC);
+  static const Color primary4Dark = Color(0xFF7FDDF2);
+  static const Color primary5Dark = Color(0xFFD4F5FC);
 
   /// Neutral — 0 is the furthest from the text colour (surface), 9 the closest
   /// (primary text). The dark ramp inverts that relationship.
@@ -66,8 +67,13 @@ class AppColors {
   static const Color red5Dark = Color(0xFFF2705C);
 
   /// Warning
+  static const Color orange0Light = Color(0xFFFFF3E4);
   static const Color orange5Light = Color(0xFFB45C06);
+  static const Color orange6Light = Color(0xFFA85506);
+
+  static const Color orange0Dark = Color(0xFF3A2A14);
   static const Color orange5Dark = Color(0xFFE8944A);
+  static const Color orange6Dark = Color(0xFFE8944A);
 
   /// Info
   static const Color blue5Light = Color(0xFF1D6AE0);
