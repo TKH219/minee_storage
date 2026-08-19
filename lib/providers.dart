@@ -14,6 +14,11 @@ import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
+import 'package:mine_storage/data/mock/mock_database.dart';
+import 'package:mine_storage/data/repositories/mock_product_repository_impl.dart';
+import 'package:mine_storage/data/repositories/mock_store_repository_impl.dart';
+import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
 import 'package:mine_storage/.env/env.dart';
@@ -98,4 +103,16 @@ final authRepositoryProvider = Provider<AuthRepository>(
 
 final postRepositoryProvider = Provider<PostRepository>(
   (ref) => PostRepositoryImpl(postApi: ref.watch(postApiProvider)),
+);
+
+/// Mock data layer. The Supabase spec replaces only these three bindings —
+/// nothing above the repository interfaces changes.
+final mockDatabaseProvider = Provider<MockDatabase>((ref) => MockDatabase());
+
+final productRepositoryProvider = Provider<ProductRepository>(
+  (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
+);
+
+final storeRepositoryProvider = Provider<StoreRepository>(
+  (ref) => MockStoreRepositoryImpl(ref.watch(mockDatabaseProvider)),
 );
