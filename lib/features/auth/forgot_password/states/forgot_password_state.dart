@@ -6,7 +6,7 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
-import 'package:mine_storage/features/auth/widgets/otp_field.dart';
+import 'package:mine_storage/shared/ui/otp_field.dart';
 import 'package:mine_storage/providers.dart';
 
 enum ResetStep { email, code, newPassword }

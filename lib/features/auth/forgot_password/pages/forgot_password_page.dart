@@ -5,7 +5,7 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/forgot_password/states/forgot_password_state.dart';
-import 'package:mine_storage/features/auth/widgets/otp_field.dart';
+import 'package:mine_storage/shared/ui/otp_field.dart';
 
 class ForgotPasswordPage extends BasePage {
   const ForgotPasswordPage({super.key});
