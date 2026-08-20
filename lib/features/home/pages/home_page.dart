@@ -11,6 +11,7 @@ import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 /// Reference screen for the architecture: Retrofit → model → repository →
 /// entity → notifier → page, covering loading, error, empty and loaded.
@@ -61,11 +62,11 @@ class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifie
   Widget buildPageContent(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mine Storage'),
+        title: Text(LocaleKeys.home_title.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),
-            tooltip: 'Sign out',
+            tooltip: LocaleKeys.home_signOut.tr(),
             onPressed: () async {
               await ref.read(authRepositoryProvider).signOut();
               if (context.mounted) {
@@ -87,16 +88,16 @@ class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifie
 
     if (currentState.showFullScreenError) {
       return ErrorAwareContainer(
-        message: currentState.errorMessage ?? currentState.errorMessageKey?.tr() ?? 'Unable to load items.',
+        message: currentState.errorMessage ?? currentState.errorMessageKey?.tr() ?? LocaleKeys.home_loadFailed.tr(),
         onRetry: notifier.loadInitial,
       );
     }
 
     if (currentState.isEmpty) {
       return EmptyView(
-        title: 'No items yet',
-        subtitle: 'Items you add will show up here.',
-        actionLabel: 'Reload',
+        title: LocaleKeys.home_emptyTitle.tr(),
+        subtitle: LocaleKeys.home_emptySubtitle.tr(),
+        actionLabel: LocaleKeys.home_reload.tr(),
         onAction: notifier.loadInitial,
       );
     }

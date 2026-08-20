@@ -114,5 +114,32 @@
     "emailNotConfirmed": "Please confirm your email first.",
     "unknownNetwork": "An unknown network error occurred.",
     "unknown": "An unknown error occurred: {error}"
+  },
+  "dashboard": {
+    "emptyTitle": "No stock yet",
+    "emptySubtitle": "Add your first product, then record what you bought and what it cost. Your numbers start the moment you make a sale."
+  },
+  "products": {
+    "title": "Products",
+    "emptyTitle": "Your shelves are empty",
+    "emptySubtitle": "Add your first product, or scan a barcode to start counting what you hold."
+  },
+  "sales": {
+    "title": "Sales",
+    "emptyTitle": "No sales yet",
+    "emptySubtitle": "Sales you record will appear here, newest first."
+  },
+  "reports": {
+    "title": "Reports",
+    "emptyTitle": "Nothing to report yet",
+    "emptySubtitle": "Once you've recorded a few purchases and used some stock, your movement and spend summaries will show up here."
+  },
+  "home": {
+    "title": "Mine Storage",
+    "signOut": "Sign out",
+    "loadFailed": "Unable to load items.",
+    "emptyTitle": "No items yet",
+    "emptySubtitle": "Items you add will show up here.",
+    "reload": "Reload"
   }
 }
