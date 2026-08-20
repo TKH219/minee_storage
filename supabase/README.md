@@ -64,7 +64,7 @@ None of these are done, and all are required before production auth works:
 
 - **No SMTP configured.** Without it, no confirmation or recovery email is sent.
 - **Both email templates are still the default, link-based ones.** They must be
-  converted to `{{ .Token }}` so the 8-digit code is delivered instead of a link.
+  converted to `{{ .Token }}` so the 6-digit code is delivered instead of a link.
 - **Migrations are not applied.** Both files above must be run against
   `otwasmlfyvytvjbdflpg`.
 - **`ANON_KEY` in `lib/env/production/.env` is still a placeholder.** Both env
@@ -73,6 +73,18 @@ None of these are done, and all are required before production auth works:
 - **`API_URL` must point at the Supabase project.** `Supabase.initialize` reads
   `Env.apiUrl`, so the committed value has to be
   `https://<project-ref>.supabase.co` for the environment being built.
+- **`mailer_otp_length` is still 8 on production.** The project is paused
+  (`status: INACTIVE`) and the Management API rejects config writes against it.
+  Resume the project, then set it to 6 — see below.
 
-OTP length is 8 in both projects (`mailer_otp_length = 8`); minimum password
-length is 6 (`password_min_length`).
+OTP length is 6, which is what `OtpField.codeLength` renders; a project left at
+the old 8 issues codes the field silently truncates, so every verification
+fails. Staging is already set. Minimum password length is 6
+(`password_min_length`).
+
+```bash
+curl -s -X PATCH "https://api.supabase.com/v1/projects/<project-ref>/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"mailer_otp_length": 6}'
+```

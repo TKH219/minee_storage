@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
 
-/// Both projects report `mailer_otp_length = 8`; a shorter field silently
+/// Both projects report `mailer_otp_length = 6`; a shorter field silently
 /// truncates and every verification fails.
 ///
-/// The eight boxes are decoration over a single offstage [TextField], so the
+/// The six boxes are decoration over a single offstage [TextField], so the
 /// platform keyboard, paste and autofill all behave normally.
 class OtpField extends StatefulWidget {
   const OtpField({
@@ -16,7 +16,7 @@ class OtpField extends StatefulWidget {
     this.hasError = false,
   });
 
-  static const int codeLength = 8;
+  static const int codeLength = 6;
 
   final ValueChanged<String> onChanged;
   final ValueChanged<String>? onSubmitted;

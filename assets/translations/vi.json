@@ -46,7 +46,7 @@
       "step3of3": "BƯỚC 3/3",
       "enterYourCode": "Nhập mã của bạn",
       "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự.",
-      "enterCode": "Nhập mã 8 số trong email của bạn.",
+      "enterCode": "Nhập mã 6 số trong email của bạn.",
       "codeSentTitle": "Đã gửi mã",
       "codeSentSubtitle": "Kiểm tra hộp thư của bạn.",
       "didntGetIt": "Chưa nhận được? ",
@@ -85,7 +85,7 @@
       "confirmPassword": "Xác nhận mật khẩu",
       "invalidEmailOrShop": "Nhập email hợp lệ và tên cửa hàng của bạn.",
       "emailRegistered": "Email này đã được đăng ký. Hãy đăng nhập.",
-      "credentialsHint": "Chúng tôi sẽ gửi mã 8 số tới email để bạn xác nhận.",
+      "credentialsHint": "Chúng tôi sẽ gửi mã 6 số tới email để bạn xác nhận.",
       "passwordHint": "Bạn sẽ dùng mật khẩu này với {email} để đăng nhập."
     },
     "forgot": {

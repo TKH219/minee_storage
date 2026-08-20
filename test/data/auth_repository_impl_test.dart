@@ -122,7 +122,7 @@ void main() {
 
     final user = await repository.confirmSignUp(
       email: 'a@b.com',
-      token: '12345678',
+      token: '123456',
       shopName: 'Original',
       wasResumed: false,
     );
@@ -137,7 +137,7 @@ void main() {
 
     final user = await repository.confirmSignUp(
       email: 'a@b.com',
-      token: '12345678',
+      token: '123456',
       shopName: 'New Name',
       wasResumed: true,
     );

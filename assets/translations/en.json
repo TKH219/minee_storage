@@ -46,7 +46,7 @@
       "step3of3": "STEP 3 OF 3",
       "enterYourCode": "Enter your code",
       "passwordTooShort": "Password must be at least 6 characters.",
-      "enterCode": "Enter the 8-digit code from your email.",
+      "enterCode": "Enter the 6-digit code from your email.",
       "codeSentTitle": "Code sent",
       "codeSentSubtitle": "Check your inbox.",
       "didntGetIt": "Didn't get it? ",
@@ -85,7 +85,7 @@
       "confirmPassword": "Confirm password",
       "invalidEmailOrShop": "Enter a valid email and your shop name.",
       "emailRegistered": "That email is already registered. Sign in instead.",
-      "credentialsHint": "We'll email you an 8-digit code to confirm it.",
+      "credentialsHint": "We'll email you a 6-digit code to confirm it.",
       "passwordHint": "You'll use this with {email} to sign in."
     },
     "forgot": {
