@@ -175,7 +175,10 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
       // setNewPassword signs out; the user re-authenticates with the new one.
       router()?.goNamed(
         AppRoutes.signInName,
-        queryParameters: {'email': state.email.trim().toLowerCase()},
+        queryParameters: {
+          'email': state.email.trim().toLowerCase(),
+          'reset': 'true',
+        },
       );
     } on Object catch (e) {
       _handleError(e);

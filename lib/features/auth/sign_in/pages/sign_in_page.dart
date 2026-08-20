@@ -11,9 +11,10 @@ import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
 
 class SignInPage extends BasePage {
-  const SignInPage({super.key, this.prefilledEmail});
+  const SignInPage({super.key, this.prefilledEmail, this.passwordWasReset = false});
 
   final String? prefilledEmail;
+  final bool passwordWasReset;
 
   @override
   ConsumerState<SignInPage> createState() => _SignInPageState();
@@ -73,6 +74,13 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
                 'Sign in to pick up where your stock left off.',
                 style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
               ),
+              if (widget.passwordWasReset && !showBanner) ...[
+                const SizedBox(height: 20),
+                const AuthErrorBanner(
+                  message: 'Password updated. Sign in with your new one.',
+                  tone: AuthBannerTone.success,
+                ),
+              ],
               if (showBanner && placement == AuthErrorPlacement.aboveEmail) ...[
                 const SizedBox(height: 20),
                 AuthErrorBanner(message: message),

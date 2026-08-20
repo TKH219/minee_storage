@@ -18,6 +18,7 @@ Widget host(
   SharedPreferences prefs, {
   Object? error,
   Duration delay = Duration.zero,
+  bool passwordWasReset = false,
   Brightness brightness = Brightness.light,
 }) {
   return ProviderScope(
@@ -28,7 +29,7 @@ Widget host(
     ],
     child: MaterialApp(
       theme: brightness == Brightness.light ? AppTheme.light() : AppTheme.dark(),
-      home: const SignInPage(),
+      home: SignInPage(passwordWasReset: passwordWasReset),
     ),
   );
 }
@@ -125,5 +126,14 @@ void main() {
     expect(tester.getSize(find.byType(FilledButton)), restingSize);
 
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('returning from a reset shows a success banner, not an error', (tester) async {
+    await tester.pumpWidget(host(prefs, passwordWasReset: true));
+    await tester.pump();
+
+    expect(find.text('Password updated. Sign in with your new one.'), findsOneWidget);
+    final banner = tester.widget<AuthErrorBanner>(find.byType(AuthErrorBanner));
+    expect(banner.tone, AuthBannerTone.success);
   });
 }
