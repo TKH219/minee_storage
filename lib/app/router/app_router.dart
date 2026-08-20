@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,7 @@ import 'package:mine_storage/features/splash/pages/splash_page.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 import 'app_routes.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 /// Held globally so non-widget code (interceptors) can navigate.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -92,7 +94,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
     errorBuilder: (context, state) {
-      logger.e('Unknown route: ${state.uri}', error: state.error);
+      logger.e(LocaleKeys.router_unknownRoute.tr(namedArgs: {'uri': '${state.uri}'}), error: state.error);
       return const _RouteNotFoundPage();
     },
   );
@@ -122,11 +124,11 @@ class _RouteNotFoundPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Page not found'),
+            Text(LocaleKeys.router_pageNotFound.tr()),
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => context.goNamed(AppRoutes.homeName),
-              child: const Text('Go home'),
+              child: Text(LocaleKeys.router_goHome.tr()),
             ),
           ],
         ),

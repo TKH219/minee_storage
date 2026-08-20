@@ -4,6 +4,8 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/lot.dart';
 import 'package:mine_storage/shared/ui/lot_card.dart';
 
+import '../../support/localization_test_harness.dart';
+
 final lotOne = Lot(
   id: 'l1',
   productId: 'milk',
@@ -20,6 +22,8 @@ Widget host(Widget child) => MaterialApp(
     );
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('lot total is price times initial, computed not stored', (tester) async {
     await tester.pumpWidget(host(LotCard(lot: lotOne, today: DateTime(2026, 8, 20))));
     expect(find.text(r'$13.20'), findsOneWidget);
