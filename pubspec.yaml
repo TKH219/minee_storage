@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
-
   # State management
   #
   # Riverpod stays on 2.x: BaseStateNotifier extends AutoDisposeNotifier, which
@@ -30,7 +28,6 @@ dependencies:
   supabase_flutter: ^2.14.2
 
   # Serialization
-  freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
 
   # Storage
@@ -43,7 +40,6 @@ dependencies:
   # UI
   flutter_svg: ^2.1.0
   lottie: ^3.1.3
-  cached_network_image: ^3.4.1
 
   # Localization
   easy_localization: ^3.0.8
@@ -52,14 +48,12 @@ dependencies:
   equatable: ^2.0.7
   intl: ^0.20.2
   logger: ^2.5.0
-  package_info_plus: ^8.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   build_runner: ^2.9.0
-  freezed: ^3.2.5
   json_serializable: ^6.14.1
   retrofit_generator: ^10.2.8
   envied_generator: ^1.3.8
