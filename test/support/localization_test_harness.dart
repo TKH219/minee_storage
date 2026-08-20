@@ -1,41 +1,42 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'dart:convert';
+import 'dart:io';
+
+// ignore: implementation_imports
+import 'package:easy_localization/src/localization.dart';
+// ignore: implementation_imports
+import 'package:easy_localization/src/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-/// Call from `setUpAll`. [EasyLocalization.ensureInitialized] reads any saved
-/// locale through SharedPreferences, which has no plugin implementation under
-/// flutter_test, so the mock has to be in place before it runs.
-Future<void> initLocalization() async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.setMockInitialValues({});
-  await EasyLocalization.ensureInitialized();
+const Locale enLocale = Locale('en');
+const Locale viLocale = Locale('vi');
+
+/// Installs a locale's real translation file into easy_localization's
+/// singleton, which is what `String.tr()` reads.
+///
+/// Deliberately does not use the `EasyLocalization` widget: that loads
+/// translations through `rootBundle`, and `pumpAndSettle` only advances a fake
+/// clock, so the asset future never completes for any test after the first one
+/// in a file. Reading the file off disk keeps it synchronous and leaves no
+/// state to leak between tests.
+void useLocale([Locale locale = enLocale]) {
+  final raw = File('assets/translations/${locale.languageCode}.json').readAsStringSync();
+  Localization.load(
+    locale,
+    translations: Translations(jsonDecode(raw) as Map<String, dynamic>),
+  );
 }
 
-/// `saveLocale: false` keeps a test from writing the real preference key, so a
-/// Vietnamese test can never leak into the next test's default.
-Widget localized(Widget child, {Locale locale = const Locale('en')}) {
-  return EasyLocalization(
-    supportedLocales: const [Locale('en'), Locale('vi')],
-    path: 'assets/translations',
-    fallbackLocale: const Locale('en'),
-    startLocale: locale,
-    saveLocale: false,
-    child: Builder(
-      builder: (context) => MaterialApp(
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        home: child,
-      ),
-    ),
-  );
+/// Wraps [child] in a bare `MaterialApp` with a locale already installed.
+Widget localized(Widget child, {Locale locale = enLocale}) {
+  useLocale(locale);
+  return MaterialApp(home: child);
 }
 
 Future<void> pumpLocalized(
   WidgetTester tester,
   Widget child, {
-  Locale locale = const Locale('en'),
+  Locale locale = enLocale,
 }) async {
   await tester.pumpWidget(localized(child, locale: locale));
   await tester.pumpAndSettle();

@@ -1,5 +1,13 @@
 {
   "common": {
     "tryAgain": "Try again"
+  },
+  "shell": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "sales": "Sales",
+    "reports": "Reports",
+    "settings": "Settings",
+    "newSale": "New sale"
   }
 }
