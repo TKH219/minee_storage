@@ -4,11 +4,19 @@ import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
 class FakeAuthRepository implements AuthRepository {
-  FakeAuthRepository({this.user, this.emailStatus = EmailStatus.none, this.error});
+  FakeAuthRepository({
+    this.user,
+    this.emailStatus = EmailStatus.none,
+    this.error,
+    this.delay = Duration.zero,
+  });
 
   UserEntity? user;
   EmailStatus emailStatus;
   Object? error;
+
+  /// Held so widget tests can observe an in-flight state.
+  Duration delay;
 
   final List<String> calls = [];
   final StreamController<bool> authStateController = StreamController<bool>.broadcast();
@@ -55,6 +63,7 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<UserEntity> signIn({required String email, required String password}) async {
     calls.add('signIn:$email');
+    if (delay > Duration.zero) await Future<void>.delayed(delay);
     _maybeThrow();
     return user ?? UserEntity(id: 'uid-1', email: email, shopName: 'S');
   }
