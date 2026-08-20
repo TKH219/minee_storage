@@ -99,6 +99,7 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
                 label: LocaleKeys.auth_common_password.tr(),
                 hint: LocaleKeys.auth_signIn_passwordHint.tr(),
                 obscureText: currentState.obscurePassword,
+                onToggleObscure: notifier.togglePasswordVisibility,
                 onChanged: notifier.updatePassword,
               ),
               if (showBanner && placement == AuthErrorPlacement.belowPassword) ...[

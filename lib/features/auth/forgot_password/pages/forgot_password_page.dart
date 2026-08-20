@@ -152,6 +152,7 @@ class _ForgotPasswordPageState
             label: LocaleKeys.auth_forgot_newPassword.tr(),
             helperText: LocaleKeys.auth_common_minChars.tr(),
             obscureText: currentState.obscurePassword,
+            onToggleObscure: notifier.togglePasswordVisibility,
             onChanged: notifier.updatePassword,
           ),
           const SizedBox(height: 16),
@@ -159,6 +160,7 @@ class _ForgotPasswordPageState
             label: LocaleKeys.auth_forgot_confirmNewPassword.tr(),
             errorText: currentState.confirmPasswordErrorKey?.tr(),
             obscureText: currentState.obscurePassword,
+            onToggleObscure: notifier.togglePasswordVisibility,
             onChanged: notifier.updateConfirmPassword,
           ),
         ];
