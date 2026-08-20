@@ -12,18 +12,33 @@ void main() {
     expect(statusOn(null, hasStock: false), ExpiryStatus.none);
   });
 
-  test('stock with no tracked expiry is healthy, not none', () {
-    expect(statusOn(null), ExpiryStatus.healthy);
+  test('stock with no tracked expiry is ok, not none', () {
+    expect(statusOn(null), ExpiryStatus.ok);
   });
 
-  test('day 30 is still expiring soon, day 31 is healthy', () {
-    expect(statusOn(today.add(const Duration(days: 30))), ExpiryStatus.expiringSoon);
-    expect(statusOn(today.add(const Duration(days: 31))), ExpiryStatus.healthy);
+  test('critical is within seven days, inclusive of day 7', () {
+    expect(statusOn(today.add(const Duration(days: 3))), ExpiryStatus.critical);
+    expect(statusOn(today.add(const Duration(days: 7))), ExpiryStatus.critical);
+    expect(statusOn(today.add(const Duration(days: 8))), ExpiryStatus.warning);
+  });
+
+  test('warning runs to day 30, ok begins at day 31', () {
+    expect(statusOn(today.add(const Duration(days: 9))), ExpiryStatus.warning);
+    expect(statusOn(today.add(const Duration(days: 30))), ExpiryStatus.warning);
+    expect(statusOn(today.add(const Duration(days: 31))), ExpiryStatus.ok);
   });
 
   test('today counts as expired, tomorrow does not', () {
     expect(statusOn(today), ExpiryStatus.expired);
     expect(statusOn(today.subtract(const Duration(days: 1))), ExpiryStatus.expired);
-    expect(statusOn(today.add(const Duration(days: 1))), ExpiryStatus.expiringSoon);
+    expect(statusOn(today.add(const Duration(days: 1))), ExpiryStatus.critical);
+  });
+
+  test('the Expiring soon chip covers both warning and critical', () {
+    expect(ExpiryStatus.critical.isExpiringSoon, isTrue);
+    expect(ExpiryStatus.warning.isExpiringSoon, isTrue);
+    expect(ExpiryStatus.ok.isExpiringSoon, isFalse);
+    expect(ExpiryStatus.expired.isExpiringSoon, isFalse);
+    expect(ExpiryStatus.none.isExpiringSoon, isFalse);
   });
 }
