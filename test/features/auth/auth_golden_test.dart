@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget host(Widget child, SharedPreferences prefs, {Object? error, required ThemeMode mode}) {
   return ProviderScope(
     overrides: [
@@ -29,6 +31,8 @@ Widget host(Widget child, SharedPreferences prefs, {Object? error, required Them
 }
 
 void main() {
+  setUp(useLocale);
+
   late SharedPreferences prefs;
 
   setUp(() async {

@@ -6,6 +6,8 @@ import 'package:mine_storage/domain/entities/product.dart';
 import 'package:mine_storage/shared/ui/expiry_badge.dart';
 import 'package:mine_storage/shared/ui/product_row.dart';
 
+import '../../support/localization_test_harness.dart';
+
 final today = DateTime(2026, 8, 20);
 
 final milk = Product(
@@ -28,6 +30,8 @@ Widget host(Widget child) => MaterialApp(
     );
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('row answers the four questions at a glance', (tester) async {
     await tester.pumpWidget(host(ProductRow(product: milk, today: today)));
     expect(find.text('Whole Milk 1L'), findsOneWidget);

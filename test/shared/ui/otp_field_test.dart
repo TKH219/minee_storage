@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget host(Widget child) => MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: SizedBox(width: 358, child: child)),
@@ -19,6 +21,8 @@ BoxDecoration boxAt(WidgetTester tester, int index) {
 }
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('renders eight boxes at 54 tall with a 10 radius', (tester) async {
     await tester.pumpWidget(host(OtpField(onChanged: (_) {})));
     for (var i = 0; i < 8; i++) {

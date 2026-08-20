@@ -2,7 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/data/mock/mock_database.dart';
 import 'package:mine_storage/data/repositories/mock_product_repository_impl.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   late MockProductRepositoryImpl repo;
 
   setUp(() {

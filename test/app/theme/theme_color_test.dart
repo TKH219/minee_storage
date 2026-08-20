@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/theme_color.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('light role tokens match the design', () {
     final c = ColorThemeExt.light();
     expect(c.fillPrimary, const Color(0xFFD4F5FC));

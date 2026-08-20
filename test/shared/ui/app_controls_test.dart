@@ -5,6 +5,8 @@ import 'package:mine_storage/shared/ui/app_buttons.dart';
 import 'package:mine_storage/shared/ui/app_filter_chip.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
       theme: brightness == Brightness.light ? AppTheme.light() : AppTheme.dark(),
       home: Scaffold(body: Center(child: child)),
@@ -18,6 +20,8 @@ BoxDecoration chipDecoration(WidgetTester tester) {
 }
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('chip is 34 tall with a 17 radius', (tester) async {
     await tester.pumpWidget(host(const AppFilterChip(label: 'All', selected: false)));
     expect(tester.getSize(find.byType(AppFilterChip)).height, 34);

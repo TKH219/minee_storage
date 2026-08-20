@@ -10,7 +10,12 @@ import 'package:mine_storage/providers.dart';
 import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
+
 void main() {
+  setUp(useLocale);
+
   ({ProviderContainer container, FakeAuthRepository repository, GoRouter router}) build({
     EmailStatus status = EmailStatus.confirmed,
   }) {
@@ -46,7 +51,7 @@ void main() {
 
     final state = t.container.read(forgotPasswordStateProvider);
     expect(state.step, ResetStep.email);
-    expect(state.errorMessage, 'No account found for that email.');
+    expect(state.errorMessageKey, LocaleKeys.auth_forgot_noAccount);
     expect(
       t.repository.calls.where((c) => c.startsWith('startPasswordReset')),
       isEmpty,

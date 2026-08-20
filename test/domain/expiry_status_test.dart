@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/domain/entities/expiry_status.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   final today = DateTime(2026, 8, 20);
 
   ExpiryStatus statusOn(DateTime? expiry, {bool hasStock = true}) =>

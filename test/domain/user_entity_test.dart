@@ -2,7 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/domain/entities/entities.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('builds from a users row', () {
     final user = UserEntity.fromRow({
       'id': 'uid-1',

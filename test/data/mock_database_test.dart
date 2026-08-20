@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/data/mock/mock_database.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   late MockDatabase db;
 
   setUp(() => db = MockDatabase(today: DateTime(2026, 8, 20)));

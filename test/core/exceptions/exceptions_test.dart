@@ -2,7 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   // The `List<AppException>` annotation is the assertion: this list only
   // compiles while every exception still descends from AppException.
   const allExceptions = <AppException>[
@@ -19,7 +23,7 @@ void main() {
 
   test('every exception offers a non-empty message for the UI', () {
     for (final exception in allExceptions) {
-      expect(exception.displayMessage, isNotEmpty, reason: '$exception');
+      expect(exception.messageKey, isNotEmpty, reason: '$exception');
     }
   });
 
@@ -78,6 +82,12 @@ void main() {
     const exception = ServerException(message: 'Boom', statusCode: 503);
 
     expect(exception.statusCode, 503);
-    expect(exception.displayMessage, 'Boom');
+    expect(exception.message, 'Boom');
+  });
+
+  test('exceptions expose a translation key, not English prose', () {
+    expect(const InvalidCredentialsException().messageKey, 'errors.invalidCredentials');
+    expect(const NetworkException().messageKey, 'errors.network');
+    expect(const UnknownSupabaseException().messageKey, 'errors.generic');
   });
 }

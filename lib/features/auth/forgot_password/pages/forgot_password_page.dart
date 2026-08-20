@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,7 @@ import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/forgot_password/states/forgot_password_state.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class ForgotPasswordPage extends BasePage {
   const ForgotPasswordPage({super.key});
@@ -61,10 +63,10 @@ class _ForgotPasswordPageState
               ),
               const SizedBox(height: 32),
               ..._stepFields(),
-              if (currentState.isError && currentState.errorMessage != null) ...[
+              if (currentState.isError && currentState.errorMessageKey != null) ...[
                 const SizedBox(height: 16),
                 Text(
-                  currentState.errorMessage!,
+                  currentState.errorMessage ?? currentState.errorMessageKey!.tr(),
                   style: context.textStyles.sansBody.copyWith(color: context.colors.red5),
                 ),
               ],
@@ -74,7 +76,7 @@ class _ForgotPasswordPageState
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: currentState.isLoading ? null : notifier.resendCode,
-                  child: const Text('Resend code'),
+                  child: Text(LocaleKeys.auth_common_resendCode.tr()),
                 ),
               ],
             ],
@@ -85,27 +87,27 @@ class _ForgotPasswordPageState
   }
 
   String get _eyebrow => switch (currentState.step) {
-    ResetStep.email => 'STEP 1 OF 3',
-    ResetStep.code => 'STEP 2 OF 3',
-    ResetStep.newPassword => 'STEP 3 OF 3',
+    ResetStep.email => LocaleKeys.auth_common_step1of3.tr(),
+    ResetStep.code => LocaleKeys.auth_common_step2of3.tr(),
+    ResetStep.newPassword => LocaleKeys.auth_common_step3of3.tr(),
   };
 
   String get _title => switch (currentState.step) {
-    ResetStep.email => 'Reset your password',
-    ResetStep.code => 'Enter your code',
-    ResetStep.newPassword => 'Set a new password',
+    ResetStep.email => LocaleKeys.auth_forgot_title.tr(),
+    ResetStep.code => LocaleKeys.auth_common_enterYourCode.tr(),
+    ResetStep.newPassword => LocaleKeys.auth_forgot_newPasswordTitle.tr(),
   };
 
   String get _subtitle => switch (currentState.step) {
-    ResetStep.email => "Enter the address on your account and we'll send a code.",
-    ResetStep.code => 'Sent to ${currentState.email}. It expires in 10 minutes.',
-    ResetStep.newPassword => "You'll be signed out and asked to sign in with it.",
+    ResetStep.email => LocaleKeys.auth_forgot_emailHint.tr(),
+    ResetStep.code => LocaleKeys.auth_common_sentTo.tr(namedArgs: {'email': currentState.email}),
+    ResetStep.newPassword => LocaleKeys.auth_forgot_newPasswordHint.tr(),
   };
 
   String get _buttonLabel => switch (currentState.step) {
-    ResetStep.email => 'Send code',
-    ResetStep.code => 'Verify code',
-    ResetStep.newPassword => 'Save password',
+    ResetStep.email => LocaleKeys.auth_forgot_sendCode.tr(),
+    ResetStep.code => LocaleKeys.auth_forgot_verifyCode.tr(),
+    ResetStep.newPassword => LocaleKeys.auth_forgot_savePassword.tr(),
   };
 
   bool get _canSubmit => switch (currentState.step) {
@@ -130,7 +132,7 @@ class _ForgotPasswordPageState
       case ResetStep.email:
         return [
           AppTextField(
-            label: 'Email',
+            label: LocaleKeys.auth_common_email.tr(),
             hint: 'you@shop.com',
             keyboardType: TextInputType.emailAddress,
             onChanged: notifier.updateEmail,
@@ -147,15 +149,15 @@ class _ForgotPasswordPageState
       case ResetStep.newPassword:
         return [
           AppTextField(
-            label: 'New password',
-            helperText: 'At least 6 characters.',
+            label: LocaleKeys.auth_forgot_newPassword.tr(),
+            helperText: LocaleKeys.auth_common_minChars.tr(),
             obscureText: currentState.obscurePassword,
             onChanged: notifier.updatePassword,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Confirm new password',
-            errorText: currentState.confirmPasswordError,
+            label: LocaleKeys.auth_forgot_confirmNewPassword.tr(),
+            errorText: currentState.confirmPasswordErrorKey?.tr(),
             obscureText: currentState.obscurePassword,
             onChanged: notifier.updateConfirmPassword,
           ),

@@ -7,6 +7,8 @@ import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
 import '../support/fake_auth_data_source.dart';
 
+import '../support/localization_test_harness.dart';
+
 Map<String, dynamic> row({bool deactivated = false, String shop = 'Minee'}) => {
   'id': 'uid-1',
   'email': 'a@b.com',
@@ -16,6 +18,8 @@ Map<String, dynamic> row({bool deactivated = false, String shop = 'Minee'}) => {
 };
 
 void main() {
+  setUp(useLocale);
+
   test('signIn returns the user and stamps last_signed_in_at', () async {
     final source = FakeAuthDataSource(row: row());
     final repository = AuthRepositoryImpl(source);
@@ -36,8 +40,8 @@ void main() {
       () => repository.signIn(email: 'a@b.com', password: 'secret'),
       throwsA(
         isA<ForbiddenException>().having(
-          (e) => e.displayMessage,
-          'displayMessage',
+          (e) => e.message,
+          'message',
           'This account has been deactivated. Contact support to get it reopened.',
         ),
       ),

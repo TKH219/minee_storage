@@ -1,3 +1,4 @@
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 /// Base type for every error this app raises out of the data layer.
 ///
 /// [ErrorInterceptor] converts any `DioException` into one of these, so state
@@ -10,7 +11,7 @@ abstract class AppException implements Exception {
   final int? statusCode;
 
   /// Message safe to surface in the UI.
-  String get displayMessage => message ?? 'Something went wrong. Please try again.';
+  String get messageKey => LocaleKeys.errors_generic;
 
   @override
   String toString() => '$runtimeType: ${statusCode ?? ''} ${message ?? ''}'.trim();
@@ -32,14 +33,14 @@ class ServerException extends HttpException {
   const ServerException({super.message, super.statusCode, super.errorCode});
 
   @override
-  String get displayMessage => message ?? 'An unexpected server error occurred.';
+  String get messageKey => LocaleKeys.errors_server;
 }
 
 class CacheException extends DatabaseException {
   const CacheException({super.message});
 
   @override
-  String get displayMessage => message ?? 'An unexpected cache error occurred.';
+  String get messageKey => LocaleKeys.errors_cache;
 }
 
 /// The request never got an answer — no connectivity, a timeout, a dead host.
@@ -47,14 +48,14 @@ class NetworkException extends AppException {
   const NetworkException({super.message});
 
   @override
-  String get displayMessage => message ?? 'No internet connection. Please check your network.';
+  String get messageKey => LocaleKeys.errors_network;
 }
 
 class NotFoundException extends HttpException {
   const NotFoundException({super.message, super.statusCode});
 
   @override
-  String get displayMessage => message ?? 'Resource not found.';
+  String get messageKey => LocaleKeys.errors_notFound;
 }
 
 class BadRequestException extends HttpException {
@@ -64,7 +65,7 @@ class BadRequestException extends HttpException {
   final Map<String, dynamic>? errors;
 
   @override
-  String get displayMessage => message ?? 'Bad request.';
+  String get messageKey => LocaleKeys.errors_badRequest;
 
   @override
   String toString() =>
@@ -76,7 +77,7 @@ class UnauthorizedException extends HttpException {
   const UnauthorizedException({super.message, super.errorCode, super.statusCode});
 
   @override
-  String get displayMessage => message ?? 'Those credentials were not accepted.';
+  String get messageKey => LocaleKeys.errors_unauthorized;
 }
 
 /// The session itself is gone, as opposed to credentials being rejected at
@@ -87,21 +88,21 @@ class SessionExpiredException extends UnauthorizedException {
   const SessionExpiredException({super.message, super.errorCode, super.statusCode});
 
   @override
-  String get displayMessage => message ?? 'Your session has expired. Please sign in again.';
+  String get messageKey => LocaleKeys.errors_sessionExpired;
 }
 
 class ForbiddenException extends HttpException {
   const ForbiddenException({super.message, super.statusCode});
 
   @override
-  String get displayMessage => message ?? 'You do not have access to this resource.';
+  String get messageKey => LocaleKeys.errors_forbidden;
 }
 
 class CancelledException extends AppException {
   const CancelledException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Request was cancelled.';
+  String get messageKey => LocaleKeys.errors_cancelled;
 }
 
 /// A failure raised by Supabase rather than by the REST API.
@@ -118,43 +119,42 @@ class InvalidCredentialsException extends SupabaseException {
   const InvalidCredentialsException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Incorrect email or password.';
+  String get messageKey => LocaleKeys.errors_invalidCredentials;
 }
 
 class InvalidCodeException extends SupabaseException {
   const InvalidCodeException({super.message});
 
   @override
-  String get displayMessage => message ?? 'That code is invalid or has expired.';
+  String get messageKey => LocaleKeys.errors_invalidCode;
 }
 
 class EmailAlreadyRegisteredException extends SupabaseException {
   const EmailAlreadyRegisteredException({super.message});
 
   @override
-  String get displayMessage => message ?? 'That email is already registered.';
+  String get messageKey => LocaleKeys.errors_emailAlreadyRegistered;
 }
 
 class WeakPasswordException extends SupabaseException {
   const WeakPasswordException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Password must be at least 6 characters.';
+  String get messageKey => LocaleKeys.errors_weakPassword;
 }
 
 class RateLimitedException extends SupabaseException {
   const RateLimitedException({super.message});
 
   @override
-  String get displayMessage =>
-      message ?? 'Too many emails sent. Please wait a minute and try again.';
+  String get messageKey => LocaleKeys.errors_rateLimited;
 }
 
 class EmailNotConfirmedException extends SupabaseException {
   const EmailNotConfirmedException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Please confirm your email first.';
+  String get messageKey => LocaleKeys.errors_emailNotConfirmed;
 }
 
 /// The stored session is gone. The purge is driven by the auth state stream,
@@ -164,12 +164,12 @@ class SupabaseSessionExpiredException extends SupabaseException {
   const SupabaseSessionExpiredException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Your session has expired. Please sign in again.';
+  String get messageKey => LocaleKeys.errors_sessionExpired;
 }
 
 class UnknownSupabaseException extends SupabaseException {
   const UnknownSupabaseException({super.message});
 
   @override
-  String get displayMessage => message ?? 'Something went wrong. Please try again.';
+  String get messageKey => LocaleKeys.errors_generic;
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,7 @@ import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/sign_up/states/sign_up_state.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class SignUpPage extends BasePage {
   const SignUpPage({super.key});
@@ -68,18 +70,17 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Text(
-                    'Your password is already set, so we skipped that step. '
-                    'The shop name you just entered replaces the old one.',
+                    LocaleKeys.auth_signUp_resumedNotice.tr(),
                     style: context.textStyles.sansCaption.copyWith(color: context.colors.neutral7),
                   ),
                 ),
               ],
               const SizedBox(height: 32),
               ..._stepFields(context),
-              if (currentState.isError && currentState.errorMessage != null) ...[
+              if (currentState.isError && currentState.errorMessageKey != null) ...[
                 const SizedBox(height: 16),
                 Text(
-                  currentState.errorMessage!,
+                  currentState.errorMessage ?? currentState.errorMessageKey!.tr(),
                   style: context.textStyles.sansBody.copyWith(color: context.colors.red5),
                 ),
               ],
@@ -89,8 +90,8 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                 const SizedBox(height: 12),
                 _footer(
                   context,
-                  prompt: 'Already have an account? ',
-                  action: 'Sign in',
+                  prompt: LocaleKeys.auth_signUp_haveAccount.tr(),
+                  action: LocaleKeys.auth_signUp_signIn.tr(),
                   onTap: () => notifier.router()?.goNamed(AppRoutes.signInName),
                 ),
               ],
@@ -98,8 +99,8 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                 const SizedBox(height: 12),
                 _footer(
                   context,
-                  prompt: "Didn't get it? ",
-                  action: 'Resend code',
+                  prompt: LocaleKeys.auth_common_didntGetIt.tr(),
+                  action: LocaleKeys.auth_common_resendCode.tr(),
                   onTap: currentState.isLoading ? null : notifier.resendCode,
                 ),
               ],
@@ -112,40 +113,40 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
 
   /// A resumed signup skips the password step entirely, so it counts two.
   String get _eyebrow {
-    if (currentState.wasResumed) return 'STEP 2 OF 2 · RESUMED';
+    if (currentState.wasResumed) return LocaleKeys.auth_signUp_step2of2Resumed.tr();
     return switch (currentState.step) {
-      SignUpStep.credentials => 'STEP 1 OF 3',
-      SignUpStep.password => 'STEP 2 OF 3',
-      SignUpStep.code => 'STEP 3 OF 3',
+      SignUpStep.credentials => LocaleKeys.auth_common_step1of3.tr(),
+      SignUpStep.password => LocaleKeys.auth_common_step2of3.tr(),
+      SignUpStep.code => LocaleKeys.auth_common_step3of3.tr(),
     };
   }
 
   String get _title {
     if (currentState.wasResumed && currentState.step == SignUpStep.code) {
-      return 'Finish signing up';
+      return LocaleKeys.auth_signUp_finishSigningUp.tr();
     }
     return switch (currentState.step) {
-      SignUpStep.credentials => 'Create your account',
-      SignUpStep.password => 'Choose a password',
-      SignUpStep.code => 'Enter your code',
+      SignUpStep.credentials => LocaleKeys.auth_signUp_title.tr(),
+      SignUpStep.password => LocaleKeys.auth_signUp_choosePassword.tr(),
+      SignUpStep.code => LocaleKeys.auth_common_enterYourCode.tr(),
     };
   }
 
   String get _subtitle {
     if (currentState.wasResumed && currentState.step == SignUpStep.code) {
-      return 'You started this before. Enter the new code we just sent.';
+      return LocaleKeys.auth_signUp_resumedHint.tr();
     }
     return switch (currentState.step) {
-      SignUpStep.credentials => "We'll email you an 8-digit code to confirm it.",
-      SignUpStep.password => "You'll use this with ${currentState.email} to sign in.",
-      SignUpStep.code => 'Sent to ${currentState.email}. It expires in 10 minutes.',
+      SignUpStep.credentials => LocaleKeys.auth_signUp_credentialsHint.tr(),
+      SignUpStep.password => LocaleKeys.auth_signUp_passwordHint.tr(namedArgs: {'email': currentState.email}),
+      SignUpStep.code => LocaleKeys.auth_common_sentTo.tr(namedArgs: {'email': currentState.email}),
     };
   }
 
   String get _buttonLabel => switch (currentState.step) {
-    SignUpStep.credentials => 'Continue',
-    SignUpStep.password => 'Create account',
-    SignUpStep.code => 'Confirm account',
+    SignUpStep.credentials => LocaleKeys.auth_signUp_continueLabel.tr(),
+    SignUpStep.password => LocaleKeys.auth_signUp_createAccount.tr(),
+    SignUpStep.code => LocaleKeys.auth_signUp_confirmAccount.tr(),
   };
 
   bool get _canSubmit => switch (currentState.step) {
@@ -191,30 +192,30 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
       case SignUpStep.credentials:
         return [
           AppTextField(
-            label: 'Email',
+            label: LocaleKeys.auth_common_email.tr(),
             hint: 'you@shop.com',
             keyboardType: TextInputType.emailAddress,
             onChanged: notifier.updateEmail,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Shop name',
-            hint: 'Northside Grocers',
-            helperText: 'Shown on your account. You can change it later.',
+            label: LocaleKeys.auth_signUp_shopName.tr(),
+            hint: LocaleKeys.auth_signUp_shopNameHint.tr(),
+            helperText: LocaleKeys.auth_signUp_shopNameHelp.tr(),
             onChanged: notifier.updateShopName,
           ),
         ];
       case SignUpStep.password:
         return [
           AppTextField(
-            label: 'Password',
-            helperText: 'At least 6 characters.',
+            label: LocaleKeys.auth_common_password.tr(),
+            helperText: LocaleKeys.auth_common_minChars.tr(),
             obscureText: currentState.obscurePassword,
             onChanged: notifier.updatePassword,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Confirm password',
+            label: LocaleKeys.auth_signUp_confirmPassword.tr(),
             obscureText: currentState.obscurePassword,
             onChanged: notifier.updatePassword,
           ),
