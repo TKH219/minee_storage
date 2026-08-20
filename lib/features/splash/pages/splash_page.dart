@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/splash/states/splash_state.dart';
+import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 
 class SplashPage extends BasePage {
   const SplashPage({super.key});
@@ -31,24 +32,31 @@ class _SplashPageState extends BasePageState<SplashPage, SplashState, SplashStat
 
   @override
   Widget buildPageContent(BuildContext context) {
+    final colors = context.colors;
+
     return Scaffold(
-      backgroundColor: context.colors.primary4,
+      backgroundColor: colors.neutral0,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.inventory_2_rounded,
-              size: 72,
-              color: context.colors.isDark ? context.colors.neutral0 : context.colors.white,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Mine Storage',
-              style: context.textStyles.sansTitleHeading2.copyWith(
-                color: context.colors.isDark ? context.colors.neutral0 : context.colors.white,
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: colors.tintPrimary,
+                borderRadius: BorderRadius.circular(11.8),
               ),
+              child: Icon(Icons.inventory_2_rounded, size: 30, color: colors.primary4),
             ),
+            const SizedBox(height: 16),
+            Text('Mine Storage', style: context.textStyles.sansTitleHeading2),
+            Text(
+              'Know what you hold.',
+              style: context.textStyles.sansBody.copyWith(color: colors.neutral6),
+            ),
+            const SizedBox(height: 24),
+            const LottieAnimation(name: 'spinner', size: 48),
           ],
         ),
       ),
