@@ -108,5 +108,27 @@ abstract class  LocaleKeys {
   static const errors_unknownNetwork = 'errors.unknownNetwork';
   static const errors_unknown = 'errors.unknown';
   static const errors = 'errors';
+  static const dashboard_emptyTitle = 'dashboard.emptyTitle';
+  static const dashboard_emptySubtitle = 'dashboard.emptySubtitle';
+  static const dashboard = 'dashboard';
+  static const products_title = 'products.title';
+  static const products_emptyTitle = 'products.emptyTitle';
+  static const products_emptySubtitle = 'products.emptySubtitle';
+  static const products = 'products';
+  static const sales_title = 'sales.title';
+  static const sales_emptyTitle = 'sales.emptyTitle';
+  static const sales_emptySubtitle = 'sales.emptySubtitle';
+  static const sales = 'sales';
+  static const reports_title = 'reports.title';
+  static const reports_emptyTitle = 'reports.emptyTitle';
+  static const reports_emptySubtitle = 'reports.emptySubtitle';
+  static const reports = 'reports';
+  static const home_title = 'home.title';
+  static const home_signOut = 'home.signOut';
+  static const home_loadFailed = 'home.loadFailed';
+  static const home_emptyTitle = 'home.emptyTitle';
+  static const home_emptySubtitle = 'home.emptySubtitle';
+  static const home_reload = 'home.reload';
+  static const home = 'home';
 
 }

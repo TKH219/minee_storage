@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class ProductListPage extends StatelessWidget {
   const ProductListPage({super.key});
@@ -10,11 +12,11 @@ class ProductListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.neutral1,
-      appBar: AppBar(title: const Text('Products')),
-      body: const EmptyView(
+      appBar: AppBar(title: Text(LocaleKeys.products_title.tr())),
+      body: EmptyView(
         icon: Icons.inventory_2_outlined,
-        title: 'Your shelves are empty',
-        subtitle: 'Add your first product, or scan a barcode to start counting what you hold.',
+        title: LocaleKeys.products_emptyTitle.tr(),
+        subtitle: LocaleKeys.products_emptySubtitle.tr(),
       ),
     );
   }

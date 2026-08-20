@@ -114,5 +114,32 @@
     "emailNotConfirmed": "Vui lòng xác nhận email của bạn trước.",
     "unknownNetwork": "Lỗi mạng không xác định.",
     "unknown": "Lỗi không xác định: {error}"
+  },
+  "dashboard": {
+    "emptyTitle": "Chưa có hàng",
+    "emptySubtitle": "Thêm sản phẩm đầu tiên, rồi ghi lại bạn đã mua gì và giá bao nhiêu. Số liệu bắt đầu chạy ngay khi bạn bán đơn đầu tiên."
+  },
+  "products": {
+    "title": "Sản phẩm",
+    "emptyTitle": "Kệ hàng của bạn đang trống",
+    "emptySubtitle": "Thêm sản phẩm đầu tiên, hoặc quét mã vạch để bắt đầu đếm hàng bạn đang có."
+  },
+  "sales": {
+    "title": "Bán hàng",
+    "emptyTitle": "Chưa có đơn nào",
+    "emptySubtitle": "Đơn bạn ghi lại sẽ hiện ở đây, mới nhất trước."
+  },
+  "reports": {
+    "title": "Báo cáo",
+    "emptyTitle": "Chưa có gì để báo cáo",
+    "emptySubtitle": "Khi bạn đã ghi vài lần nhập hàng và dùng bớt tồn kho, tổng hợp xuất nhập và chi tiêu của bạn sẽ hiện ở đây."
+  },
+  "home": {
+    "title": "Mine Storage",
+    "signOut": "Đăng xuất",
+    "loadFailed": "Không tải được danh sách.",
+    "emptyTitle": "Chưa có mục nào",
+    "emptySubtitle": "Mục bạn thêm sẽ hiện ở đây.",
+    "reload": "Tải lại"
   }
 }
