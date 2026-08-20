@@ -63,7 +63,7 @@ dev_dependencies:
   # only line compatible with riverpod 2) pins analyzer 7, while the code
   # generators above require analyzer 8+. Re-add both if this project ever
   # migrates to riverpod 3.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
   # Launcher icons are generated, not hand-cut. Regenerate with:
   #   dart run flutter_launcher_icons

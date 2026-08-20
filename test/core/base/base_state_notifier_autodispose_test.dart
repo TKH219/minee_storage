@@ -57,7 +57,7 @@ void main() {
   test('a BaseStateNotifier provider is disposed once its last listener goes', () async {
     final container = buildContainer();
 
-    final sub = container.listen(_autoDisposeProbeProvider.notifier, (_, __) {});
+    final sub = container.listen(_autoDisposeProbeProvider.notifier, (_, _) {});
     final before = sub.read();
     sub.close();
 
@@ -74,7 +74,7 @@ void main() {
   test('a keep-alive provider retains its notifier across listeners', () async {
     final container = buildContainer();
 
-    final sub = container.listen(_keepAliveProbeProvider.notifier, (_, __) {});
+    final sub = container.listen(_keepAliveProbeProvider.notifier, (_, _) {});
     final before = sub.read();
     sub.close();
 
