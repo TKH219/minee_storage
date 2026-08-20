@@ -51,7 +51,7 @@ void main() {
 
     expect(find.text('STEP 1 OF 3'), findsOneWidget);
     expect(find.text('Create your account'), findsOneWidget);
-    expect(find.text("We'll email you an 8-digit code to confirm it."), findsOneWidget);
+    expect(find.text("We'll email you a 6-digit code to confirm it."), findsOneWidget);
     expect(find.text('Shown on your account. You can change it later.'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
     expect(find.text('Sign in'), findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
     expect(tester.widgetList<TextField>(find.byType(TextField)).any((f) => f.obscureText), isFalse);
   });
 
-  testWidgets('step 3 shows eight boxes and holds Confirm until all are filled', (tester) async {
+  testWidgets('step 3 shows six boxes and holds Confirm until all are filled', (tester) async {
     await tester.pumpWidget(host(prefs));
     await tester.pump();
     notifier
@@ -111,7 +111,7 @@ void main() {
     final button = tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button.onPressed, isNull);
 
-    notifier.updateCode('41927301');
+    notifier.updateCode('419273');
     await tester.pump();
     expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNotNull);
   });
@@ -122,14 +122,14 @@ void main() {
     notifier
       ..updateEmail('maya@northsidegrocers.com')
       ..goToStep(SignUpStep.code)
-      ..updateCode('41927301');
+      ..updateCode('419273');
     await tester.pump();
 
     notifier.rejectCode('That code is wrong or has expired. Request a new one.');
     await tester.pump();
     expect(find.text('That code is wrong or has expired. Request a new one.'), findsOneWidget);
 
-    notifier.updateCode('4192730');
+    notifier.updateCode('41927');
     await tester.pump();
     expect(find.text('That code is wrong or has expired. Request a new one.'), findsNothing);
   });

@@ -107,14 +107,14 @@ void main() {
     notifier.updatePassword('secret1');
     await notifier.submitPassword();
 
-    notifier.updateCode('12345678');
+    notifier.updateCode('123456');
     await notifier.submitCode();
 
-    expect(t.repository.calls, contains('confirmSignUp:12345678:resumed=false'));
+    expect(t.repository.calls, contains('confirmSignUp:123456:resumed=false'));
     expect(currentPath(t.router), '/home');
   });
 
-  test('the code step rejects anything other than eight digits', () async {
+  test('the code step rejects anything other than six digits', () async {
     final t = build();
     final notifier = t.container.read(signUpStateProvider.notifier)
       ..updateEmail('a@b.com')

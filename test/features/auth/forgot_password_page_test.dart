@@ -55,7 +55,7 @@ void main() {
     expect(find.text('Send code'), findsOneWidget);
   });
 
-  testWidgets('step 2 verifies an eight-digit code', (tester) async {
+  testWidgets('step 2 verifies a six-digit code', (tester) async {
     await tester.pumpWidget(host(prefs));
     await tester.pump();
     notifier

@@ -23,17 +23,18 @@ BoxDecoration boxAt(WidgetTester tester, int index) {
 void main() {
   setUp(useLocale);
 
-  testWidgets('renders eight boxes at 54 tall with a 10 radius', (tester) async {
+  testWidgets('renders six boxes at 54 tall with a 10 radius', (tester) async {
     await tester.pumpWidget(host(OtpField(onChanged: (_) {})));
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 6; i++) {
       expect(find.byKey(Key('otp-box-$i')), findsOneWidget);
     }
     expect(tester.getSize(find.byKey(const Key('otp-box-0'))).height, 54);
     expect(boxAt(tester, 0).borderRadius, BorderRadius.circular(10));
+    expect(find.byKey(const Key('otp-box-6')), findsNothing);
   });
 
-  testWidgets('code length stays eight', (tester) async {
-    expect(OtpField.codeLength, 8);
+  testWidgets('code length matches the mailer, which sends six', (tester) async {
+    expect(OtpField.codeLength, 6);
   });
 
   testWidgets('typing reports the code and fills boxes left to right', (tester) async {
@@ -61,5 +62,13 @@ void main() {
     await tester.enterText(find.byType(EditableText), '12ab34');
     await tester.pump();
     expect(seen, '1234');
+  });
+
+  testWidgets('a seventh digit cannot be typed', (tester) async {
+    String? seen;
+    await tester.pumpWidget(host(OtpField(onChanged: (v) => seen = v)));
+    await tester.enterText(find.byType(EditableText), '4192730');
+    await tester.pump();
+    expect(seen, '419273');
   });
 }

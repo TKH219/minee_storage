@@ -64,14 +64,14 @@ void main() {
       ..updateEmail('a@b.com');
     await notifier.submitEmail();
 
-    notifier.updateCode('12345678');
+    notifier.updateCode('123456');
     await notifier.submitCode();
 
     expect(
       t.container.read(forgotPasswordStateProvider).step,
       ResetStep.newPassword,
     );
-    expect(t.repository.calls, contains('verifyPasswordResetCode:12345678'));
+    expect(t.repository.calls, contains('verifyPasswordResetCode:123456'));
   });
 
   test('setting the password returns to sign-in with the email prefilled', () async {
@@ -79,7 +79,7 @@ void main() {
     final notifier = t.container.read(forgotPasswordStateProvider.notifier)
       ..updateEmail('a@b.com');
     await notifier.submitEmail();
-    notifier.updateCode('12345678');
+    notifier.updateCode('123456');
     await notifier.submitCode();
 
     notifier
@@ -96,7 +96,7 @@ void main() {
     final notifier = t.container.read(forgotPasswordStateProvider.notifier)
       ..updateEmail('a@b.com');
     await notifier.submitEmail();
-    notifier.updateCode('12345678');
+    notifier.updateCode('123456');
     await notifier.submitCode();
 
     notifier.updatePassword('12345');
