@@ -42,7 +42,7 @@ abstract class BaseState {
   BaseState copyWith({StateLifeCycle? status, String? errorMessageKey, String? errorMessage});
 }
 
-abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifier<T> {
+abstract class BaseStateNotifier<T extends BaseState> extends Notifier<T> {
   GoRouter? _router;
 
   /// Navigation entry point for notifiers. Prefer this over reaching for a
