@@ -17,7 +17,11 @@ import 'package:mine_storage/shared/ui/error_aware_container.dart';
 import '../support/auth_test_harness.dart';
 import '../support/fake_auth_repository.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   late SharedPreferences preferences;
 
   setUp(() async {

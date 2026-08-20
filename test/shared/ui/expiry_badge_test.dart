@@ -4,6 +4,8 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/expiry_status.dart';
 import 'package:mine_storage/shared/ui/expiry_badge.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
       theme: brightness == Brightness.light ? AppTheme.light() : AppTheme.dark(),
       home: Scaffold(body: Center(child: child)),
@@ -17,6 +19,8 @@ BoxDecoration decorationOf(WidgetTester tester) {
 }
 
 void main() {
+  setUp(useLocale);
+
   final today = DateTime(2026, 8, 20);
 
   testWidgets('expiring soon uses the orange tint pair', (tester) async {

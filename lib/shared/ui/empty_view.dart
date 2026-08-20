@@ -1,18 +1,20 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class EmptyView extends StatelessWidget {
   const EmptyView({
     super.key,
-    this.title = 'Nothing here yet',
+    this.title,
     this.subtitle,
     this.icon = Icons.inbox_rounded,
     this.onAction,
     this.actionLabel,
   });
 
-  final String title;
+  final String? title;
   final String? subtitle;
   final IconData icon;
   final VoidCallback? onAction;
@@ -29,7 +31,7 @@ class EmptyView extends StatelessWidget {
             Icon(icon, size: 56, color: context.colors.neutral4),
             const SizedBox(height: 16),
             Text(
-              title,
+              title ?? LocaleKeys.common_nothingHereYet.tr(),
               textAlign: TextAlign.center,
               style: context.textStyles.sansBodyBold,
             ),

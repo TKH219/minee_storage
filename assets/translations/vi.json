@@ -1,6 +1,8 @@
 {
   "common": {
-    "tryAgain": "Thử lại"
+    "tryAgain": "Thử lại",
+    "somethingWentWrong": "Đã xảy ra lỗi",
+    "nothingHereYet": "Chưa có gì ở đây"
   },
   "shell": {
     "dashboard": "Tổng quan",
@@ -9,5 +11,21 @@
     "reports": "Báo cáo",
     "settings": "Cài đặt",
     "newSale": "Đơn mới"
+  },
+  "router": {
+    "pageNotFound": "Không tìm thấy trang",
+    "goHome": "Về trang chính",
+    "unknownRoute": "Không rõ đường dẫn: {uri}"
+  },
+  "stock": {
+    "archived": "Lưu trữ",
+    "notTracked": "Không theo dõi",
+    "noStock": "Hết hàng",
+    "expiredOn": "{date} · đã hết hạn",
+    "nextOut": "XUẤT TRƯỚC",
+    "purchased": "Ngày mua",
+    "unitPrice": "Giá đơn vị",
+    "lotTotal": "Tổng lô",
+    "remaining": "Còn lại"
   }
 }

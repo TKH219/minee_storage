@@ -1,6 +1,8 @@
 {
   "common": {
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "somethingWentWrong": "Something went wrong",
+    "nothingHereYet": "Nothing here yet"
   },
   "shell": {
     "dashboard": "Dashboard",
@@ -9,5 +11,21 @@
     "reports": "Reports",
     "settings": "Settings",
     "newSale": "New sale"
+  },
+  "router": {
+    "pageNotFound": "Page not found",
+    "goHome": "Go home",
+    "unknownRoute": "Unknown route: {uri}"
+  },
+  "stock": {
+    "archived": "Archived",
+    "notTracked": "Not tracked",
+    "noStock": "No stock",
+    "expiredOn": "{date} · expired",
+    "nextOut": "NEXT OUT",
+    "purchased": "Purchased",
+    "unitPrice": "Unit price",
+    "lotTotal": "Lot total",
+    "remaining": "Remaining"
   }
 }

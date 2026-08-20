@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/domain/entities/lot.dart';
 
 import 'quantity_format.dart';
@@ -40,13 +41,13 @@ class LotCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  lot.expiresOn == null ? 'Not tracked' : _full.format(lot.expiresOn!),
+                  lot.expiresOn == null ? LocaleKeys.stock_notTracked.tr() : _full.format(lot.expiresOn!),
                   style: texts.sansBodyBold.copyWith(fontSize: 15),
                 ),
               ),
               if (isNextOut)
                 Text(
-                  'NEXT OUT',
+                  LocaleKeys.stock_nextOut.tr(),
                   style: texts.sansTableHeader.copyWith(
                     color: colors.inkPrimary,
                     letterSpacing: 0.6,
@@ -55,9 +56,9 @@ class LotCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _field(context, 'Purchased', _full.format(lot.purchasedOn)),
-          _field(context, 'Unit price', formatMoney(lot.unitPrice)),
-          _field(context, 'Lot total', formatMoney(lot.lotTotal)),
+          _field(context, LocaleKeys.stock_purchased.tr(), _full.format(lot.purchasedOn)),
+          _field(context, LocaleKeys.stock_unitPrice.tr(), formatMoney(lot.unitPrice)),
+          _field(context, LocaleKeys.stock_lotTotal.tr(), formatMoney(lot.lotTotal)),
           _remaining(context),
         ],
       ),
@@ -90,7 +91,7 @@ class LotCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Remaining',
+          LocaleKeys.stock_remaining.tr(),
           style: context.textStyles.sansCaption.copyWith(color: context.colors.neutral6),
         ),
         Row(

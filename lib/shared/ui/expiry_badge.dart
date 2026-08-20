@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/domain/entities/expiry_status.dart';
 
 /// The one piece of colour in the app that carries meaning.
@@ -31,14 +32,14 @@ class ExpiryBadge extends StatelessWidget {
     final colors = context.colors;
 
     if (archived) {
-      return _pill(context, colors.neutral2, colors.neutral6, 'Archived', null);
+      return _pill(context, colors.neutral2, colors.neutral6, LocaleKeys.stock_archived.tr(), null);
     }
 
     if (status == ExpiryStatus.ok) {
       return DecoratedBox(
         decoration: const BoxDecoration(color: Colors.transparent),
         child: Text(
-          expiry == null ? 'Not tracked' : _full.format(expiry!),
+          expiry == null ? LocaleKeys.stock_notTracked.tr() : _full.format(expiry!),
           style: context.textStyles.sansCaption.copyWith(color: colors.neutral6),
         ),
       );
@@ -51,10 +52,10 @@ class ExpiryBadge extends StatelessWidget {
       ExpiryStatus.expired => (
           colors.red5,
           colors.isDark ? colors.neutral0 : colors.white,
-          '${_short.format(expiry!)} · expired',
+          LocaleKeys.stock_expiredOn.tr(namedArgs: {'date': _short.format(expiry!)}),
           Icons.warning_amber_rounded,
         ),
-      ExpiryStatus.none || ExpiryStatus.ok => (colors.neutral2, colors.neutral5, 'No stock', null),
+      ExpiryStatus.none || ExpiryStatus.ok => (colors.neutral2, colors.neutral5, LocaleKeys.stock_noStock.tr(), null),
     };
 
     return _pill(context, background, foreground, label, icon);
