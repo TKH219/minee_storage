@@ -35,7 +35,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: AppRoutes.signInName,
         pageBuilder: (context, state) => _fadePage(
           state,
-          SignInPage(prefilledEmail: state.uri.queryParameters['email']),
+          SignInPage(
+            prefilledEmail: state.uri.queryParameters['email'],
+            passwordWasReset: state.uri.queryParameters['reset'] == 'true',
+          ),
         ),
       ),
       GoRoute(
