@@ -4,7 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   AppException map(String message) => SupabaseErrorMapper.map(AuthException(message));
 
   test('every Supabase failure groups under SupabaseException', () {
@@ -75,8 +79,8 @@ void main() {
   });
 
   test('every leaf carries a message safe to show', () {
-    expect(const InvalidCredentialsException().displayMessage, isNotEmpty);
-    expect(const InvalidCodeException().displayMessage, isNotEmpty);
-    expect(const RateLimitedException().displayMessage, isNotEmpty);
+    expect(const InvalidCredentialsException().messageKey, isNotEmpty);
+    expect(const InvalidCodeException().messageKey, isNotEmpty);
+    expect(const RateLimitedException().messageKey, isNotEmpty);
   });
 }

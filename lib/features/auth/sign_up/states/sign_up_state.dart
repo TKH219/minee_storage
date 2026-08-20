@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
 import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 enum SignUpStep { credentials, password, code }
 
@@ -26,6 +28,7 @@ class SignUpState extends BaseState with Equatable {
     this.obscurePassword = true,
     this.wasResumed = false,
     super.status,
+    super.errorMessageKey,
     super.errorMessage,
   });
 
@@ -50,6 +53,7 @@ class SignUpState extends BaseState with Equatable {
   @override
   SignUpState copyWith({
     StateLifeCycle? status,
+    String? errorMessageKey,
     String? errorMessage,
     SignUpStep? step,
     String? email,
@@ -68,6 +72,7 @@ class SignUpState extends BaseState with Equatable {
       obscurePassword: obscurePassword ?? this.obscurePassword,
       wasResumed: wasResumed ?? this.wasResumed,
       status: status ?? this.status,
+      errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -82,7 +87,7 @@ class SignUpState extends BaseState with Equatable {
     obscurePassword,
     wasResumed,
     status,
-    errorMessage,
+    errorMessageKey, errorMessage,
   ];
 }
 
@@ -114,7 +119,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   @visibleForTesting
   void rejectCode(String message) =>
-      updateState(state.copyWith(status: StateLifeCycle.error, errorMessage: message));
+      updateState(state.copyWith(status: StateLifeCycle.error, errorMessageKey: message));
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
@@ -130,7 +135,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   Future<void> submitCredentials() async {
     if (!state.canSubmitCredentials) {
-      showSnackError(msg: 'Enter a valid email and your shop name.');
+      showSnackError(msg: LocaleKeys.auth_signUp_invalidEmailOrShop);
       return;
     }
 
@@ -143,7 +148,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
           updateState(
             state.copyWith(
               status: StateLifeCycle.error,
-              errorMessage: 'That email is already registered. Sign in instead.',
+              errorMessageKey: LocaleKeys.auth_signUp_emailRegistered,
             ),
           );
         case EmailStatus.unconfirmed:
@@ -163,7 +168,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   Future<void> submitPassword() async {
     if (!state.canSubmitPassword) {
-      showSnackError(msg: 'Password must be at least 6 characters.');
+      showSnackError(msg: LocaleKeys.auth_common_passwordTooShort);
       return;
     }
 
@@ -183,7 +188,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   Future<void> submitCode() async {
     if (!state.canSubmitCode) {
-      showSnackError(msg: 'Enter the 8-digit code from your email.');
+      showSnackError(msg: LocaleKeys.auth_common_enterCode);
       return;
     }
 
@@ -207,13 +212,13 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       showLoading();
       await _authRepository.resendSignUpCode(state.email);
       showLoaded();
-      showBannerSuccess(title: 'Code sent', subtitle: 'Check your inbox.');
+      showBannerSuccess(title: LocaleKeys.auth_common_codeSentTitle.tr(), subtitle: LocaleKeys.auth_common_codeSentSubtitle.tr());
     } on Object catch (e) {
       _handleError(e);
     }
   }
 
-  /// The page renders `state.errorMessage` above the form, so anything the user
+  /// The page renders `state.errorMessageKey` above the form, so anything the user
   /// fixes there stays inline. Everything else would otherwise be invisible on
   /// a step that has already moved on, so it snacks.
   void _handleError(Object error) {
@@ -230,7 +235,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
     };
 
     if (!rendersInline) {
-      showSnackError(msg: exception.displayMessage);
+      showSnackError(msg: exception.message ?? exception.messageKey.tr());
     }
   }
 }

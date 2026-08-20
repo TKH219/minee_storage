@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../support/auth_test_harness.dart';
 import '../support/fake_auth_repository.dart';
 
+import '../support/localization_test_harness.dart';
+
 Widget host(SharedPreferences prefs, {Brightness brightness = Brightness.light}) {
   final router = buildTestRouter();
   return ProviderScope(
@@ -27,6 +29,8 @@ Widget host(SharedPreferences prefs, {Brightness brightness = Brightness.light})
 }
 
 void main() {
+  setUp(useLocale);
+
   late SharedPreferences prefs;
 
   setUp(() async {

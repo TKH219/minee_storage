@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('attaches the bearer token when a session exists', () async {
     final interceptor = AuthInterceptor(accessToken: () => 'jwt-123');
     final options = RequestOptions(path: '/products');

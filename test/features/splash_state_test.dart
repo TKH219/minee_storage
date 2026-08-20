@@ -11,7 +11,11 @@ import 'package:mine_storage/providers.dart';
 import '../support/auth_test_harness.dart';
 import '../support/fake_auth_repository.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   ProviderContainer containerWith(AuthRepository repository, GoRouter router) {
     return ProviderContainer(
       overrides: [

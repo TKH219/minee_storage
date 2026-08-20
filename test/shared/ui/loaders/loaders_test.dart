@@ -6,6 +6,8 @@ import 'package:mine_storage/domain/entities/product.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/shared/ui/product_row.dart';
 
+import '../../../support/localization_test_harness.dart';
+
 final milk = Product(
   id: 'milk', storeId: 's1', name: 'Whole Milk 1L', brand: 'Dairyland', location: 'Cold room A',
   lots: [
@@ -23,6 +25,8 @@ Widget host(Widget child, {bool reducedMotion = false}) => MaterialApp(
     );
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('skeleton row geometry matches a real product row', (tester) async {
     await tester.pumpWidget(host(const SkeletonRow()));
     final skeletonHeight = tester.getSize(find.byType(SkeletonRow)).height;

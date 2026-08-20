@@ -7,6 +7,7 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 final signInStateProvider = AutoDisposeNotifierProvider<SignInStateNotifier, SignInState>(
   SignInStateNotifier.new,
@@ -25,6 +26,7 @@ class SignInState extends BaseState with Equatable {
     this.obscurePassword = true,
     this.errorPlacement = AuthErrorPlacement.none,
     super.status,
+    super.errorMessageKey,
     super.errorMessage,
   });
 
@@ -38,6 +40,7 @@ class SignInState extends BaseState with Equatable {
   @override
   SignInState copyWith({
     StateLifeCycle? status,
+    String? errorMessageKey,
     String? errorMessage,
     String? email,
     String? password,
@@ -50,6 +53,7 @@ class SignInState extends BaseState with Equatable {
       obscurePassword: obscurePassword ?? this.obscurePassword,
       errorPlacement: errorPlacement ?? this.errorPlacement,
       status: status ?? this.status,
+      errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -61,7 +65,7 @@ class SignInState extends BaseState with Equatable {
     obscurePassword,
     errorPlacement,
     status,
-    errorMessage,
+    errorMessageKey, errorMessage,
   ];
 }
 
@@ -87,7 +91,7 @@ class SignInStateNotifier extends BaseStateNotifier<SignInState> {
 
   Future<void> signIn() async {
     if (!state.canSubmit) {
-      showSnackError(msg: 'Please enter your email and password.');
+      showSnackError(msg: LocaleKeys.auth_signIn_missingFields);
       return;
     }
 

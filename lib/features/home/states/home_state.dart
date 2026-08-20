@@ -19,6 +19,7 @@ class HomeState extends BaseState with Equatable {
     this.hasReachedEnd = false,
     this.isLoadingMore = false,
     super.status,
+    super.errorMessageKey,
     super.errorMessage,
   });
 
@@ -36,6 +37,7 @@ class HomeState extends BaseState with Equatable {
   @override
   HomeState copyWith({
     StateLifeCycle? status,
+    String? errorMessageKey,
     String? errorMessage,
     List<PostEntity>? posts,
     int? page,
@@ -48,6 +50,7 @@ class HomeState extends BaseState with Equatable {
       hasReachedEnd: hasReachedEnd ?? this.hasReachedEnd,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       status: status ?? this.status,
+      errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -59,7 +62,7 @@ class HomeState extends BaseState with Equatable {
     hasReachedEnd,
     isLoadingMore,
     status,
-    errorMessage,
+    errorMessageKey, errorMessage,
   ];
 }
 

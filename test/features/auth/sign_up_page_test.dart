@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+
 late ProviderContainer container;
 
 Widget host(SharedPreferences prefs, {Brightness brightness = Brightness.light}) {
@@ -34,6 +36,8 @@ Widget host(SharedPreferences prefs, {Brightness brightness = Brightness.light})
 SignUpStateNotifier get notifier => container.read(signUpStateProvider.notifier);
 
 void main() {
+  setUp(useLocale);
+
   late SharedPreferences prefs;
 
   setUp(() async {

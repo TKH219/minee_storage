@@ -16,12 +16,19 @@ enum StateLifeCycle { init, loading, loaded, error }
 /// Every feature state extends this, so [BasePageState] can drive the shared
 /// loading overlay and error surface without knowing anything about the feature.
 abstract class BaseState {
-  const BaseState({this.status = StateLifeCycle.init, this.errorMessage});
+  const BaseState({this.status = StateLifeCycle.init, this.errorMessageKey, this.errorMessage});
 
   final StateLifeCycle status;
 
   /// Only meaningful while [isError] is true. It is deliberately not cleared on
   /// every transition, so `copyWith` stays a plain `??` merge with no sentinel.
+  ///
+  /// Holds a translation key, never resolved prose, so switching language
+  /// retranslates an error already on screen.
+  final String? errorMessageKey;
+
+  /// Prose the backend supplied verbatim, which has no key to translate. Takes
+  /// precedence over [errorMessageKey] at render time.
   final String? errorMessage;
 
   bool get isInit => status == StateLifeCycle.init;
@@ -32,7 +39,7 @@ abstract class BaseState {
 
   bool get isError => status == StateLifeCycle.error;
 
-  BaseState copyWith({StateLifeCycle? status, String? errorMessage});
+  BaseState copyWith({StateLifeCycle? status, String? errorMessageKey, String? errorMessage});
 }
 
 abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifier<T> {
@@ -69,14 +76,18 @@ abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifie
   /// Parks the error on the state and logs it — nothing else.
   ///
   /// How an error reaches the user is the feature's call: a notifier with an
-  /// inline surface just renders `state.errorMessage`, one without calls
+  /// inline surface just renders `state.errorMessageKey`, one without calls
   /// [showSnackError] itself.
   void onError(Object error) {
     final exception = resolveException(error);
     updateState(
-      state.copyWith(status: StateLifeCycle.error, errorMessage: exception.displayMessage) as T,
+      state.copyWith(
+        status: StateLifeCycle.error,
+        errorMessageKey: exception.messageKey,
+        errorMessage: exception.message,
+      ) as T,
     );
-    logger.e('Error: ${exception.displayMessage}', error: error);
+    logger.e('Error: ${exception.message ?? exception.messageKey}', error: error);
   }
 
   /// [ErrorInterceptor] rejects with a `DioException` carrying the typed
@@ -87,9 +98,9 @@ abstract class BaseStateNotifier<T extends BaseState> extends AutoDisposeNotifie
 
     if (resolved is AppException) return resolved;
     if (resolved is DioException) {
-      return ServerException(message: resolved.message ?? 'An unknown network error occurred.');
+      return ServerException(message: resolved.message);
     }
-    return ServerException(message: 'An unknown error occurred: $resolved');
+    return ServerException(message: '$resolved');
   }
 
   void showSnackError({required String msg}) => showErrorSnack(msg);

@@ -10,7 +10,12 @@ import 'package:mine_storage/providers.dart';
 import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
+
 void main() {
+  setUp(useLocale);
+
   ({ProviderContainer container, FakeAuthRepository repository, GoRouter router}) build({
     EmailStatus status = EmailStatus.none,
   }) {
@@ -48,7 +53,7 @@ void main() {
 
     final state = t.container.read(signUpStateProvider);
     expect(state.step, SignUpStep.credentials);
-    expect(state.errorMessage, 'That email is already registered. Sign in instead.');
+    expect(state.errorMessageKey, LocaleKeys.auth_signUp_emailRegistered);
   });
 
   test('an unconfirmed email resends and jumps straight to the code step', () async {

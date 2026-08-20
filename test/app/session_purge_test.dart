@@ -13,7 +13,11 @@ import 'package:mine_storage/providers.dart';
 import '../support/auth_test_harness.dart';
 import '../support/fake_auth_repository.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');

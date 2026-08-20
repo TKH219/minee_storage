@@ -5,7 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mine_storage/app/theme/theme_mode_provider.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');

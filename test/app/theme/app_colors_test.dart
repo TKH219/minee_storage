@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/app_colors.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('primary ramp is the cyan system from the design', () {
     expect(AppColors.primary0Light, const Color(0xFFF0FFFF));
     expect(AppColors.primary1Light, const Color(0xFFD4F5FC));

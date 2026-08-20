@@ -33,11 +33,18 @@ Widget localized(Widget child, {Locale locale = enLocale}) {
   return MaterialApp(home: child);
 }
 
+/// Set [settle] to false for screens carrying an indefinite animation — the
+/// splash spinner never stops, so `pumpAndSettle` would time out on it.
 Future<void> pumpLocalized(
   WidgetTester tester,
   Widget child, {
   Locale locale = enLocale,
+  bool settle = true,
 }) async {
   await tester.pumpWidget(localized(child, locale: locale));
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 }

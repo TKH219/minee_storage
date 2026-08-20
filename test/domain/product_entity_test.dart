@@ -3,6 +3,8 @@ import 'package:mine_storage/domain/entities/expiry_status.dart';
 import 'package:mine_storage/domain/entities/lot.dart';
 import 'package:mine_storage/domain/entities/product.dart';
 
+import '../support/localization_test_harness.dart';
+
 Lot lot({
   required String id,
   DateTime? expiresOn,
@@ -21,6 +23,8 @@ Lot lot({
     );
 
 void main() {
+  setUp(useLocale);
+
   final today = DateTime(2026, 8, 20);
 
   test('lot total is price times initial quantity, not remaining', () {

@@ -5,7 +5,11 @@ import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/models/models.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 
+import '../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('maps every model to an entity, preserving order', () async {
     final repository = PostRepositoryImpl(
       postApi: _FakePostApi(

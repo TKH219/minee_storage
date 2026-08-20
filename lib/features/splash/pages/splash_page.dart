@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +6,7 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/splash/states/splash_state.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class SplashPage extends BasePage {
   const SplashPage({super.key});
@@ -50,9 +52,9 @@ class _SplashPageState extends BasePageState<SplashPage, SplashState, SplashStat
               child: Icon(Icons.inventory_2_rounded, size: 30, color: colors.primary4),
             ),
             const SizedBox(height: 16),
-            Text('Mine Storage', style: context.textStyles.sansTitleHeading2),
+            Text(LocaleKeys.splash_appName.tr(), style: context.textStyles.sansTitleHeading2),
             Text(
-              'Know what you hold.',
+              LocaleKeys.splash_tagline.tr(),
               style: context.textStyles.sansBody.copyWith(color: colors.neutral6),
             ),
             const SizedBox(height: 24),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
 import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 enum ResetStep { email, code, newPassword }
 
@@ -26,6 +28,7 @@ class ForgotPasswordState extends BaseState with Equatable {
     this.confirmPassword = '',
     this.obscurePassword = true,
     super.status,
+    super.errorMessageKey,
     super.errorMessage,
   });
 
@@ -42,15 +45,16 @@ class ForgotPasswordState extends BaseState with Equatable {
 
   bool get passwordsMatch => password == confirmPassword;
 
-  String? get confirmPasswordError => confirmPassword.isEmpty || passwordsMatch
+  String? get confirmPasswordErrorKey => confirmPassword.isEmpty || passwordsMatch
       ? null
-      : "These don't match. Retype the new password.";
+      : LocaleKeys.auth_common_passwordsDontMatch;
 
   bool get canSubmitPassword => password.trim().length >= 6 && passwordsMatch && !isLoading;
 
   @override
   ForgotPasswordState copyWith({
     StateLifeCycle? status,
+    String? errorMessageKey,
     String? errorMessage,
     ResetStep? step,
     String? email,
@@ -67,6 +71,7 @@ class ForgotPasswordState extends BaseState with Equatable {
       confirmPassword: confirmPassword ?? this.confirmPassword,
       obscurePassword: obscurePassword ?? this.obscurePassword,
       status: status ?? this.status,
+      errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -80,7 +85,7 @@ class ForgotPasswordState extends BaseState with Equatable {
     confirmPassword,
     obscurePassword,
     status,
-    errorMessage,
+    errorMessageKey, errorMessage,
   ];
 }
 
@@ -119,7 +124,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
 
   Future<void> submitEmail() async {
     if (!state.canSubmitEmail) {
-      showSnackError(msg: 'Enter the email you signed up with.');
+      showSnackError(msg: LocaleKeys.auth_forgot_enterSignupEmail);
       return;
     }
 
@@ -132,7 +137,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
         updateState(
           state.copyWith(
             status: StateLifeCycle.error,
-            errorMessage: 'No account found for that email.',
+            errorMessageKey: LocaleKeys.auth_forgot_noAccount,
           ),
         );
         return;
@@ -148,7 +153,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
 
   Future<void> submitCode() async {
     if (!state.canSubmitCode) {
-      showSnackError(msg: 'Enter the 8-digit code from your email.');
+      showSnackError(msg: LocaleKeys.auth_common_enterCode);
       return;
     }
 
@@ -164,7 +169,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
 
   Future<void> submitNewPassword() async {
     if (!state.canSubmitPassword) {
-      showSnackError(msg: 'Password must be at least 6 characters.');
+      showSnackError(msg: LocaleKeys.auth_common_passwordTooShort);
       return;
     }
 
@@ -190,13 +195,13 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
       showLoading();
       await _authRepository.startPasswordReset(state.email);
       showLoaded();
-      showBannerSuccess(title: 'Code sent', subtitle: 'Check your inbox.');
+      showBannerSuccess(title: LocaleKeys.auth_common_codeSentTitle.tr(), subtitle: LocaleKeys.auth_common_codeSentSubtitle.tr());
     } on Object catch (e) {
       _handleError(e);
     }
   }
 
-  /// The page renders `state.errorMessage` above the form, so anything the user
+  /// The page renders `state.errorMessageKey` above the form, so anything the user
   /// fixes there stays inline. Everything else would otherwise be invisible on
   /// a step that has already moved on, so it snacks.
   void _handleError(Object error) {
@@ -213,7 +218,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
     };
 
     if (!rendersInline) {
-      showSnackError(msg: exception.displayMessage);
+      showSnackError(msg: exception.message ?? exception.messageKey.tr());
     }
   }
 }

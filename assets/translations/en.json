@@ -27,5 +27,92 @@
     "unitPrice": "Unit price",
     "lotTotal": "Lot total",
     "remaining": "Remaining"
+  },
+  "splash": {
+    "appName": "Mine Storage",
+    "tagline": "Know what you hold."
+  },
+  "auth": {
+    "common": {
+      "email": "Email",
+      "password": "Password",
+      "minChars": "At least 6 characters.",
+      "resendCode": "Resend code",
+      "sentTo": "Sent to {email}. It expires in 10 minutes.",
+      "step1of3": "STEP 1 OF 3",
+      "step2of3": "STEP 2 OF 3",
+      "step3of3": "STEP 3 OF 3",
+      "enterYourCode": "Enter your code",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "enterCode": "Enter the 8-digit code from your email.",
+      "codeSentTitle": "Code sent",
+      "codeSentSubtitle": "Check your inbox.",
+      "didntGetIt": "Didn't get it? ",
+      "passwordsDontMatch": "These don't match. Retype the new password."
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to pick up where your stock left off.",
+      "passwordUpdated": "Password updated. Sign in with your new one.",
+      "passwordHint": "Your password",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "createAccount": "Create an account",
+      "missingFields": "Please enter your email and password."
+    },
+    "signUp": {
+      "resumedNotice": "Your password is already set, so we skipped that step. The shop name you just entered replaces the old one.",
+      "haveAccount": "Already have an account? ",
+      "signIn": "Sign in",
+      "step2of2Resumed": "STEP 2 OF 2 · RESUMED",
+      "finishSigningUp": "Finish signing up",
+      "title": "Create your account",
+      "choosePassword": "Choose a password",
+      "resumedHint": "You started this before. Enter the new code we just sent.",
+      "continueLabel": "Continue",
+      "createAccount": "Create account",
+      "confirmAccount": "Confirm account",
+      "shopName": "Shop name",
+      "shopNameHint": "Northside Grocers",
+      "shopNameHelp": "Shown on your account. You can change it later.",
+      "confirmPassword": "Confirm password",
+      "invalidEmailOrShop": "Enter a valid email and your shop name.",
+      "emailRegistered": "That email is already registered. Sign in instead.",
+      "credentialsHint": "We'll email you an 8-digit code to confirm it.",
+      "passwordHint": "You'll use this with {email} to sign in."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "newPasswordTitle": "Set a new password",
+      "sendCode": "Send code",
+      "verifyCode": "Verify code",
+      "savePassword": "Save password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "enterSignupEmail": "Enter the email you signed up with.",
+      "noAccount": "No account found for that email.",
+      "emailHint": "Enter the address on your account and we'll send a code.",
+      "newPasswordHint": "You'll be signed out and asked to sign in with it."
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "server": "An unexpected server error occurred.",
+    "cache": "An unexpected cache error occurred.",
+    "network": "No internet connection. Please check your network.",
+    "notFound": "Resource not found.",
+    "badRequest": "Bad request.",
+    "unauthorized": "Those credentials were not accepted.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "forbidden": "You do not have access to this resource.",
+    "cancelled": "Request was cancelled.",
+    "invalidCredentials": "Incorrect email or password.",
+    "invalidCode": "That code is invalid or has expired.",
+    "emailAlreadyRegistered": "That email is already registered.",
+    "weakPassword": "Password must be at least 6 characters.",
+    "rateLimited": "Too many emails sent. Please wait a minute and try again.",
+    "emailNotConfirmed": "Please confirm your email first.",
+    "unknownNetwork": "An unknown network error occurred.",
+    "unknown": "An unknown error occurred: {error}"
   }
 }

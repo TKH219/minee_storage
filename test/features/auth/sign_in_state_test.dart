@@ -9,7 +9,12 @@ import 'package:mine_storage/providers.dart';
 import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
+
 void main() {
+  setUp(useLocale);
+
   test('canSubmit requires both fields', () {
     final router = buildTestRouter();
     final container = ProviderContainer(
@@ -74,6 +79,7 @@ void main() {
     expect(currentPath(router), '/');
     expect(container.read(signInStateProvider).isError, isTrue);
     expect(
+      // the exception carries the backend's own prose, so it wins over the key
       container.read(signInStateProvider).errorMessage,
       'Incorrect email or password.',
     );

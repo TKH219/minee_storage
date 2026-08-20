@@ -5,7 +5,11 @@ import 'package:mine_storage/core/exceptions/error_codes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/network/interceptors/error_interceptor.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   final requestOptions = RequestOptions(path: '/anything');
 
   DioException badResponse({int? statusCode, Object? data}) {

@@ -12,18 +12,20 @@ final splashStateProvider = AutoDisposeNotifierProvider<SplashStateNotifier, Spl
 );
 
 class SplashState extends BaseState with Equatable {
-  const SplashState({super.status, super.errorMessage});
+  const SplashState({super.status, super.errorMessageKey, super.errorMessage});
 
   @override
-  SplashState copyWith({StateLifeCycle? status, String? errorMessage}) {
+  SplashState copyWith({StateLifeCycle? status, String? errorMessageKey,
+    String? errorMessage}) {
     return SplashState(
       status: status ?? this.status,
+      errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [status, errorMessage];
+  List<Object?> get props => [status, errorMessageKey, errorMessage];
 }
 
 /// The app's only session gate. The router has no `redirect`, so every decision

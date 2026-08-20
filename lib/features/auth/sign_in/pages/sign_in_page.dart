@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +10,7 @@ import 'package:mine_storage/features/auth/widgets/auth_error_banner.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class SignInPage extends BasePage {
   const SignInPage({super.key, this.prefilledEmail, this.passwordWasReset = false});
@@ -56,7 +58,7 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
   @override
   Widget buildPageContent(BuildContext context) {
     final placement = currentState.errorPlacement;
-    final message = currentState.errorMessage;
+    final message = currentState.errorMessage ?? currentState.errorMessageKey?.tr();
     final showBanner = placement != AuthErrorPlacement.none && message != null;
 
     return Scaffold(
@@ -68,16 +70,16 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Welcome back', style: context.textStyles.sansTitleHeading1),
+              Text(LocaleKeys.auth_signIn_title.tr(), style: context.textStyles.sansTitleHeading1),
               const SizedBox(height: 8),
               Text(
-                'Sign in to pick up where your stock left off.',
+                LocaleKeys.auth_signIn_subtitle.tr(),
                 style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
               ),
               if (widget.passwordWasReset && !showBanner) ...[
                 const SizedBox(height: 20),
-                const AuthErrorBanner(
-                  message: 'Password updated. Sign in with your new one.',
+                AuthErrorBanner(
+                  message: LocaleKeys.auth_signIn_passwordUpdated.tr(),
                   tone: AuthBannerTone.success,
                 ),
               ],
@@ -87,7 +89,7 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
               ],
               const SizedBox(height: 32),
               AppTextField(
-                label: 'Email',
+                label: LocaleKeys.auth_common_email.tr(),
                 hint: 'you@shop.com',
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -95,8 +97,8 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
               ),
               const SizedBox(height: 16),
               AppTextField(
-                label: 'Password',
-                hint: 'Your password',
+                label: LocaleKeys.auth_common_password.tr(),
+                hint: LocaleKeys.auth_signIn_passwordHint.tr(),
                 obscureText: currentState.obscurePassword,
                 onChanged: notifier.updatePassword,
               ),
@@ -109,18 +111,18 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => notifier.router()?.goNamed(AppRoutes.forgotPasswordName),
-                    child: const Text('Forgot password?'),
+                    child: Text(LocaleKeys.auth_signIn_forgot.tr()),
                   ),
                 ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: currentState.canSubmit ? notifier.signIn : null,
-                child: currentState.isLoading ? const ButtonDots() : const Text('Sign in'),
+                child: currentState.isLoading ? const ButtonDots() : Text(LocaleKeys.auth_signIn_submit.tr()),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => notifier.router()?.goNamed(AppRoutes.signUpName),
-                child: const Text('Create an account'),
+                child: Text(LocaleKeys.auth_signIn_createAccount.tr()),
               ),
             ],
           ),

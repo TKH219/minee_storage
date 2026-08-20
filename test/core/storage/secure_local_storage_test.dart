@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/storage/secure_local_storage.dart';
 
+import '../../support/localization_test_harness.dart';
+
 void main() {
+  setUp(useLocale);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
