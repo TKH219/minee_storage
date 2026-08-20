@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
+import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/providers.dart';
@@ -11,11 +12,18 @@ final signInStateProvider = AutoDisposeNotifierProvider<SignInStateNotifier, Sig
   SignInStateNotifier.new,
 );
 
+/// The design gives sign-in two error surfaces in different places, and the
+/// split is deliberate: a rejected credential sits under the password it
+/// refers to, while a deactivated account is a property of the whole account
+/// and sits above the form.
+enum AuthErrorPlacement { none, belowPassword, aboveEmail }
+
 class SignInState extends BaseState with Equatable {
   const SignInState({
     this.email = '',
     this.password = '',
     this.obscurePassword = true,
+    this.errorPlacement = AuthErrorPlacement.none,
     super.status,
     super.errorMessage,
   });
@@ -23,6 +31,7 @@ class SignInState extends BaseState with Equatable {
   final String email;
   final String password;
   final bool obscurePassword;
+  final AuthErrorPlacement errorPlacement;
 
   bool get canSubmit => email.isNotBlank && password.isNotBlank && !isLoading;
 
@@ -32,19 +41,21 @@ class SignInState extends BaseState with Equatable {
     String? errorMessage,
     String? email,
     String? password,
+    AuthErrorPlacement? errorPlacement,
     bool? obscurePassword,
   }) {
     return SignInState(
       email: email ?? this.email,
       password: password ?? this.password,
       obscurePassword: obscurePassword ?? this.obscurePassword,
+      errorPlacement: errorPlacement ?? this.errorPlacement,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [email, password, obscurePassword, status, errorMessage];
+  List<Object?> get props => [email, password, obscurePassword, errorPlacement, status, errorMessage];
 }
 
 class SignInStateNotifier extends BaseStateNotifier<SignInState> {
@@ -58,9 +69,13 @@ class SignInStateNotifier extends BaseStateNotifier<SignInState> {
 
   void prefillEmail(String email) => updateState(state.copyWith(email: email));
 
-  void updateEmail(String value) => updateState(state.copyWith(email: value));
+  void updateEmail(String value) => updateState(
+    state.copyWith(email: value, errorPlacement: AuthErrorPlacement.none),
+  );
 
-  void updatePassword(String value) => updateState(state.copyWith(password: value));
+  void updatePassword(String value) => updateState(
+    state.copyWith(password: value, errorPlacement: AuthErrorPlacement.none),
+  );
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
@@ -75,16 +90,21 @@ class SignInStateNotifier extends BaseStateNotifier<SignInState> {
       showLoading();
       await _authRepository.signIn(email: state.email, password: state.password);
       showLoaded();
-      router()?.goNamed(AppRoutes.homeName);
+      router()?.goNamed(AppRoutes.dashboardName);
     } on Object catch (e) {
       _handleError(e);
     }
   }
 
-  /// This screen has no inline error surface, so every failure is a snack —
-  /// rejected credentials included, which is the common case here.
   void _handleError(Object error) {
     onError(error);
-    showSnackError(msg: resolveException(error).displayMessage);
+    final exception = resolveException(error);
+    updateState(
+      state.copyWith(
+        errorPlacement: exception is ForbiddenException
+            ? AuthErrorPlacement.aboveEmail
+            : AuthErrorPlacement.belowPassword,
+      ),
+    );
   }
 }

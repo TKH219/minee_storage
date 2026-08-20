@@ -80,7 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (user.isDeactivated) {
         await _dataSource.signOut();
         throw const ForbiddenException(
-          message: 'This account has been deactivated. Please contact us for support.',
+          message: 'This account has been deactivated. Contact support to get it reopened.',
         );
       }
 

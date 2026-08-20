@@ -38,7 +38,7 @@ void main() {
         isA<ForbiddenException>().having(
           (e) => e.displayMessage,
           'displayMessage',
-          'This account has been deactivated. Please contact us for support.',
+          'This account has been deactivated. Contact support to get it reopened.',
         ),
       ),
     );
