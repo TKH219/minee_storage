@@ -16,7 +16,7 @@ dependencies:
   # is a v2 API. Providers are declared by hand (see providers.dart), so
   # riverpod_generator is intentionally absent — it pins build/source_gen 2 and
   # would hold back every other generator in this project.
-  flutter_riverpod: ^2.6.1
+  flutter_riverpod: ^3.4.2
 
   # Routing
   go_router: ^17.5.0
