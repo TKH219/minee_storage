@@ -2,7 +2,9 @@
   "common": {
     "tryAgain": "Try again",
     "somethingWentWrong": "Something went wrong",
-    "nothingHereYet": "Nothing here yet"
+    "nothingHereYet": "Nothing here yet",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "shell": {
     "dashboard": "Dashboard",

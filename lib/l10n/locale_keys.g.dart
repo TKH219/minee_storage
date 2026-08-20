@@ -6,6 +6,8 @@ abstract class  LocaleKeys {
   static const common_tryAgain = 'common.tryAgain';
   static const common_somethingWentWrong = 'common.somethingWentWrong';
   static const common_nothingHereYet = 'common.nothingHereYet';
+  static const common_showPassword = 'common.showPassword';
+  static const common_hidePassword = 'common.hidePassword';
   static const common = 'common';
   static const shell_dashboard = 'shell.dashboard';
   static const shell_products = 'shell.products';
