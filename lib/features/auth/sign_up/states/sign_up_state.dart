@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
@@ -100,7 +101,22 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   void updatePassword(String value) => updateState(state.copyWith(password: value));
 
-  void updateCode(String value) => updateState(state.copyWith(code: value));
+  /// The rejected-code error clears the moment a digit changes — it must not
+  /// sit there while the user is correcting it.
+  void updateCode(String value) => updateState(
+    state.copyWith(code: value, status: StateLifeCycle.init),
+  );
+
+  @visibleForTesting
+  void goToStep(SignUpStep step) => updateState(state.copyWith(step: step));
+
+  @visibleForTesting
+  void markResumed() => updateState(state.copyWith(wasResumed: true));
+
+  @visibleForTesting
+  void rejectCode(String message) => updateState(
+    state.copyWith(status: StateLifeCycle.error, errorMessage: message),
+  );
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
