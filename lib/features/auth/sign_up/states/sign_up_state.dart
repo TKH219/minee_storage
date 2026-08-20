@@ -103,9 +103,8 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
   /// The rejected-code error clears the moment a digit changes — it must not
   /// sit there while the user is correcting it.
-  void updateCode(String value) => updateState(
-    state.copyWith(code: value, status: StateLifeCycle.init),
-  );
+  void updateCode(String value) =>
+      updateState(state.copyWith(code: value, status: StateLifeCycle.init));
 
   @visibleForTesting
   void goToStep(SignUpStep step) => updateState(state.copyWith(step: step));
@@ -114,9 +113,8 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
   void markResumed() => updateState(state.copyWith(wasResumed: true));
 
   @visibleForTesting
-  void rejectCode(String message) => updateState(
-    state.copyWith(status: StateLifeCycle.error, errorMessage: message),
-  );
+  void rejectCode(String message) =>
+      updateState(state.copyWith(status: StateLifeCycle.error, errorMessage: message));
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));

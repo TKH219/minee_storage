@@ -77,7 +77,9 @@ void main() {
     notifier.updateCode('12345678');
     await notifier.submitCode();
 
-    notifier.updatePassword('brand-new');
+    notifier
+      ..updatePassword('brand-new')
+      ..updateConfirmPassword('brand-new');
     await notifier.submitNewPassword();
 
     expect(t.repository.calls, contains('setNewPassword'));
