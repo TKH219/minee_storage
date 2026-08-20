@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 import 'nav_bar_item.dart';
 import 'nav_metrics.dart';
@@ -23,17 +24,17 @@ class AppNavBar extends StatelessWidget {
   final List<NavDestination> destinations;
 
   static const List<NavDestination> defaultDestinations = [
-    NavDestination(icon: Icons.grid_view_rounded, label: 'Dashboard'),
-    NavDestination(icon: Icons.inventory_2_outlined, label: 'Products'),
-    NavDestination(icon: Icons.receipt_long_outlined, label: 'Sales'),
-    NavDestination(icon: Icons.bar_chart_rounded, label: 'Reports'),
+    NavDestination(icon: Icons.grid_view_rounded, labelKey: LocaleKeys.shell_dashboard),
+    NavDestination(icon: Icons.inventory_2_outlined, labelKey: LocaleKeys.shell_products),
+    NavDestination(icon: Icons.receipt_long_outlined, labelKey: LocaleKeys.shell_sales),
+    NavDestination(icon: Icons.bar_chart_rounded, labelKey: LocaleKeys.shell_reports),
   ];
 
   static const List<NavDestination> staffDestinations = [
-    NavDestination(icon: Icons.grid_view_rounded, label: 'Dashboard'),
-    NavDestination(icon: Icons.inventory_2_outlined, label: 'Products'),
-    NavDestination(icon: Icons.receipt_long_outlined, label: 'Sales'),
-    NavDestination(icon: Icons.settings_outlined, label: 'Settings'),
+    NavDestination(icon: Icons.grid_view_rounded, labelKey: LocaleKeys.shell_dashboard),
+    NavDestination(icon: Icons.inventory_2_outlined, labelKey: LocaleKeys.shell_products),
+    NavDestination(icon: Icons.receipt_long_outlined, labelKey: LocaleKeys.shell_sales),
+    NavDestination(icon: Icons.settings_outlined, labelKey: LocaleKeys.shell_settings),
   ];
 
   /// The action occupies the middle slot, so branch indices 2 and 3 sit to its

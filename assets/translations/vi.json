@@ -1,5 +1,13 @@
 {
   "common": {
     "tryAgain": "Thử lại"
+  },
+  "shell": {
+    "dashboard": "Tổng quan",
+    "products": "Sản phẩm",
+    "sales": "Bán hàng",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt",
+    "newSale": "Đơn mới"
   }
 }

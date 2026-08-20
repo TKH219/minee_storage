@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 import 'nav_metrics.dart';
 
@@ -46,7 +48,7 @@ class NewSaleAction extends StatelessWidget {
         Transform.translate(
           offset: const Offset(0, -NavMetrics.actionLift + NavMetrics.itemGap),
           child: Text(
-            'New sale',
+            LocaleKeys.shell_newSale.tr(),
             style: context.textStyles.sansCaption.copyWith(
               fontSize: NavMetrics.labelSize,
               height: NavMetrics.labelHeight,

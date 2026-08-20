@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../support/fake_auth_repository.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget shellApp({
   required String initialLocation,
   required SharedPreferences prefs,
@@ -34,6 +36,8 @@ Widget shellApp({
 }
 
 void main() {
+  setUp(useLocale);
+
   late SharedPreferences prefs;
 
   setUp(() async {

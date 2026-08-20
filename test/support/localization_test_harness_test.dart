@@ -6,8 +6,6 @@ import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'localization_test_harness.dart';
 
 void main() {
-  setUpAll(initLocalization);
-
   testWidgets('renders English by default', (tester) async {
     await pumpLocalized(tester, Builder(builder: (_) => Text(LocaleKeys.common_tryAgain.tr())));
     expect(find.text('Try again'), findsOneWidget);
@@ -17,8 +15,13 @@ void main() {
     await pumpLocalized(
       tester,
       Builder(builder: (_) => Text(LocaleKeys.common_tryAgain.tr())),
-      locale: const Locale('vi'),
+      locale: viLocale,
     );
     expect(find.text('Thử lại'), findsOneWidget);
+  });
+
+  testWidgets('a Vietnamese test does not leak into the next test', (tester) async {
+    await pumpLocalized(tester, Builder(builder: (_) => Text(LocaleKeys.common_tryAgain.tr())));
+    expect(find.text('Try again'), findsOneWidget);
   });
 }

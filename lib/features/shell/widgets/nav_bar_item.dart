@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
@@ -5,10 +6,13 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'nav_metrics.dart';
 
 class NavDestination {
-  const NavDestination({required this.icon, required this.label});
+  const NavDestination({required this.icon, required this.labelKey});
 
   final IconData icon;
-  final String label;
+
+  /// Held as a key rather than a resolved string so the destination lists stay
+  /// `const` and every rebuild picks up the current language.
+  final String labelKey;
 }
 
 class NavBarItem extends StatelessWidget {
@@ -41,7 +45,7 @@ class NavBarItem extends StatelessWidget {
               Icon(destination.icon, size: NavMetrics.iconSize, color: content),
               const SizedBox(height: NavMetrics.itemGap),
               Text(
-                destination.label,
+                destination.labelKey.tr(),
                 style: context.textStyles.sansCaption.copyWith(
                   fontSize: NavMetrics.labelSize,
                   height: NavMetrics.labelHeight,

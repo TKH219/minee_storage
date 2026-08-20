@@ -5,6 +5,8 @@ import 'package:mine_storage/features/shell/widgets/app_nav_bar.dart';
 import 'package:mine_storage/features/shell/widgets/nav_bar_item.dart';
 import 'package:mine_storage/features/shell/widgets/new_sale_action.dart';
 
+import '../../support/localization_test_harness.dart';
+
 Widget host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
       theme: brightness == Brightness.light ? AppTheme.light() : AppTheme.dark(),
       home: Scaffold(body: Align(alignment: Alignment.bottomCenter, child: SizedBox(width: 390, child: child))),
@@ -23,6 +25,8 @@ Widget navBar({
     );
 
 void main() {
+  setUp(useLocale);
+
   testWidgets('the bar is 88 tall, full width and square-cornered', (tester) async {
     await tester.pumpWidget(host(navBar()));
     expect(tester.getSize(find.byType(AppNavBar)), const Size(390, 88));
