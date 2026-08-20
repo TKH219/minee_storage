@@ -50,6 +50,11 @@
       "didntGetIt": "Didn't get it? ",
       "passwordsDontMatch": "These don't match. Retype the new password."
     },
+    "social": {
+      "continueWith": "or continue with",
+      "apple": "Apple",
+      "google": "Google"
+    },
     "signIn": {
       "title": "Welcome back",
       "subtitle": "Sign in to pick up where your stock left off.",

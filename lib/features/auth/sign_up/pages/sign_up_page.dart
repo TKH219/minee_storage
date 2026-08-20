@@ -6,6 +6,7 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/sign_up/states/sign_up_state.dart';
+import 'package:mine_storage/features/auth/widgets/social_sign_in_section.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
@@ -87,6 +88,10 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
               const SizedBox(height: 32),
               FilledButton(onPressed: _canSubmit ? _submit : null, child: Text(_buttonLabel)),
               if (currentState.step == SignUpStep.credentials) ...[
+                // Only the first step offers social — past it the account is
+                // already being created with an email and password.
+                const SizedBox(height: 24),
+                const SocialSignInSection(),
                 const SizedBox(height: 12),
                 _footer(
                   context,

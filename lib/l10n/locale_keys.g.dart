@@ -47,6 +47,10 @@ abstract class  LocaleKeys {
   static const auth_common_didntGetIt = 'auth.common.didntGetIt';
   static const auth_common_passwordsDontMatch = 'auth.common.passwordsDontMatch';
   static const auth_common = 'auth.common';
+  static const auth_social_continueWith = 'auth.social.continueWith';
+  static const auth_social_apple = 'auth.social.apple';
+  static const auth_social_google = 'auth.social.google';
+  static const auth_social = 'auth.social';
   static const auth_signIn_title = 'auth.signIn.title';
   static const auth_signIn_subtitle = 'auth.signIn.subtitle';
   static const auth_signIn_passwordUpdated = 'auth.signIn.passwordUpdated';

@@ -7,6 +7,7 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/sign_in/states/sign_in_state.dart';
 import 'package:mine_storage/features/auth/widgets/auth_error_banner.dart';
+import 'package:mine_storage/features/auth/widgets/social_sign_in_section.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
@@ -117,6 +118,8 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
                 onPressed: currentState.canSubmit ? notifier.signIn : null,
                 child: currentState.isLoading ? const ButtonDots() : Text(LocaleKeys.auth_signIn_submit.tr()),
               ),
+              const SizedBox(height: 24),
+              const SocialSignInSection(),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => notifier.router()?.goNamed(AppRoutes.signUpName),
