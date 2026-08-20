@@ -50,6 +50,11 @@
       "didntGetIt": "Chưa nhận được? ",
       "passwordsDontMatch": "Hai ô không khớp. Nhập lại mật khẩu mới."
     },
+    "social": {
+      "continueWith": "hoặc tiếp tục với",
+      "apple": "Apple",
+      "google": "Google"
+    },
     "signIn": {
       "title": "Chào mừng trở lại",
       "subtitle": "Đăng nhập để tiếp tục với kho hàng của bạn.",

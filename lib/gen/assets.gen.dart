@@ -36,6 +36,9 @@ class $AssetsAnimationsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/ic_apple.svg
+  SvgGenImage get icApple => const SvgGenImage('assets/icons/ic_apple.svg');
+
   /// File path: assets/icons/ic_arrow_back.svg
   SvgGenImage get icArrowBack =>
       const SvgGenImage('assets/icons/ic_arrow_back.svg');
@@ -52,6 +55,9 @@ class $AssetsIconsGen {
 
   /// File path: assets/icons/ic_edit.svg
   SvgGenImage get icEdit => const SvgGenImage('assets/icons/ic_edit.svg');
+
+  /// File path: assets/icons/ic_google.svg
+  SvgGenImage get icGoogle => const SvgGenImage('assets/icons/ic_google.svg');
 
   /// File path: assets/icons/ic_home_empty.svg
   SvgGenImage get icHomeEmpty =>
@@ -73,11 +79,13 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
+    icApple,
     icArrowBack,
     icChecked,
     icClose,
     icCloseGreen,
     icEdit,
+    icGoogle,
     icHomeEmpty,
     icLogout,
     icPasswordHide,
