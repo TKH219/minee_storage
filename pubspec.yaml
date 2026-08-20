@@ -12,10 +12,9 @@ dependencies:
 
   # State management
   #
-  # Riverpod stays on 2.x: BaseStateNotifier extends AutoDisposeNotifier, which
-  # is a v2 API. Providers are declared by hand (see providers.dart), so
-  # riverpod_generator is intentionally absent — it pins build/source_gen 2 and
-  # would hold back every other generator in this project.
+  # Providers are declared by hand (see providers.dart), so riverpod_generator
+  # is intentionally absent — it pins build/source_gen 2 and would hold back
+  # every other generator in this project.
   flutter_riverpod: ^3.4.2
 
   # Routing
@@ -53,16 +52,17 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Held below 2.16: it needs meta ^1.18.3, but flutter_test from the pinned
+  # SDK (3.44.7) ships meta 1.18.0. Moving it requires moving the SDK.
   build_runner: ^2.9.0
   json_serializable: ^6.14.1
   retrofit_generator: ^10.2.8
   envied_generator: ^1.3.8
   flutter_gen_runner: ^5.15.0
 
-  # riverpod_lint/custom_lint are deliberately absent: riverpod_lint 2.x (the
-  # only line compatible with riverpod 2) pins analyzer 7, while the code
-  # generators above require analyzer 8+. Re-add both if this project ever
-  # migrates to riverpod 3.
+  # riverpod_lint/custom_lint remain absent. The analyzer conflict that kept
+  # them out is gone now that the project is on riverpod 3 — adding them is a
+  # deliberate follow-up, deferred to keep the 3.x migration reviewable.
   flutter_lints: ^6.0.0
 
   # Launcher icons are generated, not hand-cut. Regenerate with:
