@@ -107,7 +107,7 @@ class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifie
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         itemCount: currentState.posts.length + (currentState.isLoadingMore ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           if (index >= currentState.posts.length) {
             return const Padding(
