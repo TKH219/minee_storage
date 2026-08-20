@@ -1,6 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/gen/assets.gen.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -12,6 +15,7 @@ class AppTextField extends StatelessWidget {
     this.controller,
     this.enabled = true,
     this.obscureText = false,
+    this.onToggleObscure,
     this.keyboardType,
     this.onChanged,
   });
@@ -23,6 +27,10 @@ class AppTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool enabled;
   final bool obscureText;
+
+  /// Supplying this is what puts the reveal control on the field.
+  final VoidCallback? onToggleObscure;
+
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
 
@@ -47,7 +55,11 @@ class AppTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           onChanged: onChanged,
-          decoration: InputDecoration(hintText: hint),
+          decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: _obscureToggle(context),
+            suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          ),
         ),
         if (errorText == null && helperText != null) ...[
           const SizedBox(height: 6),
@@ -64,6 +76,24 @@ class AppTextField extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget? _obscureToggle(BuildContext context) {
+    final onToggle = onToggleObscure;
+    if (onToggle == null) return null;
+
+    // The two assets are named for the state they belong to, not the action
+    // they perform: `icPasswordHide` is the plain eye shown while the password
+    // is hidden, `icPasswordShow` the struck-through one shown while it is not.
+    final icon = obscureText ? Assets.icons.icPasswordHide : Assets.icons.icPasswordShow;
+
+    return IconButton(
+      onPressed: onToggle,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      tooltip: (obscureText ? LocaleKeys.common_showPassword : LocaleKeys.common_hidePassword).tr(),
+      icon: icon.tinted(context.colors.neutral6, width: 20, height: 20),
     );
   }
 }

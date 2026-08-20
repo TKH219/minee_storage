@@ -2,7 +2,9 @@
   "common": {
     "tryAgain": "Thử lại",
     "somethingWentWrong": "Đã xảy ra lỗi",
-    "nothingHereYet": "Chưa có gì ở đây"
+    "nothingHereYet": "Chưa có gì ở đây",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu"
   },
   "shell": {
     "dashboard": "Tổng quan",

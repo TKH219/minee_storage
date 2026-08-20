@@ -74,6 +74,32 @@ void main() {
     );
   });
 
+  testWidgets('an obscured field without a toggle callback shows no eye', (tester) async {
+    await tester.pumpWidget(host(const AppTextField(label: 'Password', obscureText: true)));
+    expect(find.byTooltip('Show password'), findsNothing);
+    expect(find.byTooltip('Hide password'), findsNothing);
+  });
+
+  testWidgets('an obscured field offers to show, and reports the tap', (tester) async {
+    var taps = 0;
+    await tester.pumpWidget(host(
+      AppTextField(label: 'Password', obscureText: true, onToggleObscure: () => taps++),
+    ));
+
+    expect(find.byTooltip('Show password'), findsOneWidget);
+    await tester.tap(find.byTooltip('Show password'));
+    expect(taps, 1);
+  });
+
+  testWidgets('a revealed field offers to hide instead', (tester) async {
+    await tester.pumpWidget(host(
+      AppTextField(label: 'Password', obscureText: false, onToggleObscure: () {}),
+    ));
+
+    expect(find.byTooltip('Hide password'), findsOneWidget);
+    expect(find.byTooltip('Show password'), findsNothing);
+  });
+
   testWidgets('the tonal button uses fillPrimary with onPrimary text', (tester) async {
     await tester.pumpWidget(host(AppTonalButton(label: 'Resend code', onPressed: () {})));
     expect(find.text('Resend code'), findsOneWidget);
