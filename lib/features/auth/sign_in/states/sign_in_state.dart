@@ -55,7 +55,14 @@ class SignInState extends BaseState with Equatable {
   }
 
   @override
-  List<Object?> get props => [email, password, obscurePassword, errorPlacement, status, errorMessage];
+  List<Object?> get props => [
+    email,
+    password,
+    obscurePassword,
+    errorPlacement,
+    status,
+    errorMessage,
+  ];
 }
 
 class SignInStateNotifier extends BaseStateNotifier<SignInState> {
@@ -69,13 +76,11 @@ class SignInStateNotifier extends BaseStateNotifier<SignInState> {
 
   void prefillEmail(String email) => updateState(state.copyWith(email: email));
 
-  void updateEmail(String value) => updateState(
-    state.copyWith(email: value, errorPlacement: AuthErrorPlacement.none),
-  );
+  void updateEmail(String value) =>
+      updateState(state.copyWith(email: value, errorPlacement: AuthErrorPlacement.none));
 
-  void updatePassword(String value) => updateState(
-    state.copyWith(password: value, errorPlacement: AuthErrorPlacement.none),
-  );
+  void updatePassword(String value) =>
+      updateState(state.copyWith(password: value, errorPlacement: AuthErrorPlacement.none));
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
@@ -22,6 +23,7 @@ class ForgotPasswordState extends BaseState with Equatable {
     this.email = '',
     this.code = '',
     this.password = '',
+    this.confirmPassword = '',
     this.obscurePassword = true,
     super.status,
     super.errorMessage,
@@ -31,13 +33,20 @@ class ForgotPasswordState extends BaseState with Equatable {
   final String email;
   final String code;
   final String password;
+  final String confirmPassword;
   final bool obscurePassword;
 
   bool get canSubmitEmail => email.isNotBlank && email.contains('@') && !isLoading;
 
   bool get canSubmitCode => code.trim().length == OtpField.codeLength && !isLoading;
 
-  bool get canSubmitPassword => password.trim().length >= 6 && !isLoading;
+  bool get passwordsMatch => password == confirmPassword;
+
+  String? get confirmPasswordError => confirmPassword.isEmpty || passwordsMatch
+      ? null
+      : "These don't match. Retype the new password.";
+
+  bool get canSubmitPassword => password.trim().length >= 6 && passwordsMatch && !isLoading;
 
   @override
   ForgotPasswordState copyWith({
@@ -47,6 +56,7 @@ class ForgotPasswordState extends BaseState with Equatable {
     String? email,
     String? code,
     String? password,
+    String? confirmPassword,
     bool? obscurePassword,
   }) {
     return ForgotPasswordState(
@@ -54,6 +64,7 @@ class ForgotPasswordState extends BaseState with Equatable {
       email: email ?? this.email,
       code: code ?? this.code,
       password: password ?? this.password,
+      confirmPassword: confirmPassword ?? this.confirmPassword,
       obscurePassword: obscurePassword ?? this.obscurePassword,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -66,6 +77,7 @@ class ForgotPasswordState extends BaseState with Equatable {
     email,
     code,
     password,
+    confirmPassword,
     obscurePassword,
     status,
     errorMessage,
@@ -83,9 +95,15 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
 
   void updateEmail(String value) => updateState(state.copyWith(email: value));
 
-  void updateCode(String value) => updateState(state.copyWith(code: value));
+  void updateCode(String value) =>
+      updateState(state.copyWith(code: value, status: StateLifeCycle.init));
+
+  @visibleForTesting
+  void goToStep(ResetStep step) => updateState(state.copyWith(step: step));
 
   void updatePassword(String value) => updateState(state.copyWith(password: value));
+
+  void updateConfirmPassword(String value) => updateState(state.copyWith(confirmPassword: value));
 
   void togglePasswordVisibility() =>
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
@@ -136,10 +154,7 @@ class ForgotPasswordStateNotifier extends BaseStateNotifier<ForgotPasswordState>
 
     try {
       showLoading();
-      await _authRepository.verifyPasswordResetCode(
-        email: state.email,
-        token: state.code,
-      );
+      await _authRepository.verifyPasswordResetCode(email: state.email, token: state.code);
       showLoaded();
       updateState(state.copyWith(step: ResetStep.newPassword));
     } on Object catch (e) {

@@ -57,9 +57,7 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
               const SizedBox(height: 8),
               Text(
                 _subtitle,
-                style: context.textStyles.sansBody.copyWith(
-                  color: context.colors.neutral6,
-                ),
+                style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
               ),
               if (currentState.wasResumed && currentState.step == SignUpStep.code) ...[
                 const SizedBox(height: 20),
@@ -72,9 +70,7 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                   child: Text(
                     'Your password is already set, so we skipped that step. '
                     'The shop name you just entered replaces the old one.',
-                    style: context.textStyles.sansCaption.copyWith(
-                      color: context.colors.neutral7,
-                    ),
+                    style: context.textStyles.sansCaption.copyWith(color: context.colors.neutral7),
                   ),
                 ),
               ],
@@ -84,16 +80,11 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                 const SizedBox(height: 16),
                 Text(
                   currentState.errorMessage!,
-                  style: context.textStyles.sansBody.copyWith(
-                    color: context.colors.red5,
-                  ),
+                  style: context.textStyles.sansBody.copyWith(color: context.colors.red5),
                 ),
               ],
               const SizedBox(height: 32),
-              FilledButton(
-                onPressed: _canSubmit ? _submit : null,
-                child: Text(_buttonLabel),
-              ),
+              FilledButton(onPressed: _canSubmit ? _submit : null, child: Text(_buttonLabel)),
               if (currentState.step == SignUpStep.credentials) ...[
                 const SizedBox(height: 12),
                 _footer(
@@ -183,17 +174,12 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          prompt,
-          style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
-        ),
+        Text(prompt, style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6)),
         GestureDetector(
           onTap: onTap,
           child: Text(
             action,
-            style: context.textStyles.sansBodyBold.copyWith(
-              color: context.colors.inkPrimary,
-            ),
+            style: context.textStyles.sansBodyBold.copyWith(color: context.colors.inkPrimary),
           ),
         ),
       ],
@@ -243,5 +229,4 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
         ];
     }
   }
-
 }

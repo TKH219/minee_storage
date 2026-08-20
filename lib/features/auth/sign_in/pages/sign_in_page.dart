@@ -100,17 +100,14 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () =>
-                        notifier.router()?.goNamed(AppRoutes.forgotPasswordName),
+                    onPressed: () => notifier.router()?.goNamed(AppRoutes.forgotPasswordName),
                     child: const Text('Forgot password?'),
                   ),
                 ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: currentState.canSubmit ? notifier.signIn : null,
-                child: currentState.isLoading
-                    ? const ButtonDots()
-                    : const Text('Sign in'),
+                child: currentState.isLoading ? const ButtonDots() : const Text('Sign in'),
               ),
               const SizedBox(height: 12),
               TextButton(

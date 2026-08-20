@@ -5,6 +5,7 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/forgot_password/states/forgot_password_state.dart';
+import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
 
 class ForgotPasswordPage extends BasePage {
@@ -15,12 +16,7 @@ class ForgotPasswordPage extends BasePage {
 }
 
 class _ForgotPasswordPageState
-    extends
-        BasePageState<
-          ForgotPasswordPage,
-          ForgotPasswordState,
-          ForgotPasswordStateNotifier
-        > {
+    extends BasePageState<ForgotPasswordPage, ForgotPasswordState, ForgotPasswordStateNotifier> {
   @override
   void setCurrentState() => currentState = ref.watch(forgotPasswordStateProvider);
 
@@ -49,13 +45,19 @@ class _ForgotPasswordPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                _eyebrow,
+                style: context.textStyles.sansTableHeader.copyWith(
+                  color: context.colors.neutral6,
+                  letterSpacing: 0.6,
+                ),
+              ),
+              const SizedBox(height: 10),
               Text(_title, style: context.textStyles.sansTitleHeading1),
               const SizedBox(height: 8),
               Text(
                 _subtitle,
-                style: context.textStyles.sansBody.copyWith(
-                  color: context.colors.neutral6,
-                ),
+                style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
               ),
               const SizedBox(height: 32),
               ..._stepFields(),
@@ -63,16 +65,11 @@ class _ForgotPasswordPageState
                 const SizedBox(height: 16),
                 Text(
                   currentState.errorMessage!,
-                  style: context.textStyles.sansBody.copyWith(
-                    color: context.colors.red5,
-                  ),
+                  style: context.textStyles.sansBody.copyWith(color: context.colors.red5),
                 ),
               ],
               const SizedBox(height: 32),
-              FilledButton(
-                onPressed: _canSubmit ? _submit : null,
-                child: Text(_buttonLabel),
-              ),
+              FilledButton(onPressed: _canSubmit ? _submit : null, child: Text(_buttonLabel)),
               if (currentState.step == ResetStep.code) ...[
                 const SizedBox(height: 12),
                 TextButton(
@@ -87,21 +84,27 @@ class _ForgotPasswordPageState
     );
   }
 
+  String get _eyebrow => switch (currentState.step) {
+    ResetStep.email => 'STEP 1 OF 3',
+    ResetStep.code => 'STEP 2 OF 3',
+    ResetStep.newPassword => 'STEP 3 OF 3',
+  };
+
   String get _title => switch (currentState.step) {
     ResetStep.email => 'Reset your password',
-    ResetStep.code => 'Check your email',
+    ResetStep.code => 'Enter your code',
     ResetStep.newPassword => 'Set a new password',
   };
 
   String get _subtitle => switch (currentState.step) {
-    ResetStep.email => 'We will send a code to your email.',
-    ResetStep.code => 'We sent an 8-digit code to ${currentState.email}.',
-    ResetStep.newPassword => 'At least 6 characters.',
+    ResetStep.email => "Enter the address on your account and we'll send a code.",
+    ResetStep.code => 'Sent to ${currentState.email}. It expires in 10 minutes.',
+    ResetStep.newPassword => "You'll be signed out and asked to sign in with it.",
   };
 
   String get _buttonLabel => switch (currentState.step) {
     ResetStep.email => 'Send code',
-    ResetStep.code => 'Verify',
+    ResetStep.code => 'Verify code',
     ResetStep.newPassword => 'Save password',
   };
 
@@ -126,16 +129,11 @@ class _ForgotPasswordPageState
     switch (currentState.step) {
       case ResetStep.email:
         return [
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              hintText: 'you@shop.com',
-            ),
+          AppTextField(
+            label: 'Email',
+            hint: 'you@shop.com',
             keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.done,
-            autocorrect: false,
             onChanged: notifier.updateEmail,
-            onSubmitted: (_) => notifier.submitEmail(),
           ),
         ];
       case ResetStep.code:
@@ -143,26 +141,23 @@ class _ForgotPasswordPageState
           OtpField(
             onChanged: notifier.updateCode,
             onSubmitted: (_) => notifier.submitCode(),
+            hasError: currentState.isError,
           ),
         ];
       case ResetStep.newPassword:
         return [
-          TextField(
-            decoration: InputDecoration(
-              labelText: 'New password',
-              suffixIcon: IconButton(
-                icon: Icon(
-                  currentState.obscurePassword
-                      ? Icons.visibility_off_rounded
-                      : Icons.visibility_rounded,
-                ),
-                onPressed: notifier.togglePasswordVisibility,
-              ),
-            ),
+          AppTextField(
+            label: 'New password',
+            helperText: 'At least 6 characters.',
             obscureText: currentState.obscurePassword,
-            textInputAction: TextInputAction.done,
             onChanged: notifier.updatePassword,
-            onSubmitted: (_) => notifier.submitNewPassword(),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: 'Confirm new password',
+            errorText: currentState.confirmPasswordError,
+            obscureText: currentState.obscurePassword,
+            onChanged: notifier.updateConfirmPassword,
           ),
         ];
     }
