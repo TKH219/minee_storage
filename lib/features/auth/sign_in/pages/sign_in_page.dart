@@ -5,6 +5,9 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/auth/sign_in/states/sign_in_state.dart';
+import 'package:mine_storage/features/auth/widgets/auth_error_banner.dart';
+import 'package:mine_storage/shared/ui/app_text_field.dart';
+import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/shared/ui/theme_mode_button.dart';
 
 class SignInPage extends BasePage {
@@ -20,6 +23,14 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
   late final TextEditingController _emailController = TextEditingController(
     text: widget.prefilledEmail ?? '',
   );
+
+  @override
+  void initState() {
+    // The design holds progress inside the Sign in button so the row never
+    // jumps under the thumb; the shared full-bleed overlay would hide it.
+    allowToShowLoading = false;
+    super.initState();
+  }
 
   @override
   void initDataFromConstructor() {
@@ -43,7 +54,12 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
 
   @override
   Widget buildPageContent(BuildContext context) {
+    final placement = currentState.errorPlacement;
+    final message = currentState.errorMessage;
+    final showBanner = placement != AuthErrorPlacement.none && message != null;
+
     return Scaffold(
+      backgroundColor: context.colors.neutral0,
       appBar: AppBar(actions: const [ThemeModeButton()]),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -54,53 +70,47 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
               Text('Welcome back', style: context.textStyles.sansTitleHeading1),
               const SizedBox(height: 8),
               Text(
-                'Sign in to continue to Mine Storage.',
-                style: context.textStyles.sansBody.copyWith(
-                  color: context.colors.neutral6,
-                ),
+                'Sign in to pick up where your stock left off.',
+                style: context.textStyles.sansBody.copyWith(color: context.colors.neutral6),
               ),
+              if (showBanner && placement == AuthErrorPlacement.aboveEmail) ...[
+                const SizedBox(height: 20),
+                AuthErrorBanner(message: message),
+              ],
               const SizedBox(height: 32),
-              TextField(
+              AppTextField(
+                label: 'Email',
+                hint: 'you@shop.com',
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'you@shop.com',
-                ),
                 keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                autocorrect: false,
                 onChanged: notifier.updateEmail,
               ),
               const SizedBox(height: 16),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      currentState.obscurePassword
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                    ),
-                    onPressed: notifier.togglePasswordVisibility,
+              AppTextField(
+                label: 'Password',
+                hint: 'Your password',
+                obscureText: currentState.obscurePassword,
+                onChanged: notifier.updatePassword,
+              ),
+              if (showBanner && placement == AuthErrorPlacement.belowPassword) ...[
+                const SizedBox(height: 12),
+                AuthErrorBanner(message: message),
+              ],
+              if (placement != AuthErrorPlacement.aboveEmail)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () =>
+                        notifier.router()?.goNamed(AppRoutes.forgotPasswordName),
+                    child: const Text('Forgot password?'),
                   ),
                 ),
-                obscureText: currentState.obscurePassword,
-                textInputAction: TextInputAction.done,
-                onChanged: notifier.updatePassword,
-                onSubmitted: (_) => notifier.signIn(),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () =>
-                      notifier.router()?.goNamed(AppRoutes.forgotPasswordName),
-                  child: const Text('Forgot password?'),
-                ),
-              ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: currentState.canSubmit ? notifier.signIn : null,
-                child: const Text('Sign in'),
+                child: currentState.isLoading
+                    ? const ButtonDots()
+                    : const Text('Sign in'),
               ),
               const SizedBox(height: 12),
               TextButton(
