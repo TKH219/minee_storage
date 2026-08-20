@@ -14,8 +14,9 @@ import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 enum SignUpStep { credentials, password, code }
 
-final signUpStateProvider = AutoDisposeNotifierProvider<SignUpStateNotifier, SignUpState>(
+final signUpStateProvider = NotifierProvider<SignUpStateNotifier, SignUpState>(
   SignUpStateNotifier.new,
+  isAutoDispose: true,
 );
 
 class SignUpState extends BaseState with Equatable {

@@ -9,8 +9,9 @@ import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
-final signInStateProvider = AutoDisposeNotifierProvider<SignInStateNotifier, SignInState>(
+final signInStateProvider = NotifierProvider<SignInStateNotifier, SignInState>(
   SignInStateNotifier.new,
+  isAutoDispose: true,
 );
 
 /// The design gives sign-in two error surfaces in different places, and the

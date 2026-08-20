@@ -7,8 +7,9 @@ import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
 import 'package:mine_storage/providers.dart';
 
-final homeStateProvider = AutoDisposeNotifierProvider<HomeStateNotifier, HomeState>(
+final homeStateProvider = NotifierProvider<HomeStateNotifier, HomeState>(
   HomeStateNotifier.new,
+  isAutoDispose: true,
 );
 
 /// Reference state for a paged list screen. Copy this shape for new features.

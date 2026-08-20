@@ -15,8 +15,9 @@ import 'package:mine_storage/l10n/locale_keys.g.dart';
 enum ResetStep { email, code, newPassword }
 
 final forgotPasswordStateProvider =
-    AutoDisposeNotifierProvider<ForgotPasswordStateNotifier, ForgotPasswordState>(
+    NotifierProvider<ForgotPasswordStateNotifier, ForgotPasswordState>(
       ForgotPasswordStateNotifier.new,
+      isAutoDispose: true,
     );
 
 class ForgotPasswordState extends BaseState with Equatable {
