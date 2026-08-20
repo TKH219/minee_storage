@@ -63,6 +63,6 @@ void main() {
       lot(id: 'earlier', purchasedOn: DateTime(2026, 2, 1), unitPrice: 1, initial: 4, remaining: 4),
     ]);
     expect(p.lotsFefo.map((l) => l.id), ['earlier', 'later']);
-    expect(p.statusOn(today), ExpiryStatus.healthy);
+    expect(p.statusOn(today), ExpiryStatus.ok);
   });
 }
