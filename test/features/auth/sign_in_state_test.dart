@@ -10,7 +10,6 @@ import '../../support/auth_test_harness.dart';
 import '../../support/fake_auth_repository.dart';
 
 import '../../support/localization_test_harness.dart';
-import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 void main() {
   setUp(useLocale);
