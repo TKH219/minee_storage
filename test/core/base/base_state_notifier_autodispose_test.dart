@@ -36,8 +36,10 @@ class _KeepAliveProbeNotifier extends Notifier<_ProbeState> {
   _ProbeState build() => const _ProbeState();
 }
 
-final _autoDisposeProbeProvider =
-    AutoDisposeNotifierProvider<_ProbeNotifier, _ProbeState>(_ProbeNotifier.new);
+final _autoDisposeProbeProvider = NotifierProvider<_ProbeNotifier, _ProbeState>(
+  _ProbeNotifier.new,
+  isAutoDispose: true,
+);
 
 final _keepAliveProbeProvider = NotifierProvider<_KeepAliveProbeNotifier, _ProbeState>(
   _KeepAliveProbeNotifier.new,

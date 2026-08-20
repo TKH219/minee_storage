@@ -7,8 +7,9 @@ import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
-final splashStateProvider = AutoDisposeNotifierProvider<SplashStateNotifier, SplashState>(
+final splashStateProvider = NotifierProvider<SplashStateNotifier, SplashState>(
   SplashStateNotifier.new,
+  isAutoDispose: true,
 );
 
 class SplashState extends BaseState with Equatable {
