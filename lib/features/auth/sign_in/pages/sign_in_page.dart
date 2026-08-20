@@ -9,7 +9,6 @@ import 'package:mine_storage/features/auth/sign_in/states/sign_in_state.dart';
 import 'package:mine_storage/features/auth/widgets/auth_error_banner.dart';
 import 'package:mine_storage/shared/ui/app_text_field.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
-import 'package:mine_storage/shared/ui/theme_mode_button.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 class SignInPage extends BasePage {
@@ -63,7 +62,6 @@ class _SignInPageState extends BasePageState<SignInPage, SignInState, SignInStat
 
     return Scaffold(
       backgroundColor: context.colors.neutral0,
-      appBar: AppBar(actions: const [ThemeModeButton()]),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),

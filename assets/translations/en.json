@@ -141,5 +141,14 @@
     "emptyTitle": "No items yet",
     "emptySubtitle": "Items you add will show up here.",
     "reload": "Reload"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": "Preferences",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language"
   }
 }

@@ -130,5 +130,13 @@ abstract class  LocaleKeys {
   static const home_emptySubtitle = 'home.emptySubtitle';
   static const home_reload = 'home.reload';
   static const home = 'home';
+  static const settings_title = 'settings.title';
+  static const settings_preferences = 'settings.preferences';
+  static const settings_theme = 'settings.theme';
+  static const settings_themeSystem = 'settings.themeSystem';
+  static const settings_themeLight = 'settings.themeLight';
+  static const settings_themeDark = 'settings.themeDark';
+  static const settings_language = 'settings.language';
+  static const settings = 'settings';
 
 }

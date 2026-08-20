@@ -68,6 +68,32 @@ void main() {
     });
   }
 
+  // Vietnamese runs longer than English, so these catch truncation the English
+  // goldens cannot.
+  for (final (name, mode) in [('light', ThemeMode.light), ('dark', ThemeMode.dark)]) {
+    testWidgets('splash golden · vi · $name', (tester) async {
+      useLocale(viLocale);
+      sizeToPhone(tester);
+      await tester.pumpWidget(host(const SplashPage(), prefs, mode: mode));
+      await tester.pump();
+      await expectLater(
+        find.byType(SplashPage),
+        matchesGoldenFile('../../goldens/auth_splash_vi_$name.png'),
+      );
+    });
+
+    testWidgets('sign-in default golden · vi · $name', (tester) async {
+      useLocale(viLocale);
+      sizeToPhone(tester);
+      await tester.pumpWidget(host(const SignInPage(), prefs, mode: mode));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byType(SignInPage),
+        matchesGoldenFile('../../goldens/auth_sign_in_vi_$name.png'),
+      );
+    });
+  }
+
   testWidgets('sign-in deactivated golden', (tester) async {
     sizeToPhone(tester);
     await tester.pumpWidget(host(

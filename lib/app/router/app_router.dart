@@ -17,6 +17,7 @@ import 'package:mine_storage/shared/utils/logger.dart';
 
 import 'app_routes.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
+import 'package:mine_storage/features/settings/pages/settings_page.dart';
 
 /// Held globally so non-widget code (interceptors) can navigate.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -52,6 +53,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.forgotPassword,
         name: AppRoutes.forgotPasswordName,
         pageBuilder: (context, state) => _fadePage(state, const ForgotPasswordPage()),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        name: AppRoutes.settingsName,
+        builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
         path: AppRoutes.home,
