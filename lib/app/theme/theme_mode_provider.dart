@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mine_storage/shared/utils/logger.dart';
 
+import 'package:mine_storage/l10n/locale_keys.g.dart';
+
 /// Overridden in `main()` once [SharedPreferences] has been opened.
 final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('sharedPreferencesProvider must be overridden in main()'),
@@ -52,10 +54,12 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
 }
 
 extension ThemeModeLabel on ThemeMode {
-  String get label => switch (this) {
-    ThemeMode.system => 'System',
-    ThemeMode.light => 'Light',
-    ThemeMode.dark => 'Dark',
+  /// A key, not a resolved string, so switching language retranslates the
+  /// label already on screen.
+  String get labelKey => switch (this) {
+    ThemeMode.system => LocaleKeys.settings_themeSystem,
+    ThemeMode.light => LocaleKeys.settings_themeLight,
+    ThemeMode.dark => LocaleKeys.settings_themeDark,
   };
 
   IconData get icon => switch (this) {

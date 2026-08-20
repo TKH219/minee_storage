@@ -21,6 +21,7 @@ GoRouter buildTestRouter() {
       ),
       GoRoute(path: AppRoutes.home, name: AppRoutes.homeName, builder: stub),
       GoRoute(path: AppRoutes.dashboard, name: AppRoutes.dashboardName, builder: stub),
+      GoRoute(path: AppRoutes.settings, name: AppRoutes.settingsName, builder: stub),
     ],
   );
 }

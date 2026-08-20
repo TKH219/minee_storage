@@ -141,5 +141,14 @@
     "emptyTitle": "Chưa có mục nào",
     "emptySubtitle": "Mục bạn thêm sẽ hiện ở đây.",
     "reload": "Tải lại"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "preferences": "Tuỳ chọn",
+    "theme": "Giao diện",
+    "themeSystem": "Theo hệ thống",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "language": "Ngôn ngữ"
   }
 }

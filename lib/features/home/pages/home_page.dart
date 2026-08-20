@@ -10,7 +10,6 @@ import 'package:mine_storage/features/home/widgets/post_item.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
-import 'package:mine_storage/shared/ui/theme_mode_button.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 /// Reference screen for the architecture: Retrofit → model → repository →
@@ -74,7 +73,6 @@ class _HomePageState extends BasePageState<HomePage, HomeState, HomeStateNotifie
               }
             },
           ),
-          const ThemeModeButton(),
         ],
       ),
       body: SafeArea(child: _buildBody(context)),
