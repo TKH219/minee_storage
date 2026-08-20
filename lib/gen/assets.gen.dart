@@ -14,6 +14,25 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart' as _svg;
 import 'package:vector_graphics/vector_graphics.dart' as _vg;
 
+class $AssetsAnimationsGen {
+  const $AssetsAnimationsGen();
+
+  /// File path: assets/animations/check.json
+  String get check => 'assets/animations/check.json';
+
+  /// File path: assets/animations/dots.json
+  String get dots => 'assets/animations/dots.json';
+
+  /// File path: assets/animations/scan.json
+  String get scan => 'assets/animations/scan.json';
+
+  /// File path: assets/animations/spinner.json
+  String get spinner => 'assets/animations/spinner.json';
+
+  /// List of all assets
+  List<String> get values => [check, dots, scan, spinner];
+}
+
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
@@ -78,6 +97,7 @@ class $AssetsImagesGen {
 }
 
 abstract final class Assets {
+  static const $AssetsAnimationsGen animations = $AssetsAnimationsGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
 }
