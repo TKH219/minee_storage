@@ -8,6 +8,7 @@ class AppTextField extends StatelessWidget {
     required this.label,
     this.hint,
     this.errorText,
+    this.helperText,
     this.controller,
     this.enabled = true,
     this.obscureText = false,
@@ -18,6 +19,7 @@ class AppTextField extends StatelessWidget {
   final String label;
   final String? hint;
   final String? errorText;
+  final String? helperText;
   final TextEditingController? controller;
   final bool enabled;
   final bool obscureText;
@@ -47,6 +49,13 @@ class AppTextField extends StatelessWidget {
           onChanged: onChanged,
           decoration: InputDecoration(hintText: hint),
         ),
+        if (errorText == null && helperText != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            helperText!,
+            style: context.textStyles.sansCaption.copyWith(color: colors.neutral6),
+          ),
+        ],
         if (errorText != null) ...[
           const SizedBox(height: 6),
           Text(
