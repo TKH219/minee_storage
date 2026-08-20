@@ -75,6 +75,22 @@ void main() {
     expect(find.text('Create account'), findsOneWidget);
   });
 
+  testWidgets('both password fields carry an eye, and reveal together', (tester) async {
+    await tester.pumpWidget(host(prefs));
+    await tester.pump();
+    notifier.goToStep(SignUpStep.password);
+    await tester.pump();
+
+    expect(find.byTooltip('Show password'), findsNWidgets(2));
+    expect(tester.widgetList<TextField>(find.byType(TextField)).every((f) => f.obscureText), isTrue);
+
+    await tester.tap(find.byTooltip('Show password').first);
+    await tester.pump();
+
+    expect(find.byTooltip('Hide password'), findsNWidgets(2));
+    expect(tester.widgetList<TextField>(find.byType(TextField)).any((f) => f.obscureText), isFalse);
+  });
+
   testWidgets('step 3 shows eight boxes and holds Confirm until all are filled', (tester) async {
     await tester.pumpWidget(host(prefs));
     await tester.pump();

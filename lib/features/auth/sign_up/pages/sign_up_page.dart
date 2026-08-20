@@ -216,12 +216,14 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
             label: LocaleKeys.auth_common_password.tr(),
             helperText: LocaleKeys.auth_common_minChars.tr(),
             obscureText: currentState.obscurePassword,
+            onToggleObscure: notifier.togglePasswordVisibility,
             onChanged: notifier.updatePassword,
           ),
           const SizedBox(height: 16),
           AppTextField(
             label: LocaleKeys.auth_signUp_confirmPassword.tr(),
             obscureText: currentState.obscurePassword,
+            onToggleObscure: notifier.togglePasswordVisibility,
             onChanged: notifier.updatePassword,
           ),
         ];

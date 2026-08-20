@@ -54,6 +54,27 @@ void main() {
     prefs = await SharedPreferences.getInstance();
   });
 
+  testWidgets('the password field reveals and re-hides from its own eye', (tester) async {
+    await tester.pumpWidget(host(prefs));
+    await tester.pump();
+
+    expect(tester.widget<TextField>(find.byType(TextField).last).obscureText, isTrue);
+
+    await tester.tap(find.byTooltip('Show password'));
+    await tester.pump();
+    expect(tester.widget<TextField>(find.byType(TextField).last).obscureText, isFalse);
+
+    await tester.tap(find.byTooltip('Hide password'));
+    await tester.pump();
+    expect(tester.widget<TextField>(find.byType(TextField).last).obscureText, isTrue);
+  });
+
+  testWidgets('only the password field carries an eye', (tester) async {
+    await tester.pumpWidget(host(prefs));
+    await tester.pump();
+    expect(find.byTooltip('Show password'), findsOneWidget);
+  });
+
   testWidgets('carries the design copy', (tester) async {
     await tester.pumpWidget(host(prefs));
     await tester.pump();
