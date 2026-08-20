@@ -21,23 +21,44 @@ void main() {
 
   testWidgets('expiring soon uses the orange tint pair', (tester) async {
     await tester.pumpWidget(host(
-      ExpiryBadge(status: ExpiryStatus.expiringSoon, expiry: DateTime(2026, 9, 12), today: today),
+      ExpiryBadge(status: ExpiryStatus.warning, expiry: DateTime(2026, 9, 12), today: today),
     ));
     expect(decorationOf(tester).color, const Color(0xFFFFF3E4));
     expect(tester.widget<Text>(find.byType(Text)).style!.color, const Color(0xFFA85506));
   });
 
-  testWidgets('expired uses the red tint pair', (tester) async {
+  testWidgets('expired is a filled red pill with white text', (tester) async {
     await tester.pumpWidget(host(
       ExpiryBadge(status: ExpiryStatus.expired, expiry: DateTime(2026, 8, 14), today: today),
     ));
+    expect(decorationOf(tester).color, const Color(0xFFC93A28));
+    expect(tester.widget<Text>(find.byType(Text)).style!.color, const Color(0xFFFFFFFF));
+  });
+
+  testWidgets('critical is red text on the red tint, not filled', (tester) async {
+    await tester.pumpWidget(host(
+      ExpiryBadge(status: ExpiryStatus.critical, expiry: DateTime(2026, 8, 22), today: today),
+    ));
     expect(decorationOf(tester).color, const Color(0xFFFFEDEB));
     expect(tester.widget<Text>(find.byType(Text)).style!.color, const Color(0xFFC93A28));
+    expect(find.text('22 Aug · 2d'), findsOneWidget);
+  });
+
+  testWidgets('dated pills carry an icon, plain dates do not', (tester) async {
+    await tester.pumpWidget(host(
+      ExpiryBadge(status: ExpiryStatus.critical, expiry: DateTime(2026, 8, 22), today: today),
+    ));
+    expect(find.byType(Icon), findsOneWidget);
+
+    await tester.pumpWidget(host(
+      ExpiryBadge(status: ExpiryStatus.ok, expiry: DateTime(2026, 11, 3), today: today),
+    ));
+    expect(find.byType(Icon), findsNothing);
   });
 
   testWidgets('healthy is bare text, not a pill', (tester) async {
     await tester.pumpWidget(host(
-      ExpiryBadge(status: ExpiryStatus.healthy, expiry: DateTime(2026, 11, 3), today: today),
+      ExpiryBadge(status: ExpiryStatus.ok, expiry: DateTime(2026, 11, 3), today: today),
     ));
     expect(decorationOf(tester).color, Colors.transparent);
     expect(tester.widget<Text>(find.byType(Text)).style!.fontSize, 12);
@@ -69,14 +90,14 @@ void main() {
 
   testWidgets('expiring soon shows the day countdown', (tester) async {
     await tester.pumpWidget(host(
-      ExpiryBadge(status: ExpiryStatus.expiringSoon, expiry: DateTime(2026, 9, 13), today: today),
+      ExpiryBadge(status: ExpiryStatus.warning, expiry: DateTime(2026, 9, 13), today: today),
     ));
     expect(find.text('13 Sep · 24d'), findsOneWidget);
   });
 
   testWidgets('dark mode takes the dark tint, not an inverted light one', (tester) async {
     await tester.pumpWidget(host(
-      ExpiryBadge(status: ExpiryStatus.expiringSoon, expiry: DateTime(2026, 9, 12), today: today),
+      ExpiryBadge(status: ExpiryStatus.warning, expiry: DateTime(2026, 9, 12), today: today),
       brightness: Brightness.dark,
     ));
     expect(decorationOf(tester).color, const Color(0xFF3A2A14));
