@@ -30,7 +30,7 @@ void main() {
     expect(container.read(signInStateProvider).canSubmit, isTrue);
   });
 
-  test('a successful sign-in navigates home', () async {
+  test('a successful sign-in lands on the shell', () async {
     final router = buildTestRouter();
     final repository = FakeAuthRepository();
     final container = ProviderContainer(
@@ -47,7 +47,7 @@ void main() {
     await notifier.signIn();
 
     expect(repository.calls, contains('signIn:a@b.com'));
-    expect(currentPath(router), '/home');
+    expect(currentPath(router), '/dashboard');
   });
 
   test('a failed sign-in stays put and records the error', () async {
@@ -77,5 +77,67 @@ void main() {
       container.read(signInStateProvider).errorMessage,
       'Incorrect email or password.',
     );
+  });
+
+  test('wrong credentials place the error below the password field', () async {
+    final router = buildTestRouter();
+    final repository = FakeAuthRepository(error: const InvalidCredentialsException());
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(repository),
+        routerProvider.overrideWithValue(router),
+      ],
+    );
+    addTearDown(container.dispose);
+    final notifier = container.read(signInStateProvider.notifier)
+      ..updateEmail('a@b.com')
+      ..updatePassword('secret');
+
+    await notifier.signIn();
+
+    expect(container.read(signInStateProvider).errorPlacement,
+        AuthErrorPlacement.belowPassword);
+  });
+
+  test('a deactivated account places the error above the email field', () async {
+    final router = buildTestRouter();
+    final repository = FakeAuthRepository(
+      error: const ForbiddenException(message: 'deactivated'),
+    );
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(repository),
+        routerProvider.overrideWithValue(router),
+      ],
+    );
+    addTearDown(container.dispose);
+    final notifier = container.read(signInStateProvider.notifier)
+      ..updateEmail('a@b.com')
+      ..updatePassword('secret');
+
+    await notifier.signIn();
+
+    expect(container.read(signInStateProvider).errorPlacement,
+        AuthErrorPlacement.aboveEmail);
+  });
+
+  test('editing either field clears the error surface', () async {
+    final router = buildTestRouter();
+    final repository = FakeAuthRepository(error: const InvalidCredentialsException());
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(repository),
+        routerProvider.overrideWithValue(router),
+      ],
+    );
+    addTearDown(container.dispose);
+    final notifier = container.read(signInStateProvider.notifier)
+      ..updateEmail('a@b.com')
+      ..updatePassword('secret');
+    await notifier.signIn();
+    expect(container.read(signInStateProvider).errorPlacement, isNot(AuthErrorPlacement.none));
+
+    notifier.updatePassword('secret2');
+    expect(container.read(signInStateProvider).errorPlacement, AuthErrorPlacement.none);
   });
 }
