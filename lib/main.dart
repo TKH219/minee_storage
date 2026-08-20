@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mine_storage/app/env/env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/app.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/storage/secure_local_storage.dart';
-import 'package:mine_storage/.env/env.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

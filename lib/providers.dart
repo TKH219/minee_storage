@@ -21,7 +21,7 @@ import 'package:mine_storage/domain/repositories/product_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
-import 'package:mine_storage/.env/env.dart';
+import 'package:mine_storage/app/env/env.dart';
 
 export 'package:mine_storage/shared/ui/app_snack.dart' show snackbarKey;
 
