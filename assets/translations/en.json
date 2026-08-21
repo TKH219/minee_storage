@@ -50,7 +50,9 @@
       "codeSentTitle": "Code sent",
       "codeSentSubtitle": "Check your inbox.",
       "didntGetIt": "Didn't get it? ",
-      "passwordsDontMatch": "These don't match. Retype the new password."
+      "passwordsDontMatch": "These don't match. Retype the new password.",
+      "step1of2": "STEP 1 OF 2",
+      "step2of2": "STEP 2 OF 2"
     },
     "social": {
       "continueWith": "or continue with",
@@ -86,7 +88,8 @@
       "invalidEmailOrShop": "Enter a valid email and your shop name.",
       "emailRegistered": "That email is already registered. Sign in instead.",
       "credentialsHint": "We'll email you a 6-digit code to confirm it.",
-      "passwordHint": "You'll use this with {email} to sign in."
+      "passwordHint": "You'll use this with {email} to sign in.",
+      "invalidEmailOrPassword": "Enter a valid email and a password of at least 6 characters."
     },
     "forgot": {
       "title": "Reset your password",
