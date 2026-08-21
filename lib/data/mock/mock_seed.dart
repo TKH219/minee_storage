@@ -164,21 +164,24 @@ MockSeed mockSeed() {
   final stores = <Store>[
     const Store(
         id: _mainStore,
+        ownerId: 'mock-owner',
         name: 'Northside · Main',
+        categoryCode: 'grocery',
         currencyCode: 'USD',
-        productCount: 128,
         role: StoreRole.owner),
     const Store(
         id: 'northside-depot',
+        ownerId: 'mock-owner',
         name: 'Northside · Depot',
+        categoryCode: 'warehouse',
         currencyCode: 'USD',
-        productCount: 64,
         role: StoreRole.manager),
     const Store(
         id: 'riverside-kiosk',
+        ownerId: 'mock-owner',
         name: 'Riverside Kiosk',
+        categoryCode: 'grocery',
         currencyCode: 'VND',
-        productCount: 41,
         role: StoreRole.staff),
   ];
 
