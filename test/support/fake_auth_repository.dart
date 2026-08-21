@@ -92,13 +92,15 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) async {
-    calls.add('updateProfile:$fullName');
+    // Mirrors AuthRepositoryImpl, which trims before it writes.
+    final trimmed = fullName.trim();
+    calls.add('updateProfile:$trimmed');
     lastAvatarUrl = avatarUrl;
     _maybeThrow();
     final updated = UserEntity(
       id: user?.id ?? 'uid-1',
       email: user?.email ?? 'a@b.com',
-      fullName: fullName,
+      fullName: trimmed,
       avatarUrl: avatarUrl,
       onboardingCompletedAt: user?.onboardingCompletedAt,
     );

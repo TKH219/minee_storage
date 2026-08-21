@@ -8,6 +8,7 @@ import 'package:mine_storage/features/auth/sign_in/pages/sign_in_page.dart';
 import 'package:mine_storage/features/auth/sign_up/pages/sign_up_page.dart';
 import 'package:mine_storage/features/dashboard/pages/dashboard_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
+import 'package:mine_storage/features/onboarding/profile/pages/profile_page.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
@@ -57,7 +58,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.onboardingProfile,
         name: AppRoutes.onboardingProfileName,
-        pageBuilder: (context, state) => _fadePage(state, const SizedBox.shrink()),
+        pageBuilder: (context, state) => _fadePage(state, const ProfilePage()),
       ),
       GoRoute(
         path: AppRoutes.createStore,
