@@ -41,7 +41,7 @@ void main() {
 
     expect(t.container.read(signUpStateProvider).step, SignUpStep.code);
     expect(t.container.read(signUpStateProvider).wasResumed, isFalse);
-    expect(t.repository.calls, contains('startSignUp:a@b.com:'));
+    expect(t.repository.calls, contains('startSignUp:a@b.com'));
   });
 
   test('a confirmed email is blocked and stays on step one', () async {
@@ -107,7 +107,7 @@ void main() {
     notifier.updateCode('123456');
     await notifier.submitCode();
 
-    expect(t.repository.calls, contains('confirmSignUp:123456:resumed=false'));
+    expect(t.repository.calls, contains('confirmSignUp:123456'));
     expect(currentPath(t.router), '/home');
   });
 

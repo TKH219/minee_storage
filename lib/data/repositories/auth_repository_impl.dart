@@ -23,18 +23,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> startSignUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) {
-    return _guard(
-      () => _dataSource.signUp(
-        email: _normalise(email),
-        password: password,
-        shopName: shopName.trim(),
-      ),
-    );
+  Future<void> startSignUp({required String email, required String password}) {
+    return _guard(() => _dataSource.signUp(email: _normalise(email), password: password));
   }
 
   @override
@@ -42,12 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _guard(() => _dataSource.resendSignUpCode(_normalise(email)));
 
   @override
-  Future<UserEntity> confirmSignUp({
-    required String email,
-    required String token,
-    required String shopName,
-    required bool wasResumed,
-  }) {
+  Future<UserEntity> confirmSignUp({required String email, required String token}) {
     return _guard(() async {
       final userId = await _dataSource.verifySignUpCode(
         email: _normalise(email),
@@ -118,6 +103,24 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() => _guard(() => _dataSource.signOut());
 
   @override
+  Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) {
+    return _guard(() async {
+      final id = _requireSession();
+      await _dataSource.updateProfileRow(
+        userId: id,
+        fullName: fullName.trim(),
+        avatarUrl: avatarUrl,
+      );
+      return _requireUser(id);
+    });
+  }
+
+  @override
+  Future<void> completeOnboarding() {
+    return _guard(() => _dataSource.stampOnboardingCompleted(_requireSession()));
+  }
+
+  @override
   Future<UserEntity?> currentUser() {
     return _guard(() async {
       final id = _dataSource.currentUserId;
@@ -129,6 +132,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<bool> get authStateChanges => _dataSource.authStateChanges;
+
+  String _requireSession() {
+    final id = _dataSource.currentUserId;
+    if (id == null) {
+      throw const UnauthorizedException(
+        message: 'Your session has expired. Please sign in again.',
+      );
+    }
+    return id;
+  }
 
   Future<UserEntity> _requireUser(String userId) async {
     final row = await _dataSource.fetchUserRow(userId);

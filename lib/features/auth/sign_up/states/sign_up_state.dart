@@ -148,7 +148,6 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
           await _authRepository.startSignUp(
             email: state.email,
             password: state.password,
-            shopName: '',
           );
           showLoaded();
           updateState(state.copyWith(step: SignUpStep.code, wasResumed: false));
@@ -166,12 +165,7 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
     try {
       showLoading();
-      await _authRepository.confirmSignUp(
-        email: state.email,
-        token: state.code,
-        shopName: '',
-        wasResumed: state.wasResumed,
-      );
+      await _authRepository.confirmSignUp(email: state.email, token: state.code);
       showLoaded();
       router()?.goNamed(AppRoutes.homeName);
     } on Object catch (e) {

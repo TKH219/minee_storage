@@ -18,6 +18,8 @@ class FakeAuthRepository implements AuthRepository {
   /// Held so widget tests can observe an in-flight state.
   Duration delay;
 
+  String? lastAvatarUrl;
+
   final List<String> calls = [];
   final StreamController<bool> authStateController = StreamController<bool>.broadcast();
 
@@ -33,12 +35,8 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> startSignUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
-    calls.add('startSignUp:$email:$shopName');
+  Future<void> startSignUp({required String email, required String password}) async {
+    calls.add('startSignUp:$email');
     _maybeThrow();
   }
 
@@ -49,15 +47,10 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> confirmSignUp({
-    required String email,
-    required String token,
-    required String shopName,
-    required bool wasResumed,
-  }) async {
-    calls.add('confirmSignUp:$token:resumed=$wasResumed');
+  Future<UserEntity> confirmSignUp({required String email, required String token}) async {
+    calls.add('confirmSignUp:$token');
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, fullName: shopName);
+    return user ?? UserEntity(id: 'uid-1', email: email);
   }
 
   @override
@@ -91,6 +84,28 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async => calls.add('signOut');
+
+  @override
+  Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) async {
+    calls.add('updateProfile:$fullName');
+    lastAvatarUrl = avatarUrl;
+    _maybeThrow();
+    final updated = UserEntity(
+      id: user?.id ?? 'uid-1',
+      email: user?.email ?? 'a@b.com',
+      fullName: fullName,
+      avatarUrl: avatarUrl,
+      onboardingCompletedAt: user?.onboardingCompletedAt,
+    );
+    user = updated;
+    return updated;
+  }
+
+  @override
+  Future<void> completeOnboarding() async {
+    calls.add('completeOnboarding');
+    _maybeThrow();
+  }
 
   @override
   Future<UserEntity?> currentUser() async {
