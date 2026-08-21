@@ -54,14 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
         token: token.trim(),
       );
 
-      // The trigger read raw_user_meta_data from the *first* attempt, so a
-      // resumed signup would otherwise silently discard the name just typed.
-      if (wasResumed) {
-        await _dataSource.updateShopName(userId: userId, shopName: shopName.trim());
-      }
-
-      final user = await _requireUser(userId);
-      return wasResumed ? _withShopName(user, shopName.trim()) : user;
+      return _requireUser(userId);
     });
   }
 
@@ -146,14 +139,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     return UserEntity.fromRow(row);
   }
-
-  UserEntity _withShopName(UserEntity user, String shopName) => UserEntity(
-    id: user.id,
-    email: user.email,
-    shopName: shopName,
-    isDeactivated: user.isDeactivated,
-    lastSignedInAt: user.lastSignedInAt,
-  );
 
   String _normalise(String email) => email.trim().toLowerCase();
 
