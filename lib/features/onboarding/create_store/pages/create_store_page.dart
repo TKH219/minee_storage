@@ -202,15 +202,21 @@ class _CreateStorePageState
         ),
         child: Row(
           children: [
+            Text(
+              label,
+              style: context.textStyles.sansBody.copyWith(color: colors.neutral9),
+            ),
+            const SizedBox(width: 16),
+            // The value takes what is left: a long category name in Vietnamese
+            // would otherwise push the chevron off the row.
             Expanded(
               child: Text(
-                label,
-                style: context.textStyles.sansBody.copyWith(color: colors.neutral9),
+                value,
+                textAlign: TextAlign.end,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textStyles.sansCaption.copyWith(color: colors.neutral6),
               ),
-            ),
-            Text(
-              value,
-              style: context.textStyles.sansCaption.copyWith(color: colors.neutral6),
             ),
             const SizedBox(width: 6),
             Icon(Icons.chevron_right_rounded, size: 20, color: colors.neutral4),
