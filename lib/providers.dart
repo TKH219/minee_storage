@@ -12,6 +12,10 @@ import 'package:mine_storage/core/storage/user_state_purger.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source_impl.dart';
 import 'package:mine_storage/data/repositories/supabase_store_repository_impl.dart';
+import 'package:mine_storage/data/data_sources/remote/storage_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/storage_data_source_impl.dart';
+import 'package:mine_storage/data/repositories/media_repository_impl.dart';
+import 'package:mine_storage/domain/repositories/media_repository.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
@@ -113,6 +117,14 @@ final mockDatabaseProvider = Provider<MockDatabase>((ref) => MockDatabase());
 
 final productRepositoryProvider = Provider<ProductRepository>(
   (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
+);
+
+final storageDataSourceProvider = Provider<StorageDataSource>(
+  (ref) => StorageDataSourceImpl(ref.watch(supabaseClientProvider)),
+);
+
+final mediaRepositoryProvider = Provider<MediaRepository>(
+  (ref) => MediaRepositoryImpl(ref.watch(storageDataSourceProvider)),
 );
 
 final storeDataSourceProvider = Provider<StoreDataSource>(
