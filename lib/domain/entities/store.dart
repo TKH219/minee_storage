@@ -5,18 +5,63 @@ enum StoreRole { owner, manager, staff }
 class Store extends Equatable {
   const Store({
     required this.id,
+    required this.ownerId,
     required this.name,
-    required this.currencyCode,
-    required this.productCount,
-    required this.role,
+    this.categoryCode,
+    this.address,
+    this.url,
+    this.currencyCode = 'VND',
+    this.phone,
+    this.timezone = 'Asia/Ho_Chi_Minh',
+    this.logoUrl,
+    this.isArchived = false,
+    this.role = StoreRole.owner,
   });
 
+  /// Builds from a `public.stores` row as PostgREST returns it.
+  ///
+  /// [role] is always owner: row-level security only ever returns rows whose
+  /// `owner_id` is the caller. Memberships arrive with the roles feature.
+  factory Store.fromRow(Map<String, dynamic> row) => Store(
+    id: row['id'] as String,
+    ownerId: (row['owner_id'] as String?) ?? '',
+    name: (row['name'] as String?) ?? '',
+    categoryCode: row['category_code'] as String?,
+    address: row['address'] as String?,
+    url: row['url'] as String?,
+    currencyCode: (row['currency'] as String?) ?? 'VND',
+    phone: row['phone'] as String?,
+    timezone: (row['timezone'] as String?) ?? 'Asia/Ho_Chi_Minh',
+    logoUrl: row['logo_url'] as String?,
+    isArchived: (row['is_archived'] as bool?) ?? false,
+  );
+
   final String id;
+  final String ownerId;
   final String name;
+  final String? categoryCode;
+  final String? address;
+  final String? url;
   final String currencyCode;
-  final int productCount;
+  final String? phone;
+  final String timezone;
+  final String? logoUrl;
+  final bool isArchived;
   final StoreRole role;
 
   @override
-  List<Object?> get props => [id, name, currencyCode, productCount, role];
+  List<Object?> get props => [
+    id,
+    ownerId,
+    name,
+    categoryCode,
+    address,
+    url,
+    currencyCode,
+    phone,
+    timezone,
+    logoUrl,
+    isArchived,
+    role,
+  ];
 }
