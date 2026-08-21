@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../support/fake_store_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -14,18 +16,27 @@ import '../support/fake_auth_repository.dart';
 import '../support/localization_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   setUp(useLocale);
 
   ProviderContainer containerWith(AuthRepository repository, GoRouter router) {
-    return ProviderContainer(
+    final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
+    // The provider is auto-dispose; in the app the page listens for its whole
+    // life. Without a listener here it is collected across the resolver's
+    // async gaps and the navigation never lands.
+    container.listen(splashStateProvider, (_, _) {});
+    return container;
   }
 
-  test('routes to home when a session exists', () async {
+  test('routes to the dashboard when a session is fully onboarded', () async {
     final router = buildTestRouter();
     final container = containerWith(
       FakeAuthRepository(
@@ -37,7 +48,7 @@ void main() {
 
     await container.read(splashStateProvider.notifier).bootstrap();
 
-    expect(currentPath(router), '/home');
+    expect(currentPath(router), '/dashboard');
   });
 
   test('routes to sign-in when there is no session', () async {

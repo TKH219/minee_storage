@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_state.dart';
-import 'package:mine_storage/domain/repositories/auth_repository.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
@@ -34,15 +34,23 @@ class SplashState extends BaseState with Equatable {
 ///
 /// Losing a session mid-use routes back to splash, which re-runs this — that is
 /// what keeps the rule in one place instead of duplicating it in a redirect.
-String resolveStartRoute({required bool loggedIn}) =>
-    loggedIn ? AppRoutes.homeName : AppRoutes.signInName;
+String resolveStartRoute({
+  required bool loggedIn,
+  required bool needsProfile,
+  required bool needsStore,
+}) {
+  if (!loggedIn) return AppRoutes.signInName;
+  if (needsProfile) return AppRoutes.onboardingProfileName;
+  if (needsStore) return AppRoutes.createStoreName;
+  return AppRoutes.dashboardName;
+}
 
 class SplashStateNotifier extends BaseStateNotifier<SplashState> {
-  late final AuthRepository _authRepository;
+  late final OnboardingResolver _resolver;
 
   @override
   SplashState createInitialState() {
-    _authRepository = ref.read(authRepositoryProvider);
+    _resolver = ref.read(onboardingResolverProvider);
     return const SplashState();
   }
 
@@ -50,13 +58,15 @@ class SplashStateNotifier extends BaseStateNotifier<SplashState> {
   Future<void> bootstrap() async {
     showLoading();
     try {
-      final user = await _authRepository.currentUser();
+      final route = await _resolver.resolve();
+      if (!ref.mounted) return;
       showLoaded();
-      router()?.goNamed(resolveStartRoute(loggedIn: user != null));
+      router()?.goNamed(route);
     } on Object catch (e) {
       logger.e('Splash bootstrap failed', error: e);
+      if (!ref.mounted) return;
       showLoaded();
-      router()?.goNamed(resolveStartRoute(loggedIn: false));
+      router()?.goNamed(AppRoutes.signInName);
     }
   }
 }

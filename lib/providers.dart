@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
@@ -16,6 +17,7 @@ import 'package:mine_storage/data/data_sources/remote/storage_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/storage_data_source_impl.dart';
 import 'package:mine_storage/data/repositories/media_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/media_repository.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
@@ -117,6 +119,14 @@ final mockDatabaseProvider = Provider<MockDatabase>((ref) => MockDatabase());
 
 final productRepositoryProvider = Provider<ProductRepository>(
   (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
+);
+
+final onboardingResolverProvider = Provider<OnboardingResolver>(
+  (ref) => OnboardingResolver(
+    ref.watch(authRepositoryProvider),
+    ref.watch(storeRepositoryProvider),
+    SharedPreferences.getInstance,
+  ),
 );
 
 final storageDataSourceProvider = Provider<StorageDataSource>(

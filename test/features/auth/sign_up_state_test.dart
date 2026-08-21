@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../support/fake_store_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +16,7 @@ import '../../support/localization_test_harness.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   setUp(useLocale);
 
   ({ProviderContainer container, FakeAuthRepository repository, GoRouter router}) build({
@@ -24,10 +27,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signUpStateProvider, (_, _) {});
     return (container: container, repository: repository, router: router);
   }
 
@@ -97,7 +104,7 @@ void main() {
     expect(t.repository.calls, isEmpty);
   });
 
-  test('a valid code confirms and navigates onward', () async {
+  test('a valid code confirms and hands over to onboarding', () async {
     final t = build();
     final notifier = t.container.read(signUpStateProvider.notifier)
       ..updateEmail('a@b.com')
@@ -108,7 +115,7 @@ void main() {
     await notifier.submitCode();
 
     expect(t.repository.calls, contains('confirmSignUp:123456'));
-    expect(currentPath(t.router), '/home');
+    expect(currentPath(t.router), '/onboarding/profile');
   });
 
   test('the code step rejects anything other than six digits', () async {
