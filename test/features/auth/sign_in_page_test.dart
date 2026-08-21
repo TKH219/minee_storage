@@ -54,6 +54,15 @@ void main() {
     prefs = await SharedPreferences.getInstance();
   });
 
+  testWidgets('no social sign-in buttons while the feature is off', (tester) async {
+    await tester.pumpWidget(host(prefs));
+    await tester.pump();
+
+    expect(find.text('Google'), findsNothing);
+    expect(find.text('Apple'), findsNothing);
+    expect(find.text('or continue with'), findsNothing);
+  });
+
   testWidgets('the password field reveals and re-hides from its own eye', (tester) async {
     await tester.pumpWidget(host(prefs));
     await tester.pump();

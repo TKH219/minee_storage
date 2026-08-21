@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mine_storage/app/config/app_features.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
@@ -91,7 +92,7 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
                 // Only the first step offers social — past it the account is
                 // already being created with an email and password.
                 const SizedBox(height: 24),
-                const SocialSignInSection(),
+                if (AppFeatures.socialSignInEnabled) const SocialSignInSection(),
                 const SizedBox(height: 12),
                 _footer(
                   context,
