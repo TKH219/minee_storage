@@ -160,5 +160,43 @@
     "themeLight": "Sáng",
     "themeDark": "Tối",
     "language": "Ngôn ngữ"
+  },
+  "onboarding": {
+    "profile": {
+      "title": "Bạn tên là gì?",
+      "subtitle": "Tên của bạn sẽ hiện trên hóa đơn và những gì bạn chia sẻ.",
+      "fullName": "Họ và tên",
+      "fullNameHint": "Nguyễn Thùy Linh",
+      "required": "Bắt buộc.",
+      "addPhoto": "Thêm ảnh",
+      "uploading": "Đang tải lên…",
+      "continueLabel": "Tiếp tục",
+      "nameRequired": "Nhập tên của bạn để tiếp tục.",
+      "photoFailed": "Không tải được ảnh này. Bạn vẫn có thể tiếp tục mà không cần ảnh."
+    },
+    "store": {
+      "title": "Thiết lập cửa hàng",
+      "subtitle": "Bạn có thể thêm cửa hàng khác sau và chuyển qua lại.",
+      "logo": "Ảnh cửa hàng",
+      "optional": "không bắt buộc",
+      "name": "Tên cửa hàng",
+      "nameHint": "Tạp hóa Linh",
+      "category": "Loại hình",
+      "categoryPrompt": "Chọn loại hình",
+      "categoryTitle": "Cửa hàng của bạn thuộc loại nào?",
+      "currency": "Tiền tệ",
+      "currencyTitle": "Dùng tiền tệ nào?",
+      "address": "Địa chỉ",
+      "addressHint": "12 Lê Lợi, Quận 1",
+      "url": "Liên kết cửa hàng",
+      "urlHint": "shopee.vn/cua-hang",
+      "urlHelp": "Dành cho cửa hàng bán online.",
+      "urlInvalid": "Liên kết này không hợp lệ.",
+      "create": "Tạo cửa hàng",
+      "nameRequired": "Đặt tên cho cửa hàng của bạn.",
+      "categoryRequired": "Chọn loại hình cho cửa hàng.",
+      "categoriesFailed": "Không tải được danh sách loại hình.",
+      "retry": "Thử lại"
+    }
   }
 }

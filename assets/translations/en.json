@@ -160,5 +160,43 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "language": "Language"
+  },
+  "onboarding": {
+    "profile": {
+      "title": "Tell us who you are",
+      "subtitle": "Your name shows on invoices and on anything you share.",
+      "fullName": "Full name",
+      "fullNameHint": "Maya Chen",
+      "required": "Required.",
+      "addPhoto": "Add a photo",
+      "uploading": "Uploading…",
+      "continueLabel": "Continue",
+      "nameRequired": "Enter your name to continue.",
+      "photoFailed": "That photo could not be uploaded. You can carry on without it."
+    },
+    "store": {
+      "title": "Set up your shop",
+      "subtitle": "You can add more shops later, and switch between them.",
+      "logo": "Shop logo",
+      "optional": "optional",
+      "name": "Shop name",
+      "nameHint": "Northside Grocers",
+      "category": "Category",
+      "categoryPrompt": "Choose a category",
+      "categoryTitle": "What kind of shop?",
+      "currency": "Currency",
+      "currencyTitle": "Which currency?",
+      "address": "Address",
+      "addressHint": "12 Lê Lợi, District 1",
+      "url": "Shop link",
+      "urlHint": "shopee.vn/your-shop",
+      "urlHelp": "For a shop that sells online.",
+      "urlInvalid": "That doesn't look like a valid link.",
+      "create": "Create shop",
+      "nameRequired": "Give your shop a name.",
+      "categoryRequired": "Choose a category for your shop.",
+      "categoriesFailed": "Categories could not be loaded.",
+      "retry": "Try again"
+    }
   }
 }
