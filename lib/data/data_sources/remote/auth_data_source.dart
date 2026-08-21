@@ -1,11 +1,7 @@
 abstract class AuthDataSource {
   Future<String> emailStatus(String email);
 
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  });
+  Future<void> signUp({required String email, required String password});
 
   Future<void> resendSignUpCode(String email);
 
@@ -25,7 +21,13 @@ abstract class AuthDataSource {
 
   Future<void> touchLastSignedIn(String userId);
 
-  Future<void> updateShopName({required String userId, required String shopName});
+  Future<void> updateProfileRow({
+    required String userId,
+    required String fullName,
+    String? avatarUrl,
+  });
+
+  Future<void> stampOnboardingCompleted(String userId);
 
   String? get currentUserId;
 

@@ -17,16 +17,8 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
-    await _client.auth.signUp(
-      email: email,
-      password: password,
-      data: {'shop_name': shopName},
-    );
+  Future<void> signUp({required String email, required String password}) async {
+    await _client.auth.signUp(email: email, password: password);
   }
 
   @override
@@ -87,11 +79,27 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
-  Future<void> updateShopName({required String userId, required String shopName}) async {
+  Future<void> updateProfileRow({
+    required String userId,
+    required String fullName,
+    String? avatarUrl,
+  }) async {
     await _client
         .from('users')
         .update({
-          'shop_name': shopName,
+          'full_name': fullName,
+          'avatar_url': ?avatarUrl,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('id', userId);
+  }
+
+  @override
+  Future<void> stampOnboardingCompleted(String userId) async {
+    await _client
+        .from('users')
+        .update({
+          'onboarding_completed_at': DateTime.now().toUtc().toIso8601String(),
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         })
         .eq('id', userId);
