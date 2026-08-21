@@ -29,7 +29,7 @@ void main() {
     final router = buildTestRouter();
     final container = containerWith(
       FakeAuthRepository(
-        user: const UserEntity(id: 'uid-1', email: 'a@b.com', shopName: 'S'),
+        user: const UserEntity(id: 'uid-1', email: 'a@b.com', fullName: 'S'),
       ),
       router,
     );
