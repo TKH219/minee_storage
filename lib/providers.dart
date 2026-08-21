@@ -9,6 +9,9 @@ import 'package:mine_storage/core/network/dio_builder.dart';
 import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
 import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
+import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/store_data_source_impl.dart';
+import 'package:mine_storage/data/repositories/supabase_store_repository_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
@@ -16,7 +19,6 @@ import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/data/mock/mock_database.dart';
 import 'package:mine_storage/data/repositories/mock_product_repository_impl.dart';
-import 'package:mine_storage/data/repositories/mock_store_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
@@ -113,6 +115,10 @@ final productRepositoryProvider = Provider<ProductRepository>(
   (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
 );
 
+final storeDataSourceProvider = Provider<StoreDataSource>(
+  (ref) => StoreDataSourceImpl(ref.watch(supabaseClientProvider)),
+);
+
 final storeRepositoryProvider = Provider<StoreRepository>(
-  (ref) => MockStoreRepositoryImpl(ref.watch(mockDatabaseProvider)),
+  (ref) => SupabaseStoreRepositoryImpl(ref.watch(storeDataSourceProvider)),
 );
