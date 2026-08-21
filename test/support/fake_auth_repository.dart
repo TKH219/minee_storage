@@ -50,7 +50,10 @@ class FakeAuthRepository implements AuthRepository {
   Future<UserEntity> confirmSignUp({required String email, required String token}) async {
     calls.add('confirmSignUp:$token');
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email);
+    // Confirming leaves a real session behind, so currentUser() must see it.
+    final confirmed = user ?? UserEntity(id: 'uid-1', email: email);
+    user = confirmed;
+    return confirmed;
   }
 
   @override
@@ -58,7 +61,9 @@ class FakeAuthRepository implements AuthRepository {
     calls.add('signIn:$email');
     if (delay > Duration.zero) await Future<void>.delayed(delay);
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, fullName: 'S');
+    final signedIn = user ?? UserEntity(id: 'uid-1', email: email, fullName: 'S');
+    user = signedIn;
+    return signedIn;
   }
 
   @override

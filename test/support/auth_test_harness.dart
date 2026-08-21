@@ -19,6 +19,12 @@ GoRouter buildTestRouter() {
         name: AppRoutes.forgotPasswordName,
         builder: stub,
       ),
+      GoRoute(
+        path: AppRoutes.onboardingProfile,
+        name: AppRoutes.onboardingProfileName,
+        builder: stub,
+      ),
+      GoRoute(path: AppRoutes.createStore, name: AppRoutes.createStoreName, builder: stub),
       GoRoute(path: AppRoutes.home, name: AppRoutes.homeName, builder: stub),
       GoRoute(path: AppRoutes.dashboard, name: AppRoutes.dashboardName, builder: stub),
       GoRoute(path: AppRoutes.settings, name: AppRoutes.settingsName, builder: stub),

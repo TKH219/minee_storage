@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../support/fake_store_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,6 +14,7 @@ import '../../support/fake_auth_repository.dart';
 import '../../support/localization_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   setUp(useLocale);
 
   test('canSubmit requires both fields', () {
@@ -19,10 +22,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier);
 
     expect(container.read(signInStateProvider).canSubmit, isFalse);
@@ -40,10 +47,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier)
       ..updateEmail('a@b.com')
       ..updatePassword('secret');
@@ -65,10 +76,14 @@ void main() {
             ),
           ),
         ),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier)
       ..updateEmail('a@b.com')
       ..updatePassword('wrong');
@@ -90,10 +105,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier)
       ..updateEmail('a@b.com')
       ..updatePassword('secret');
@@ -112,10 +131,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier)
       ..updateEmail('a@b.com')
       ..updatePassword('secret');
@@ -132,10 +155,14 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(signInStateProvider, (_, _) {});
     final notifier = container.read(signInStateProvider.notifier)
       ..updateEmail('a@b.com')
       ..updatePassword('secret');

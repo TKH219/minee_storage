@@ -4,11 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
-import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
@@ -87,10 +87,12 @@ class SignUpState extends BaseState with Equatable {
 
 class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
   late final AuthRepository _authRepository;
+  late final OnboardingResolver _resolver;
 
   @override
   SignUpState createInitialState() {
     _authRepository = ref.read(authRepositoryProvider);
+    _resolver = ref.read(onboardingResolverProvider);
     return const SignUpState();
   }
 
@@ -167,7 +169,9 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       showLoading();
       await _authRepository.confirmSignUp(email: state.email, token: state.code);
       showLoaded();
-      router()?.goNamed(AppRoutes.homeName);
+      final route = await _resolver.resolve();
+      if (!ref.mounted) return;
+      router()?.goNamed(route);
     } on Object catch (e) {
       _handleError(e);
     }
