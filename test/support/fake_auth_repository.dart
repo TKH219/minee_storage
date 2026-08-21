@@ -57,7 +57,7 @@ class FakeAuthRepository implements AuthRepository {
   }) async {
     calls.add('confirmSignUp:$token:resumed=$wasResumed');
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, shopName: shopName);
+    return user ?? UserEntity(id: 'uid-1', email: email, fullName: shopName);
   }
 
   @override
@@ -65,7 +65,7 @@ class FakeAuthRepository implements AuthRepository {
     calls.add('signIn:$email');
     if (delay > Duration.zero) await Future<void>.delayed(delay);
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, shopName: 'S');
+    return user ?? UserEntity(id: 'uid-1', email: email, fullName: 'S');
   }
 
   @override

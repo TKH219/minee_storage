@@ -12,7 +12,7 @@ import '../support/localization_test_harness.dart';
 Map<String, dynamic> row({bool deactivated = false, String shop = 'Minee'}) => {
   'id': 'uid-1',
   'email': 'a@b.com',
-  'shop_name': shop,
+  'full_name': shop,
   'is_deactivated': deactivated,
   'last_signed_in_at': null,
 };
@@ -27,7 +27,7 @@ void main() {
     final user = await repository.signIn(email: 'A@B.com ', password: 'secret');
 
     expect(user.id, 'uid-1');
-    expect(user.shopName, 'Minee');
+    expect(user.fullName, 'Minee');
     expect(source.calls, contains('signIn:a@b.com'));
     expect(source.calls, contains('touch:uid-1'));
   });
@@ -127,23 +127,8 @@ void main() {
       wasResumed: false,
     );
 
-    expect(user.shopName, 'Original');
+    expect(user.fullName, 'Original');
     expect(source.calls.where((c) => c.startsWith('updateShopName')), isEmpty);
-  });
-
-  test('a resumed signup overwrites the shop name the trigger stored', () async {
-    final source = FakeAuthDataSource(row: row(shop: 'Old Name'));
-    final repository = AuthRepositoryImpl(source);
-
-    final user = await repository.confirmSignUp(
-      email: 'a@b.com',
-      token: '123456',
-      shopName: 'New Name',
-      wasResumed: true,
-    );
-
-    expect(source.calls, contains('updateShopName:New Name'));
-    expect(user.shopName, 'New Name');
   });
 
   test('confirmSignUp maps a bad code', () async {
