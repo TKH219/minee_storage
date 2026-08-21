@@ -55,6 +55,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _fadePage(state, const ForgotPasswordPage()),
       ),
       GoRoute(
+        path: AppRoutes.onboardingProfile,
+        name: AppRoutes.onboardingProfileName,
+        pageBuilder: (context, state) => _fadePage(state, const SizedBox.shrink()),
+      ),
+      GoRoute(
+        path: AppRoutes.createStore,
+        name: AppRoutes.createStoreName,
+        pageBuilder: (context, state) => _fadePage(state, const SizedBox.shrink()),
+      ),
+      GoRoute(
         path: AppRoutes.settings,
         name: AppRoutes.settingsName,
         builder: (context, state) => const SettingsPage(),

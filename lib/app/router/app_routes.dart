@@ -17,6 +17,12 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String forgotPasswordName = 'forgotPassword';
 
+  static const String onboardingProfile = '/onboarding/profile';
+  static const String onboardingProfileName = 'onboardingProfile';
+
+  static const String createStore = '/onboarding/store';
+  static const String createStoreName = 'createStore';
+
   static const String home = '/home';
   static const String homeName = 'home';
 

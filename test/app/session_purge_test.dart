@@ -1,3 +1,4 @@
+import '../support/fake_store_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +46,9 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
+        storeRepositoryProvider.overrideWithValue(
+          FakeStoreRepository(stores: [storeFixture()]),
+        ),
         routerProvider.overrideWithValue(router),
         // Only read for the initial value; never issues a request here.
         supabaseClientProvider.overrideWithValue(
