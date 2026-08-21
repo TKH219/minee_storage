@@ -117,13 +117,11 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
     );
   }
 
-  /// A resumed signup skips the password step entirely, so it counts two.
   String get _eyebrow {
     if (currentState.wasResumed) return LocaleKeys.auth_signUp_step2of2Resumed.tr();
     return switch (currentState.step) {
-      SignUpStep.credentials => LocaleKeys.auth_common_step1of3.tr(),
-      SignUpStep.password => LocaleKeys.auth_common_step2of3.tr(),
-      SignUpStep.code => LocaleKeys.auth_common_step3of3.tr(),
+      SignUpStep.credentials => LocaleKeys.auth_common_step1of2.tr(),
+      SignUpStep.code => LocaleKeys.auth_common_step2of2.tr(),
     };
   }
 
@@ -133,7 +131,6 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
     }
     return switch (currentState.step) {
       SignUpStep.credentials => LocaleKeys.auth_signUp_title.tr(),
-      SignUpStep.password => LocaleKeys.auth_signUp_choosePassword.tr(),
       SignUpStep.code => LocaleKeys.auth_common_enterYourCode.tr(),
     };
   }
@@ -144,20 +141,17 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
     }
     return switch (currentState.step) {
       SignUpStep.credentials => LocaleKeys.auth_signUp_credentialsHint.tr(),
-      SignUpStep.password => LocaleKeys.auth_signUp_passwordHint.tr(namedArgs: {'email': currentState.email}),
       SignUpStep.code => LocaleKeys.auth_common_sentTo.tr(namedArgs: {'email': currentState.email}),
     };
   }
 
   String get _buttonLabel => switch (currentState.step) {
-    SignUpStep.credentials => LocaleKeys.auth_signUp_continueLabel.tr(),
-    SignUpStep.password => LocaleKeys.auth_signUp_createAccount.tr(),
+    SignUpStep.credentials => LocaleKeys.auth_signUp_createAccount.tr(),
     SignUpStep.code => LocaleKeys.auth_signUp_confirmAccount.tr(),
   };
 
   bool get _canSubmit => switch (currentState.step) {
     SignUpStep.credentials => currentState.canSubmitCredentials,
-    SignUpStep.password => currentState.canSubmitPassword,
     SignUpStep.code => currentState.canSubmitCode,
   };
 
@@ -165,8 +159,6 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
     switch (currentState.step) {
       case SignUpStep.credentials:
         notifier.submitCredentials();
-      case SignUpStep.password:
-        notifier.submitPassword();
       case SignUpStep.code:
         notifier.submitCode();
     }
@@ -205,24 +197,8 @@ class _SignUpPageState extends BasePageState<SignUpPage, SignUpState, SignUpStat
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: LocaleKeys.auth_signUp_shopName.tr(),
-            hint: LocaleKeys.auth_signUp_shopNameHint.tr(),
-            helperText: LocaleKeys.auth_signUp_shopNameHelp.tr(),
-            onChanged: notifier.updateShopName,
-          ),
-        ];
-      case SignUpStep.password:
-        return [
-          AppTextField(
             label: LocaleKeys.auth_common_password.tr(),
             helperText: LocaleKeys.auth_common_minChars.tr(),
-            obscureText: currentState.obscurePassword,
-            onToggleObscure: notifier.togglePasswordVisibility,
-            onChanged: notifier.updatePassword,
-          ),
-          const SizedBox(height: 16),
-          AppTextField(
-            label: LocaleKeys.auth_signUp_confirmPassword.tr(),
             obscureText: currentState.obscurePassword,
             onToggleObscure: notifier.togglePasswordVisibility,
             onChanged: notifier.updatePassword,

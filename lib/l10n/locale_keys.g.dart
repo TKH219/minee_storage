@@ -48,6 +48,8 @@ abstract class  LocaleKeys {
   static const auth_common_codeSentSubtitle = 'auth.common.codeSentSubtitle';
   static const auth_common_didntGetIt = 'auth.common.didntGetIt';
   static const auth_common_passwordsDontMatch = 'auth.common.passwordsDontMatch';
+  static const auth_common_step1of2 = 'auth.common.step1of2';
+  static const auth_common_step2of2 = 'auth.common.step2of2';
   static const auth_common = 'auth.common';
   static const auth_social_continueWith = 'auth.social.continueWith';
   static const auth_social_apple = 'auth.social.apple';
@@ -81,6 +83,7 @@ abstract class  LocaleKeys {
   static const auth_signUp_emailRegistered = 'auth.signUp.emailRegistered';
   static const auth_signUp_credentialsHint = 'auth.signUp.credentialsHint';
   static const auth_signUp_passwordHint = 'auth.signUp.passwordHint';
+  static const auth_signUp_invalidEmailOrPassword = 'auth.signUp.invalidEmailOrPassword';
   static const auth_signUp = 'auth.signUp';
   static const auth_forgot_title = 'auth.forgot.title';
   static const auth_forgot_newPasswordTitle = 'auth.forgot.newPasswordTitle';

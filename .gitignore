@@ -74,3 +74,5 @@ firebase_admin_sdk_service_account.json
 # git worktrees created for isolated task execution
 .claude/worktrees/
 /configs/*
+# Golden-diff output, regenerated on every failing run.
+test/**/failures/
