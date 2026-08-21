@@ -11,7 +11,7 @@ class FakeAuthDataSource implements AuthDataSource {
   });
 
   String status;
-  String userId;
+  String? userId;
   Map<String, dynamic>? row;
   Object? signInError;
   Object? verifyError;
@@ -19,6 +19,7 @@ class FakeAuthDataSource implements AuthDataSource {
 
   final List<String> calls = [];
   String? lastShopName;
+  String? lastAvatarUrl;
   String? lastPassword;
 
   @override
@@ -28,13 +29,8 @@ class FakeAuthDataSource implements AuthDataSource {
   }
 
   @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     calls.add('signUp:$email');
-    lastShopName = shopName;
   }
 
   @override
@@ -44,7 +40,7 @@ class FakeAuthDataSource implements AuthDataSource {
   Future<String> verifySignUpCode({required String email, required String token}) async {
     calls.add('verifySignUp:$token');
     if (verifyError != null) throw verifyError!;
-    return userId;
+    return userId!;
   }
 
   @override
@@ -54,7 +50,7 @@ class FakeAuthDataSource implements AuthDataSource {
   }) async {
     calls.add('signIn:$email');
     if (signInError != null) throw signInError!;
-    return userId;
+    return userId!;
   }
 
   @override
@@ -88,9 +84,18 @@ class FakeAuthDataSource implements AuthDataSource {
   }
 
   @override
-  Future<void> updateShopName({required String userId, required String shopName}) async {
-    calls.add('updateShopName:$shopName');
-    lastShopName = shopName;
+  Future<void> updateProfileRow({
+    required String userId,
+    required String fullName,
+    String? avatarUrl,
+  }) async {
+    calls.add('updateProfileRow:$userId:$fullName');
+    lastAvatarUrl = avatarUrl;
+  }
+
+  @override
+  Future<void> stampOnboardingCompleted(String userId) async {
+    calls.add('stampOnboardingCompleted:$userId');
   }
 
   @override
