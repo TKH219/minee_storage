@@ -3,20 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/data/data_sources/remote/user_profile_data_source_impl.dart';
 
 import '../support/fake_user_api.dart';
+import '../support/model_fixtures.dart';
 import '../support/localization_test_harness.dart';
 
 void main() {
   setUp(useLocale);
 
   test('a profile read filters by id in PostgREST grammar', () async {
-    final api = FakeUserApi(userRows: [
-      {'id': 'uid-1', 'email': 'a@b.com', 'full_name': 'Maya'},
-    ]);
+    final api = FakeUserApi(userRows: [userModelFixture(fullName: 'Maya')]);
 
     final row = await UserProfileDataSourceImpl(api).fetchUserRow('uid-1');
 
     expect(api.lastQuery['id'], 'eq.uid-1');
-    expect(row!['full_name'], 'Maya');
+    expect(row!.fullName, 'Maya');
   });
 
   test('a missing profile row is null, not an error', () async {

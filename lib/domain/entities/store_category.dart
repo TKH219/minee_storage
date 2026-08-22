@@ -14,17 +14,6 @@ class StoreCategory extends Equatable with AuditTimes {
     this.deletedTime,
   });
 
-  factory StoreCategory.fromRow(Map<String, dynamic> row) => StoreCategory(
-    code: row['code'] as String,
-    nameVi: (row['name_vi'] as String?) ?? '',
-    nameEn: (row['name_en'] as String?) ?? '',
-    icon: (row['icon'] as String?) ?? 'other',
-    sortOrder: (row['sort_order'] as int?) ?? 0,
-    createdTime: parseTime(row, 'created_at'),
-    updatedTime: parseTime(row, 'updated_at'),
-    deletedTime: parseTime(row, 'deleted_at'),
-  );
-
   final String code;
   final String nameVi;
   final String nameEn;

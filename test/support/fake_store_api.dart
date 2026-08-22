@@ -1,6 +1,8 @@
 import 'package:mine_storage/data/data_sources/remote/store_api.dart';
 import 'package:mine_storage/data/models/models.dart';
 
+import 'model_fixtures.dart';
+
 class FakeStoreApi implements StoreApi {
   FakeStoreApi({
     this.storeRows = const [],
@@ -8,15 +10,16 @@ class FakeStoreApi implements StoreApi {
     this.currencyRows = const [],
   });
 
-  List<Map<String, dynamic>> storeRows;
-  List<Map<String, dynamic>> categoryRows;
-  List<Map<String, dynamic>> currencyRows;
+  List<StoreModel> storeRows;
+  List<StoreCategoryModel> categoryRows;
+  List<CurrencyModel> currencyRows;
 
   final Map<String, String> lastQuery = {};
   Map<String, dynamic> inserted = {};
+  StoreModel? insertResult;
 
   @override
-  Future<dynamic> fetchStores({
+  Future<List<StoreModel>> fetchStores({
     required String ownerId,
     required String deletedAt,
     String select = '*',
@@ -30,15 +33,13 @@ class FakeStoreApi implements StoreApi {
   }
 
   @override
-  Future<dynamic> insertStore(CreateStoreRequest request) async {
+  Future<List<StoreModel>> insertStore(CreateStoreRequest request) async {
     inserted = request.toJson();
-    return [
-      {'id': 's-new', ...inserted},
-    ];
+    return [insertResult ?? storeModelFixture(id: 's-new', name: request.name)];
   }
 
   @override
-  Future<dynamic> fetchCategories({
+  Future<List<StoreCategoryModel>> fetchCategories({
     String deletedAt = 'is.null',
     String select = '*',
     String order = 'sort_order.asc',
@@ -48,7 +49,7 @@ class FakeStoreApi implements StoreApi {
   }
 
   @override
-  Future<dynamic> fetchCurrencies({
+  Future<List<CurrencyModel>> fetchCurrencies({
     String deletedAt = 'is.null',
     String select = '*',
     String order = 'sort_order.asc',

@@ -1,5 +1,6 @@
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 /// Implements both halves so a repository test can pass it twice and keep
 /// asserting on one [calls] list.
@@ -15,7 +16,7 @@ class FakeAuthDataSource implements AuthDataSource, UserProfileDataSource {
 
   String status;
   String? userId;
-  Map<String, dynamic>? row;
+  UserModel? row;
   Object? signInError;
   Object? verifyError;
   Object? touchError;
@@ -75,7 +76,7 @@ class FakeAuthDataSource implements AuthDataSource, UserProfileDataSource {
   Future<void> signOut() async => calls.add('signOut');
 
   @override
-  Future<Map<String, dynamic>?> fetchUserRow(String id) async {
+  Future<UserModel?> fetchUserRow(String id) async {
     calls.add('fetchRow:$id');
     return row;
   }

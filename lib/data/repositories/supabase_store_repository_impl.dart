@@ -17,7 +17,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
       if (ownerId == null) return const <Store>[];
 
       final rows = await _dataSource.fetchMine(ownerId);
-      return rows.map(Store.fromRow).toList();
+      return rows.map((row) => row.toEntity()).toList();
     });
   }
 
@@ -42,7 +42,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
           logoUrl: _blankToNull(logoUrl),
         ),
       );
-      return Store.fromRow(row);
+      return row.toEntity();
     });
   }
 
@@ -50,7 +50,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
   Future<List<StoreCategory>> categories() {
     return _guard(() async {
       final rows = await _dataSource.fetchCategories();
-      final categories = rows.map(StoreCategory.fromRow).toList()
+      final categories = rows.map((row) => row.toEntity()).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
       return categories;
     });
@@ -60,7 +60,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
   Future<List<Currency>> currencies() {
     return _guard(() async {
       final rows = await _dataSource.fetchCurrencies();
-      final currencies = rows.map(Currency.fromRow).toList()
+      final currencies = rows.map((row) => row.toEntity()).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
       return currencies;
     });

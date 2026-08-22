@@ -1,13 +1,13 @@
 import 'package:mine_storage/data/models/models.dart';
 
 abstract class StoreDataSource {
-  Future<List<Map<String, dynamic>>> fetchMine(String ownerId);
+  Future<List<StoreModel>> fetchMine(String ownerId);
 
-  Future<List<Map<String, dynamic>>> fetchCategories();
+  Future<List<StoreCategoryModel>> fetchCategories();
 
-  Future<List<Map<String, dynamic>>> fetchCurrencies();
+  Future<List<CurrencyModel>> fetchCurrencies();
 
-  Future<Map<String, dynamic>> insertStore(CreateStoreRequest request);
+  Future<StoreModel> insertStore(CreateStoreRequest request);
 
   String? get currentUserId;
 }

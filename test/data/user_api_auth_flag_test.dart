@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/network/interceptors/supabase_rest_interceptor.dart';
 import 'package:mine_storage/data/data_sources/remote/user_api.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 import '../support/localization_test_harness.dart';
 
@@ -19,7 +20,13 @@ class _RecordingAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     requests.add(options);
-    return ResponseBody.fromString('"none"', 200, headers: {
+    // fetchUser decodes into UserModel, so the stub must be a real row.
+    final body = options.path.contains('rpc/email_status')
+        ? '"none"'
+        : '[{"id":"uid-1","email":"a@b.com","full_name":"Maya",'
+              '"is_deactivated":false,"created_at":"2026-08-01T09:00:00.000Z",'
+              '"updated_at":"2026-08-02T09:00:00.000Z"}]';
+    return ResponseBody.fromString(body, 200, headers: {
       Headers.contentTypeHeader: [Headers.jsonContentType],
     });
   }
@@ -44,7 +51,7 @@ void main() {
   test('the email-status check goes out without the session token', () async {
     final t = build();
 
-    await t.api.emailStatus({'p_email': 'a@b.com'});
+    await t.api.emailStatus(const EmailStatusRequest(email: 'a@b.com'));
 
     final sent = t.adapter.requests.single;
     expect(sent.extra[SupabaseRestInterceptor.requiresAuthKey], isFalse);

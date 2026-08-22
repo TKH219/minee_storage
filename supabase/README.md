@@ -131,6 +131,14 @@ was dropped in its favour. Note the consequence — a deleted store leaves repor
 entirely, where an archived one used to remain readable; if that older meaning is
 wanted back it needs a separate flag.
 
+**Every body and every response is a model, not a map.** Reads decode into
+`StoreModel`, `StoreCategoryModel`, `CurrencyModel` and `UserModel`, each with a
+`toEntity()` that is the only place the domain learns the wire format — the
+entities themselves no longer parse JSON. Writes go out as `CreateStoreRequest`,
+`UpdateUserRequest` and `EmailStatusRequest`. Nothing on either path is typed
+`dynamic` or `Map<String, dynamic>` except the generated `fromJson`/`toJson`
+signatures themselves.
+
 **Request bodies are models, not maps.** `POST /rest/v1/stores` takes a
 `CreateStoreRequest` (`lib/data/models/request/store/`), serialised by
 json_serializable with `fieldRename: FieldRename.snake` so the field names are

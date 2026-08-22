@@ -1,4 +1,5 @@
 import 'package:mine_storage/data/data_sources/remote/user_api.dart';
+import 'package:mine_storage/data/models/models.dart';
 import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
 
 class UserProfileDataSourceImpl implements UserProfileDataSource {
@@ -7,18 +8,18 @@ class UserProfileDataSourceImpl implements UserProfileDataSource {
   final UserApi _api;
 
   @override
-  Future<String> emailStatus(String email) => _api.emailStatus({'p_email': email});
+  Future<String> emailStatus(String email) =>
+      _api.emailStatus(EmailStatusRequest(email: email));
 
   @override
-  Future<Map<String, dynamic>?> fetchUserRow(String userId) async {
-    final body = await _api.fetchUser(id: 'eq.$userId');
-    if (body is! List || body.isEmpty) return null;
-    return (body.first as Map).cast<String, dynamic>();
+  Future<UserModel?> fetchUserRow(String userId) async {
+    final rows = await _api.fetchUser(id: 'eq.$userId');
+    return rows.isEmpty ? null : rows.first;
   }
 
   @override
   Future<void> touchLastSignedIn(String userId) {
-    return _patch(userId, {'last_signed_in_at': _now()});
+    return _patch(userId, (now) => UpdateUserRequest(lastSignedInAt: now, updatedAt: now));
   }
 
   @override
@@ -27,20 +28,25 @@ class UserProfileDataSourceImpl implements UserProfileDataSource {
     required String fullName,
     String? avatarUrl,
   }) {
-    return _patch(userId, {
-      'full_name': fullName,
-      'avatar_url': ?avatarUrl,
-    });
+    return _patch(
+      userId,
+      (now) => UpdateUserRequest(
+        fullName: fullName,
+        avatarUrl: avatarUrl,
+        updatedAt: now,
+      ),
+    );
   }
 
   @override
   Future<void> stampOnboardingCompleted(String userId) {
-    return _patch(userId, {'onboarding_completed_at': _now()});
+    return _patch(
+      userId,
+      (now) => UpdateUserRequest(onboardingCompletedAt: now, updatedAt: now),
+    );
   }
 
-  Future<void> _patch(String userId, Map<String, dynamic> values) {
-    return _api.updateUser('eq.$userId', {...values, 'updated_at': _now()});
+  Future<void> _patch(String userId, UpdateUserRequest Function(DateTime now) build) {
+    return _api.updateUser('eq.$userId', build(DateTime.now().toUtc()));
   }
-
-  String _now() => DateTime.now().toUtc().toIso8601String();
 }
