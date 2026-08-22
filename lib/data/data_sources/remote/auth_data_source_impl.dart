@@ -1,18 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
-import 'package:mine_storage/data/data_sources/remote/auth_table_data_source.dart';
 
 class AuthDataSourceImpl implements AuthDataSource {
-  AuthDataSourceImpl(this._client, this._tables);
+  AuthDataSourceImpl(this._client);
 
   final SupabaseClient _client;
-
-  /// Table reads and writes go over REST; GoTrue keeps only the session.
-  final AuthTableDataSource _tables;
-
-  @override
-  Future<String> emailStatus(String email) => _tables.emailStatus(email);
 
   @override
   Future<void> signUp({required String email, required String password}) async {
@@ -62,29 +55,6 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<void> signOut() => _client.auth.signOut();
-
-  @override
-  Future<Map<String, dynamic>?> fetchUserRow(String userId) => _tables.fetchUserRow(userId);
-
-  @override
-  Future<void> touchLastSignedIn(String userId) => _tables.touchLastSignedIn(userId);
-
-  @override
-  Future<void> updateProfileRow({
-    required String userId,
-    required String fullName,
-    String? avatarUrl,
-  }) {
-    return _tables.updateProfileRow(
-      userId: userId,
-      fullName: fullName,
-      avatarUrl: avatarUrl,
-    );
-  }
-
-  @override
-  Future<void> stampOnboardingCompleted(String userId) =>
-      _tables.stampOnboardingCompleted(userId);
 
   @override
   String? get currentUserId => _client.auth.currentUser?.id;
