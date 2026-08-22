@@ -17,13 +17,13 @@ class FakeStoreApi implements StoreApi {
   @override
   Future<dynamic> fetchStores({
     required String ownerId,
-    required String isArchived,
+    required String deletedAt,
     String select = '*',
     String order = 'created_at.asc',
   }) async {
     lastQuery
       ..['owner_id'] = ownerId
-      ..['is_archived'] = isArchived
+      ..['deleted_at'] = deletedAt
       ..['order'] = order;
     return storeRows;
   }
@@ -38,6 +38,7 @@ class FakeStoreApi implements StoreApi {
 
   @override
   Future<dynamic> fetchCategories({
+    String deletedAt = 'is.null',
     String select = '*',
     String order = 'sort_order.asc',
   }) async {
@@ -47,6 +48,7 @@ class FakeStoreApi implements StoreApi {
 
   @override
   Future<dynamic> fetchCurrencies({
+    String deletedAt = 'is.null',
     String select = '*',
     String order = 'sort_order.asc',
   }) async {

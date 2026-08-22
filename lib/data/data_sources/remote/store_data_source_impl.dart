@@ -14,7 +14,7 @@ class StoreDataSourceImpl implements StoreDataSource {
 
   @override
   Future<List<Map<String, dynamic>>> fetchMine(String ownerId) async {
-    return _rows(await _api.fetchStores(ownerId: 'eq.$ownerId', isArchived: 'eq.false'));
+    return _rows(await _api.fetchStores(ownerId: 'eq.$ownerId', deletedAt: 'is.null'));
   }
 
   @override
