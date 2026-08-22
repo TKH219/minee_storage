@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/onboarding/create_store/states/create_store_state.dart';
 import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
 
 import '../../support/auth_test_harness.dart';
@@ -64,10 +66,35 @@ void main() {
     );
   }
 
-  test('currency defaults to VND', () {
+  test('before the table loads there is no currency id to submit', () {
     final t = build();
 
-    expect(t.container.read(createStoreStateProvider).currencyCode, 'VND');
+    expect(t.container.read(createStoreStateProvider).currency, isNull);
+    expect(t.container.read(createStoreStateProvider).displayCurrency, Currency.vnd);
+  });
+
+  test('loading selects the VND row, so the id sent is a real one', () async {
+    const vnd = Currency(id: 'cur-vnd', code: 'VND', symbol: '₫', decimals: 0, sortOrder: 10);
+    const usd = Currency(id: 'cur-usd', code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    final t = build(
+      stores: FakeStoreRepository(categoryList: _categories, currencyList: const [vnd, usd]),
+    );
+
+    await t.container.read(createStoreStateProvider.notifier).loadCategories();
+
+    expect(t.container.read(createStoreStateProvider).currency, vnd);
+    expect(t.container.read(createStoreStateProvider).displayCurrency, vnd);
+  });
+
+  test('with no VND row the first currency is selected rather than none', () async {
+    const usd = Currency(id: 'cur-usd', code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    final t = build(
+      stores: FakeStoreRepository(categoryList: _categories, currencyList: const [usd]),
+    );
+
+    await t.container.read(createStoreStateProvider.notifier).loadCategories();
+
+    expect(t.container.read(createStoreStateProvider).currency, usd);
   });
 
   test('loadCategories fills the list', () async {
@@ -79,7 +106,7 @@ void main() {
   });
 
   test('the currency list is read from the repository, not hardcoded', () async {
-    const usd = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    const usd = Currency(id: 'cur-usd', code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
     final t = build(
       stores: FakeStoreRepository(
         categoryList: _categories,
@@ -93,27 +120,32 @@ void main() {
     expect(t.container.read(createStoreStateProvider).currencies, [Currency.vnd, usd]);
   });
 
-  test('the selected currency resolves against the loaded list', () async {
-    const usd = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+  test('choosing a currency keeps its generated id', () async {
+    const vnd = Currency(id: 'cur-vnd', code: 'VND', symbol: '₫', decimals: 0, sortOrder: 10);
+    const usd = Currency(id: 'cur-usd', code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
     final t = build(
-      stores: FakeStoreRepository(
-        categoryList: _categories,
-        currencyList: const [Currency.vnd, usd],
-      ),
+      stores: FakeStoreRepository(categoryList: _categories, currencyList: const [vnd, usd]),
     );
     final notifier = t.container.read(createStoreStateProvider.notifier);
     await notifier.loadCategories();
 
-    notifier.updateCurrency('USD');
+    notifier.updateCurrency(usd);
 
-    expect(t.container.read(createStoreStateProvider).currency, usd);
+    expect(t.container.read(createStoreStateProvider).currency?.id, 'cur-usd');
   });
 
-  test('before the list loads, the currency shows the VND default', () {
-    final t = build();
+  test('submit is refused while no currency has resolved', () async {
+    final t = build(
+      stores: FakeStoreRepository(categoryList: _categories, currencyList: const []),
+    );
+    final notifier = t.container.read(createStoreStateProvider.notifier)
+      ..updateName('S')
+      ..updateCategory('other');
+    await notifier.loadCategories();
 
-    expect(t.container.read(createStoreStateProvider).currencies, isEmpty);
-    expect(t.container.read(createStoreStateProvider).currency, Currency.vnd);
+    await notifier.submit();
+
+    expect(t.stores.calls.where((c) => c.startsWith('create')), isEmpty);
   });
 
   test('a failed load leaves both lists empty and recoverable', () async {
@@ -139,10 +171,11 @@ void main() {
     final notifier = t.container.read(createStoreStateProvider.notifier)
       ..updateName('Tạp hóa Linh')
       ..updateCategory('grocery');
+    await notifier.loadCategories();
 
     await notifier.submit();
 
-    expect(t.stores.calls, contains('create:Tạp hóa Linh:grocery:VND'));
+    expect(t.stores.calls, contains('create:Tạp hóa Linh:grocery:cur-vnd'));
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString(OnboardingResolver.activeStoreKey), isNotNull);
     expect(currentPath(t.router), '/dashboard');
@@ -153,6 +186,7 @@ void main() {
     final notifier = t.container.read(createStoreStateProvider.notifier)
       ..updateName('S')
       ..updateCategory('other');
+    await notifier.loadCategories();
 
     await notifier.submit();
 
@@ -162,6 +196,7 @@ void main() {
   test('a name or category is required before submit', () async {
     final t = build();
     final notifier = t.container.read(createStoreStateProvider.notifier);
+    await notifier.loadCategories();
 
     await notifier.submit();
     expect(t.stores.calls.where((c) => c.startsWith('create')), isEmpty);
@@ -181,6 +216,7 @@ void main() {
       ..updateName('S')
       ..updateCategory('other')
       ..updateUrl('not a url');
+    await notifier.loadCategories();
 
     await notifier.submit();
 
@@ -194,6 +230,7 @@ void main() {
       ..updateName('S')
       ..updateCategory('other')
       ..updateUrl('shopee.vn/linh');
+    await notifier.loadCategories();
 
     await notifier.submit();
 
@@ -207,6 +244,7 @@ void main() {
       ..updateName('S')
       ..updateCategory('other')
       ..updateUrl('   ');
+    await notifier.loadCategories();
 
     await notifier.submit();
 
@@ -240,5 +278,22 @@ void main() {
 
     expect(t.media.calls, contains('uploadStoreLogo'));
     expect(t.container.read(createStoreStateProvider).logoUrl, isNotNull);
+  });
+
+  test('a REST failure surfaces as the typed error, not an unknown one', () async {
+    final t = build(
+      stores: FakeStoreRepository(
+        error: DioException(
+          requestOptions: RequestOptions(path: '/rest/v1/store_categories'),
+          error: const NetworkException(message: 'offline'),
+        ),
+      ),
+    );
+
+    await t.container.read(createStoreStateProvider.notifier).loadCategories();
+
+    final state = t.container.read(createStoreStateProvider);
+    expect(state.isError, isTrue);
+    expect(state.errorMessageKey, LocaleKeys.errors_network);
   });
 }

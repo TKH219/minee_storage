@@ -11,7 +11,7 @@ void main() {
       'category_code': 'grocery',
       'address': '12 Lê Lợi',
       'url': 'https://shopee.vn/linh',
-      'currency': 'VND',
+      'currency_id': 'cur-vnd',
       'phone': '0900000000',
       'timezone': 'Asia/Ho_Chi_Minh',
       'logo_url': 'https://cdn.example/logo.png',
@@ -24,7 +24,7 @@ void main() {
     expect(store.categoryCode, 'grocery');
     expect(store.address, '12 Lê Lợi');
     expect(store.url, 'https://shopee.vn/linh');
-    expect(store.currencyCode, 'VND');
+    expect(store.currencyId, 'cur-vnd');
     expect(store.phone, '0900000000');
     expect(store.timezone, 'Asia/Ho_Chi_Minh');
     expect(store.logoUrl, 'https://cdn.example/logo.png');
@@ -37,10 +37,10 @@ void main() {
     expect(store.role, StoreRole.owner);
   });
 
-  test('currency defaults to VND and timezone to Ho Chi Minh', () {
+  test('a row without a currency id yields an empty one, not a guess', () {
     final store = Store.fromRow({'id': 's-1', 'owner_id': 'uid-1', 'name': 'S'});
 
-    expect(store.currencyCode, 'VND');
+    expect(store.currencyId, isEmpty);
     expect(store.timezone, 'Asia/Ho_Chi_Minh');
   });
 

@@ -1,17 +1,22 @@
 import 'dart:typed_data';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dio/dio.dart';
 
 import 'package:mine_storage/data/data_sources/remote/storage_data_source.dart';
 
 class StorageDataSourceImpl implements StorageDataSource {
-  StorageDataSourceImpl(this._client, {this.bucket = 'avatars'});
+  StorageDataSourceImpl(
+    this._dio, {
+    required String? Function() currentUserId,
+    this.bucket = 'avatars',
+  }) : _currentUserId = currentUserId;
 
-  final SupabaseClient _client;
+  final Dio _dio;
+  final String? Function() _currentUserId;
   final String bucket;
 
   @override
-  String? get currentUserId => _client.auth.currentUser?.id;
+  String? get currentUserId => _currentUserId();
 
   @override
   Future<String> upload({
@@ -19,13 +24,20 @@ class StorageDataSourceImpl implements StorageDataSource {
     required Uint8List bytes,
     required String contentType,
   }) async {
-    await _client.storage
-        .from(bucket)
-        .uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(contentType: contentType, upsert: true),
-        );
-    return _client.storage.from(bucket).getPublicUrl(path);
+    await _dio.post<dynamic>(
+      '/storage/v1/object/$bucket/$path',
+      data: Stream<List<int>>.fromIterable([bytes]),
+      options: Options(
+        headers: {
+          'Content-Type': contentType,
+          Headers.contentLengthHeader: bytes.length,
+          // Re-picking a photo overwrites the previous object rather than
+          // failing with "resource already exists".
+          'x-upsert': 'true',
+        },
+      ),
+    );
+
+    return '${_dio.options.baseUrl}/storage/v1/object/public/$bucket/$path';
   }
 }

@@ -1,6 +1,5 @@
 import 'package:mine_storage/app/extensions/string_extensions.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
-import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
@@ -25,7 +24,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
   Future<Store> create({
     required String name,
     required String categoryCode,
-    required String currencyCode,
+    required String currencyId,
     String? address,
     String? url,
     String? logoUrl,
@@ -35,7 +34,7 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
         'owner_id': _requireSession(),
         'name': name.trim(),
         'category_code': categoryCode,
-        'currency': currencyCode,
+        'currency_id': currencyId,
         'address': _blankToNull(address),
         'url': normalisedUrlOrNull(url),
         'logo_url': _blankToNull(logoUrl),
@@ -79,12 +78,8 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
     return id;
   }
 
-  /// Single boundary where a Supabase failure becomes an [AppException].
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on Object catch (e) {
-      throw SupabaseErrorMapper.map(e);
-    }
-  }
+  /// These calls go over Dio, so [ErrorInterceptor] has already turned any
+  /// failure into a typed [AppException] carried on the DioException. Catching
+  /// and re-mapping here would flatten it back to "unknown".
+  Future<T> _guard<T>(Future<T> Function() action) => action();
 }

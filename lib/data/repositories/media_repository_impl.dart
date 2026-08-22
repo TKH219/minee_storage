@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
-import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 import 'package:mine_storage/data/data_sources/remote/storage_data_source.dart';
 import 'package:mine_storage/domain/repositories/media_repository.dart';
 
@@ -55,11 +54,8 @@ class MediaRepositoryImpl implements MediaRepository {
     });
   }
 
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on Object catch (e) {
-      throw SupabaseErrorMapper.map(e);
-    }
-  }
+  /// These calls go over Dio, so [ErrorInterceptor] has already turned any
+  /// failure into a typed [AppException] carried on the DioException. Catching
+  /// and re-mapping here would flatten it back to "unknown".
+  Future<T> _guard<T>(Future<T> Function() action) => action();
 }
