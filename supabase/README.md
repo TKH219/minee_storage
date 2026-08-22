@@ -67,6 +67,7 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260822000100` | `currencies`, 13 seeded rows; `stores.currency` gains a foreign key to it |
 | `20260822000200` | `currencies` gains a generated `id`; `stores.currency_id` added and backfilled |
 | `20260822000300` | drop `stores.currency` — **irreversible**, applied after the backfill was verified |
+| `20260822000400` | `created_at`/`updated_at`/`deleted_at` on every table; `stores.is_archived` dropped in favour of `deleted_at` |
 
 Every migration is idempotent (`create table if not exists`,
 `create or replace function`, `drop … if exists`, `on conflict do nothing`), so
@@ -124,6 +125,12 @@ generated `id` (`stores.currency_id`), with `currencies.code` kept unique
 alongside it. Adding either now needs a migration — the accepted cost of one
 source of truth rather than a Dart list that can drift from the column it writes.
 
+Every table carries `created_at`, `updated_at` and `deleted_at`. `deleted_at` is
+the soft delete: every read filters `deleted_at=is.null`, and `stores.is_archived`
+was dropped in its favour. Note the consequence — a deleted store leaves reports
+entirely, where an archived one used to remain readable; if that older meaning is
+wanted back it needs a separate flag.
+
 **Both are read over REST, not the Supabase SDK.** Table and storage access goes
 through Dio + Retrofit against `/rest/v1` and `/storage/v1` — see
 `store_api.dart`, `user_api.dart` and `SupabaseRestInterceptor`, which supplies
@@ -150,7 +157,7 @@ None of these are done, and all are required before production auth works:
 - **No SMTP configured.** Without it, no confirmation or recovery email is sent.
 - **Both email templates are still the default, link-based ones.** They must be
   converted to `{{ .Token }}` so the 6-digit code is delivered instead of a link.
-- **Migrations are not applied.** All twelve files above must be run against
+- **Migrations are not applied.** All thirteen files above must be run against
   `otwasmlfyvytvjbdflpg`, in order.
 - **`ANON_KEY` in `lib/env/production/.env` is still a placeholder.** Both env
   files carry `REPLACE_WITH_*_ANON_KEY`; the real publishable keys must be pasted
