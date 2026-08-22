@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+
+import 'package:mine_storage/core/network/interceptors/supabase_rest_interceptor.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'user_api.g.dart';
@@ -22,6 +24,9 @@ abstract class UserApi {
     @Body() Map<String, dynamic> values,
   );
 
+  /// Runs before anyone is signed in — signup step 1 and forgot-password both
+  /// call it — so it deliberately goes with the anon key.
   @POST('/rest/v1/rpc/email_status')
+  @Extra({SupabaseRestInterceptor.requiresAuthKey: false})
   Future<String> emailStatus(@Body() Map<String, dynamic> body);
 }
