@@ -1,8 +1,10 @@
+import 'package:mine_storage/data/models/models.dart';
+
 /// The `public.users` row and the email-existence RPC, over REST.
 abstract class UserProfileDataSource {
   Future<String> emailStatus(String email);
 
-  Future<Map<String, dynamic>?> fetchUserRow(String userId);
+  Future<UserModel?> fetchUserRow(String userId);
 
   Future<void> touchLastSignedIn(String userId);
 

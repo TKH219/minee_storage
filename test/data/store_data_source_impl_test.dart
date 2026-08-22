@@ -45,8 +45,8 @@ void main() {
       ),
     );
 
-    expect(row['id'], 's-new');
-    expect(row['name'], 'Tạp hóa Linh');
+    expect(row.id, 's-new');
+    expect(row.name, 'Tạp hóa Linh');
     expect(api.inserted['name'], 'Tạp hóa Linh');
   });
 
@@ -76,5 +76,5 @@ void main() {
 
 class _EmptyInsertApi extends FakeStoreApi {
   @override
-  Future<dynamic> insertStore(CreateStoreRequest request) async => <dynamic>[];
+  Future<List<StoreModel>> insertStore(CreateStoreRequest request) async => [];
 }

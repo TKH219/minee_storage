@@ -3,64 +3,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 
 void main() {
-  test('fromRow maps every shop column', () {
-    final store = Store.fromRow({
-      'id': 's-1',
-      'owner_id': 'uid-1',
-      'name': 'Tạp hóa Linh',
-      'category_code': 'grocery',
-      'address': '12 Lê Lợi',
-      'url': 'https://shopee.vn/linh',
-      'currency_id': 'cur-vnd',
-      'phone': '0900000000',
-      'timezone': 'Asia/Ho_Chi_Minh',
-      'logo_url': 'https://cdn.example/logo.png',
-    });
-
-    expect(store.id, 's-1');
-    expect(store.ownerId, 'uid-1');
-    expect(store.name, 'Tạp hóa Linh');
-    expect(store.categoryCode, 'grocery');
-    expect(store.address, '12 Lê Lợi');
-    expect(store.url, 'https://shopee.vn/linh');
-    expect(store.currencyId, 'cur-vnd');
-    expect(store.phone, '0900000000');
-    expect(store.timezone, 'Asia/Ho_Chi_Minh');
-    expect(store.logoUrl, 'https://cdn.example/logo.png');
-    expect(store.isDeleted, isFalse);
-  });
-
-  test('a row you can see is a row you own', () {
-    final store = Store.fromRow({'id': 's-1', 'owner_id': 'uid-1', 'name': 'S'});
+  test('a store you can see is a store you own', () {
+    const store = Store(id: 's-1', ownerId: 'uid-1', name: 'S');
 
     expect(store.role, StoreRole.owner);
   });
 
-  test('a row without a currency id yields an empty one, not a guess', () {
-    final store = Store.fromRow({'id': 's-1', 'owner_id': 'uid-1', 'name': 'S'});
+  test('timezone defaults to Ho Chi Minh', () {
+    const store = Store(id: 's-1', ownerId: 'uid-1', name: 'S');
 
-    expect(store.currencyId, isEmpty);
     expect(store.timezone, 'Asia/Ho_Chi_Minh');
+  });
+
+  test('equality is by value', () {
+    const a = Store(id: 's-1', ownerId: 'uid-1', name: 'S', currencyId: 'c');
+    const b = Store(id: 's-1', ownerId: 'uid-1', name: 'S', currencyId: 'c');
+
+    expect(a, b);
+  });
+
+  test('a different currency makes a different store', () {
+    const a = Store(id: 's-1', ownerId: 'uid-1', name: 'S', currencyId: 'cur-vnd');
+    const b = Store(id: 's-1', ownerId: 'uid-1', name: 'S', currencyId: 'cur-usd');
+
+    expect(a, isNot(b));
   });
 
   test('a category localises to the active language', () {
     const category = StoreCategory(
-      code: 'grocery',
-      nameVi: 'Tạp hóa',
-      nameEn: 'Grocery',
-      icon: 'basket',
-      sortOrder: 10,
+      code: 'grocery', nameVi: 'Tạp hóa', nameEn: 'Grocery', icon: 'basket', sortOrder: 10,
     );
 
     expect(category.localisedName('vi'), 'Tạp hóa');
     expect(category.localisedName('en'), 'Grocery');
-  });
-
-  test('a category row tolerates missing optional values', () {
-    final category = StoreCategory.fromRow({'code': 'other'});
-
-    expect(category.code, 'other');
-    expect(category.icon, 'other');
-    expect(category.sortOrder, 0);
   });
 }

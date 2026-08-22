@@ -128,7 +128,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final id = _dataSource.currentUserId;
       if (id == null) return null;
       final row = await _profiles.fetchUserRow(id);
-      return row == null ? null : UserEntity.fromRow(row);
+      return row?.toEntity();
     });
   }
 
@@ -152,7 +152,7 @@ class AuthRepositoryImpl implements AuthRepository {
         message: 'Your profile could not be loaded. Please try again.',
       );
     }
-    return UserEntity.fromRow(row);
+    return row.toEntity();
   }
 
   String _normalise(String email) => email.trim().toLowerCase();

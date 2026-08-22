@@ -21,26 +21,6 @@ class Store extends Equatable with AuditTimes {
     this.deletedTime,
   });
 
-  /// Builds from a `public.stores` row as PostgREST returns it.
-  ///
-  /// [role] is always owner: row-level security only ever returns rows whose
-  /// `owner_id` is the caller. Memberships arrive with the roles feature.
-  factory Store.fromRow(Map<String, dynamic> row) => Store(
-    id: row['id'] as String,
-    ownerId: (row['owner_id'] as String?) ?? '',
-    name: (row['name'] as String?) ?? '',
-    categoryCode: row['category_code'] as String?,
-    address: row['address'] as String?,
-    url: row['url'] as String?,
-    currencyId: (row['currency_id'] as String?) ?? '',
-    phone: row['phone'] as String?,
-    timezone: (row['timezone'] as String?) ?? 'Asia/Ho_Chi_Minh',
-    logoUrl: row['logo_url'] as String?,
-    createdTime: parseTime(row, 'created_at'),
-    updatedTime: parseTime(row, 'updated_at'),
-    deletedTime: parseTime(row, 'deleted_at'),
-  );
-
   final String id;
   final String ownerId;
   final String name;
