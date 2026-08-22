@@ -1,5 +1,6 @@
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/data_sources/remote/store_api.dart';
+import 'package:mine_storage/data/models/models.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
 
 class StoreDataSourceImpl implements StoreDataSource {
@@ -26,9 +27,9 @@ class StoreDataSourceImpl implements StoreDataSource {
       _rows(await _api.fetchCurrencies());
 
   @override
-  Future<Map<String, dynamic>> insertStore(Map<String, dynamic> values) async {
+  Future<Map<String, dynamic>> insertStore(CreateStoreRequest request) async {
     // `Prefer: return=representation` makes PostgREST echo the created rows.
-    final rows = _rows(await _api.insertStore(values));
+    final rows = _rows(await _api.insertStore(request));
     if (rows.isEmpty) {
       throw const ServerException(message: 'The shop could not be created. Please try again.');
     }

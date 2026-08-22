@@ -1,6 +1,7 @@
 import 'package:mine_storage/app/extensions/string_extensions.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
+import 'package:mine_storage/data/models/models.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 
@@ -30,15 +31,17 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
     String? logoUrl,
   }) {
     return _guard(() async {
-      final row = await _dataSource.insertStore({
-        'owner_id': _requireSession(),
-        'name': name.trim(),
-        'category_code': categoryCode,
-        'currency_id': currencyId,
-        'address': _blankToNull(address),
-        'url': normalisedUrlOrNull(url),
-        'logo_url': _blankToNull(logoUrl),
-      });
+      final row = await _dataSource.insertStore(
+        CreateStoreRequest(
+          ownerId: _requireSession(),
+          name: name.trim(),
+          categoryCode: categoryCode,
+          currencyId: currencyId,
+          address: _blankToNull(address),
+          url: normalisedUrlOrNull(url),
+          logoUrl: _blankToNull(logoUrl),
+        ),
+      );
       return Store.fromRow(row);
     });
   }

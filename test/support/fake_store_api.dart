@@ -1,4 +1,5 @@
 import 'package:mine_storage/data/data_sources/remote/store_api.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 class FakeStoreApi implements StoreApi {
   FakeStoreApi({
@@ -29,10 +30,10 @@ class FakeStoreApi implements StoreApi {
   }
 
   @override
-  Future<dynamic> insertStore(Map<String, dynamic> values) async {
-    inserted = values;
+  Future<dynamic> insertStore(CreateStoreRequest request) async {
+    inserted = request.toJson();
     return [
-      {'id': 's-new', ...values},
+      {'id': 's-new', ...inserted},
     ];
   }
 

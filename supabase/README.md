@@ -131,6 +131,13 @@ was dropped in its favour. Note the consequence — a deleted store leaves repor
 entirely, where an archived one used to remain readable; if that older meaning is
 wanted back it needs a separate flag.
 
+**Request bodies are models, not maps.** `POST /rest/v1/stores` takes a
+`CreateStoreRequest` (`lib/data/models/request/store/`), serialised by
+json_serializable with `fieldRename: FieldRename.snake` so the field names are
+the column names by construction rather than by hand-written string keys.
+`includeIfNull: false` means an unset optional is omitted rather than sent as
+null, so the column keeps its own default.
+
 **Per-request auth.** `SupabaseRestInterceptor` attaches the session token by
 default. An endpoint that runs before anyone is signed in opts out:
 
