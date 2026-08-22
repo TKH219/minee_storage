@@ -15,7 +15,6 @@ void main() {
       'phone': '0900000000',
       'timezone': 'Asia/Ho_Chi_Minh',
       'logo_url': 'https://cdn.example/logo.png',
-      'is_archived': false,
     });
 
     expect(store.id, 's-1');
@@ -28,7 +27,7 @@ void main() {
     expect(store.phone, '0900000000');
     expect(store.timezone, 'Asia/Ho_Chi_Minh');
     expect(store.logoUrl, 'https://cdn.example/logo.png');
-    expect(store.isArchived, isFalse);
+    expect(store.isDeleted, isFalse);
   });
 
   test('a row you can see is a row you own', () {

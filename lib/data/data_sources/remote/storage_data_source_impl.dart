@@ -38,6 +38,9 @@ class StorageDataSourceImpl implements StorageDataSource {
       ),
     );
 
-    return '${_dio.options.baseUrl}/storage/v1/object/public/$bucket/$path';
+    // API_URL is configured with a trailing slash, and this URL is stored on
+    // the row — a doubled slash would be persisted, not just requested.
+    final base = _dio.options.baseUrl.replaceAll(RegExp(r'/+$'), '');
+    return '$base/storage/v1/object/public/$bucket/$path';
   }
 }

@@ -15,7 +15,7 @@ abstract class StoreApi {
   @GET('/rest/v1/stores')
   Future<dynamic> fetchStores({
     @Query('owner_id') required String ownerId,
-    @Query('is_archived') required String isArchived,
+    @Query('deleted_at') required String deletedAt,
     @Query('select') String select = '*',
     @Query('order') String order = 'created_at.asc',
   });
@@ -26,12 +26,14 @@ abstract class StoreApi {
 
   @GET('/rest/v1/store_categories')
   Future<dynamic> fetchCategories({
+    @Query('deleted_at') String deletedAt = 'is.null',
     @Query('select') String select = '*',
     @Query('order') String order = 'sort_order.asc',
   });
 
   @GET('/rest/v1/currencies')
   Future<dynamic> fetchCurrencies({
+    @Query('deleted_at') String deletedAt = 'is.null',
     @Query('select') String select = '*',
     @Query('order') String order = 'sort_order.asc',
   });

@@ -1,8 +1,9 @@
+import 'package:mine_storage/domain/entities/audit_times.dart';
 import 'package:equatable/equatable.dart';
 
 enum StoreRole { owner, manager, staff }
 
-class Store extends Equatable {
+class Store extends Equatable with AuditTimes {
   const Store({
     required this.id,
     required this.ownerId,
@@ -14,8 +15,10 @@ class Store extends Equatable {
     this.phone,
     this.timezone = 'Asia/Ho_Chi_Minh',
     this.logoUrl,
-    this.isArchived = false,
     this.role = StoreRole.owner,
+    this.createdTime,
+    this.updatedTime,
+    this.deletedTime,
   });
 
   /// Builds from a `public.stores` row as PostgREST returns it.
@@ -33,7 +36,9 @@ class Store extends Equatable {
     phone: row['phone'] as String?,
     timezone: (row['timezone'] as String?) ?? 'Asia/Ho_Chi_Minh',
     logoUrl: row['logo_url'] as String?,
-    isArchived: (row['is_archived'] as bool?) ?? false,
+    createdTime: parseTime(row, 'created_at'),
+    updatedTime: parseTime(row, 'updated_at'),
+    deletedTime: parseTime(row, 'deleted_at'),
   );
 
   final String id;
@@ -46,8 +51,14 @@ class Store extends Equatable {
   final String? phone;
   final String timezone;
   final String? logoUrl;
-  final bool isArchived;
   final StoreRole role;
+
+  @override
+  final DateTime? createdTime;
+  @override
+  final DateTime? updatedTime;
+  @override
+  final DateTime? deletedTime;
 
   @override
   List<Object?> get props => [
@@ -61,7 +72,9 @@ class Store extends Equatable {
     phone,
     timezone,
     logoUrl,
-    isArchived,
     role,
+    createdTime,
+    updatedTime,
+    deletedTime,
   ];
 }

@@ -9,14 +9,14 @@ import '../support/localization_test_harness.dart';
 void main() {
   setUp(useLocale);
 
-  test('fetchMine speaks PostgREST filter grammar', () async {
+  test('fetchMine asks only for live rows, in PostgREST filter grammar', () async {
     final api = FakeStoreApi();
     final source = StoreDataSourceImpl(api, currentUserId: () => 'uid-1');
 
     await source.fetchMine('uid-1');
 
     expect(api.lastQuery['owner_id'], 'eq.uid-1');
-    expect(api.lastQuery['is_archived'], 'eq.false');
+    expect(api.lastQuery['deleted_at'], 'is.null');
     expect(api.lastQuery['order'], 'created_at.asc');
   });
 
