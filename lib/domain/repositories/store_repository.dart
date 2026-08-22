@@ -14,4 +14,6 @@ abstract class StoreRepository {
   });
 
   Future<List<StoreCategory>> categories();
+
+  Future<List<Currency>> currencies();
 }

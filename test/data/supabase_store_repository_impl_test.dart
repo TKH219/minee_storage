@@ -96,4 +96,16 @@ void main() {
       throwsA(isA<UnauthorizedException>()),
     );
   });
+
+  test('currencies arrive sorted by sort order', () async {
+    final source = FakeStoreDataSource(currencyRows: [
+      {'code': 'USD', 'symbol': r'$', 'decimals': 2, 'sort_order': 20},
+      {'code': 'VND', 'symbol': '₫', 'decimals': 0, 'sort_order': 10},
+    ]);
+
+    final currencies = await SupabaseStoreRepositoryImpl(source).currencies();
+
+    expect(currencies.map((c) => c.code), ['VND', 'USD']);
+    expect(currencies.first.decimals, 0);
+  });
 }

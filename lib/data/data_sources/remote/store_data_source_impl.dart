@@ -28,6 +28,12 @@ class StoreDataSourceImpl implements StoreDataSource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> fetchCurrencies() async {
+    final rows = await _client.from('currencies').select().order('sort_order');
+    return rows.cast<Map<String, dynamic>>();
+  }
+
+  @override
   Future<Map<String, dynamic>> insertStore(Map<String, dynamic> values) async {
     return _client.from('stores').insert(values).select().single();
   }

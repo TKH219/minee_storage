@@ -54,6 +54,16 @@ class SupabaseStoreRepositoryImpl implements StoreRepository {
     });
   }
 
+  @override
+  Future<List<Currency>> currencies() {
+    return _guard(() async {
+      final rows = await _dataSource.fetchCurrencies();
+      final currencies = rows.map(Currency.fromRow).toList()
+        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+      return currencies;
+    });
+  }
+
   String? _blankToNull(String? value) {
     final trimmed = value?.trim() ?? '';
     return trimmed.isEmpty ? null : trimmed;

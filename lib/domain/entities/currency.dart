@@ -1,37 +1,33 @@
 import 'package:equatable/equatable.dart';
 
-/// The currency list is held in code rather than the database because it is
-/// static reference data; adding one needs no migration.
+/// A row of `public.currencies` — the currencies a shop can trade in.
 class Currency extends Equatable {
-  const Currency({required this.code, required this.symbol, required this.decimals});
+  const Currency({
+    required this.code,
+    required this.symbol,
+    required this.decimals,
+    this.sortOrder = 0,
+  });
+
+  factory Currency.fromRow(Map<String, dynamic> row) => Currency(
+    code: row['code'] as String,
+    symbol: (row['symbol'] as String?) ?? '',
+    decimals: (row['decimals'] as int?) ?? 2,
+    sortOrder: (row['sort_order'] as int?) ?? 0,
+  );
 
   final String code;
   final String symbol;
 
   /// Minor-unit precision. Drives money rounding — VND has none.
   final int decimals;
+  final int sortOrder;
 
-  static const Currency vnd = Currency(code: 'VND', symbol: '₫', decimals: 0);
-
-  static const List<Currency> all = [
-    vnd,
-    Currency(code: 'USD', symbol: r'$', decimals: 2),
-    Currency(code: 'EUR', symbol: '€', decimals: 2),
-    Currency(code: 'JPY', symbol: '¥', decimals: 0),
-    Currency(code: 'KRW', symbol: '₩', decimals: 0),
-    Currency(code: 'THB', symbol: '฿', decimals: 2),
-    Currency(code: 'SGD', symbol: r'S$', decimals: 2),
-    Currency(code: 'MYR', symbol: 'RM', decimals: 2),
-    Currency(code: 'PHP', symbol: '₱', decimals: 2),
-    Currency(code: 'IDR', symbol: 'Rp', decimals: 0),
-    Currency(code: 'CNY', symbol: '¥', decimals: 2),
-    Currency(code: 'AUD', symbol: r'A$', decimals: 2),
-    Currency(code: 'GBP', symbol: '£', decimals: 2),
-  ];
-
-  static Currency byCode(String code) =>
-      all.firstWhere((c) => c.code == code, orElse: () => vnd);
+  /// The default a new shop is created with, matching `stores.currency`'s own
+  /// default. Held in code so the picker has something to show before the
+  /// table has loaded — it is not a stand-in for the table.
+  static const Currency vnd = Currency(code: 'VND', symbol: '₫', decimals: 0, sortOrder: 10);
 
   @override
-  List<Object?> get props => [code, symbol, decimals];
+  List<Object?> get props => [code, symbol, decimals, sortOrder];
 }

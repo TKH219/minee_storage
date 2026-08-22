@@ -78,6 +78,62 @@ void main() {
     expect(t.container.read(createStoreStateProvider).categories, _categories);
   });
 
+  test('the currency list is read from the repository, not hardcoded', () async {
+    const usd = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    final t = build(
+      stores: FakeStoreRepository(
+        categoryList: _categories,
+        currencyList: const [Currency.vnd, usd],
+      ),
+    );
+
+    await t.container.read(createStoreStateProvider.notifier).loadCategories();
+
+    expect(t.stores.calls, contains('currencies'));
+    expect(t.container.read(createStoreStateProvider).currencies, [Currency.vnd, usd]);
+  });
+
+  test('the selected currency resolves against the loaded list', () async {
+    const usd = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    final t = build(
+      stores: FakeStoreRepository(
+        categoryList: _categories,
+        currencyList: const [Currency.vnd, usd],
+      ),
+    );
+    final notifier = t.container.read(createStoreStateProvider.notifier);
+    await notifier.loadCategories();
+
+    notifier.updateCurrency('USD');
+
+    expect(t.container.read(createStoreStateProvider).currency, usd);
+  });
+
+  test('before the list loads, the currency shows the VND default', () {
+    final t = build();
+
+    expect(t.container.read(createStoreStateProvider).currencies, isEmpty);
+    expect(t.container.read(createStoreStateProvider).currency, Currency.vnd);
+  });
+
+  test('a failed load leaves both lists empty and recoverable', () async {
+    final stores = FakeStoreRepository(
+      categoryList: _categories,
+      currencyList: const [Currency.vnd],
+      error: const NetworkException(),
+    );
+    final t = build(stores: stores);
+    final notifier = t.container.read(createStoreStateProvider.notifier);
+
+    await notifier.loadCategories();
+    expect(t.container.read(createStoreStateProvider).isError, isTrue);
+    expect(t.container.read(createStoreStateProvider).currencies, isEmpty);
+
+    stores.error = null;
+    await notifier.loadCategories();
+    expect(t.container.read(createStoreStateProvider).currencies, isNotEmpty);
+  });
+
   test('submit creates the shop, stores the active id and reaches the dashboard', () async {
     final t = build();
     final notifier = t.container.read(createStoreStateProvider.notifier)

@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
-import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/onboarding/create_store/states/create_store_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/app_option_sheet.dart';
@@ -249,7 +248,7 @@ class _CreateStorePageState
       title: LocaleKeys.onboarding_store_currencyTitle.tr(),
       selected: currentState.currencyCode,
       options: [
-        for (final currency in Currency.all)
+        for (final currency in currentState.currencies)
           AppOption(value: currency.code, label: '${currency.code}  ${currency.symbol}'),
       ],
     );
