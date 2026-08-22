@@ -3,20 +3,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 
 void main() {
+  test('fromRow maps a currencies row', () {
+    final currency = Currency.fromRow({
+      'code': 'USD',
+      'symbol': r'$',
+      'decimals': 2,
+      'sort_order': 20,
+    });
+
+    expect(currency.code, 'USD');
+    expect(currency.symbol, r'$');
+    expect(currency.decimals, 2);
+    expect(currency.sortOrder, 20);
+  });
+
+  test('a row missing its precision defaults to two minor units', () {
+    final currency = Currency.fromRow({'code': 'XAF', 'symbol': 'F'});
+
+    expect(currency.decimals, 2);
+    expect(currency.sortOrder, 0);
+  });
+
   test('VND is the default and carries no minor units', () {
     expect(Currency.vnd.code, 'VND');
+    expect(Currency.vnd.symbol, '₫');
     expect(Currency.vnd.decimals, 0);
-    expect(Currency.all.first, Currency.vnd);
   });
 
-  test('every currency code is unique', () {
-    final codes = Currency.all.map((c) => c.code).toList();
+  test('equality is by value', () {
+    const a = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
+    const b = Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20);
 
-    expect(codes.toSet().length, codes.length);
-  });
-
-  test('an unknown code falls back to VND rather than throwing', () {
-    expect(Currency.byCode('XXX'), Currency.vnd);
-    expect(Currency.byCode('USD').decimals, 2);
+    expect(a, b);
   });
 }

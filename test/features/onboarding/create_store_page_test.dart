@@ -37,7 +37,14 @@ Widget host({
           ),
         ),
         storeRepositoryProvider.overrideWithValue(
-          stores ?? FakeStoreRepository(categoryList: _categories),
+          stores ??
+              FakeStoreRepository(
+                categoryList: _categories,
+                currencyList: const [
+                  Currency.vnd,
+                  Currency(code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20),
+                ],
+              ),
         ),
         mediaRepositoryProvider.overrideWithValue(FakeMediaRepository()),
         routerProvider.overrideWithValue(buildTestRouter()),
@@ -143,5 +150,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the currency picker lists what the table returned', (tester) async {
+    await tester.pumpWidget(host());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('VND'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Which currency?'), findsOneWidget);
+    expect(find.textContaining('USD'), findsOneWidget);
+
+    await tester.tap(find.textContaining('USD'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining(r'USD  $'), findsOneWidget);
   });
 }
