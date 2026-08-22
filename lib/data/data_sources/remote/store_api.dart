@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:retrofit/retrofit.dart';
 
+import 'package:mine_storage/data/models/models.dart';
+
 part 'store_api.g.dart';
 
 /// Supabase PostgREST. Returns bare JSON arrays, not the `{code, message,
@@ -22,7 +24,7 @@ abstract class StoreApi {
 
   @POST('/rest/v1/stores')
   @Headers({'Prefer': 'return=representation'})
-  Future<dynamic> insertStore(@Body() Map<String, dynamic> values);
+  Future<dynamic> insertStore(@Body() CreateStoreRequest request);
 
   @GET('/rest/v1/store_categories')
   Future<dynamic> fetchCategories({

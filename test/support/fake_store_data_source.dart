@@ -1,4 +1,5 @@
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 class FakeStoreDataSource implements StoreDataSource {
   FakeStoreDataSource({
@@ -47,10 +48,10 @@ class FakeStoreDataSource implements StoreDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> insertStore(Map<String, dynamic> values) async {
-    calls.add('insertStore:${values['name']}');
+  Future<Map<String, dynamic>> insertStore(CreateStoreRequest request) async {
+    calls.add('insertStore:${request.name}');
     _maybeThrow();
-    inserted = values;
-    return {'id': 's-new', ...values};
+    inserted = request.toJson();
+    return {'id': 's-new', ...inserted};
   }
 }
