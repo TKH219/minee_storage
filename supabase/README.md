@@ -158,7 +158,10 @@ token unless it deliberately gives it up.
 through Dio + Retrofit against `/rest/v1` and `/storage/v1` — see
 `store_api.dart`, `user_api.dart` and `SupabaseRestInterceptor`, which supplies
 the `apikey` header PostgREST requires alongside the bearer. `supabase_flutter`
-remains only for auth: credentials, the OTP, and the session. A REST failure
+remains only for auth: credentials, the OTP, and the session. That boundary is
+expressed in the types rather than in a comment — `AuthDataSource` is GoTrue
+only, `UserProfileDataSource` is REST only, and `AuthRepositoryImpl` holds one
+of each. A REST failure
 arrives as a `DioException` already carrying a typed `AppException` from
 `ErrorInterceptor`, so repositories must **not** re-wrap it — doing so flattens
 a network error into "unknown". Its `icon` column holds an opaque token that the app

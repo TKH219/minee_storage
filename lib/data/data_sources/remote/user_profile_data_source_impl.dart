@@ -1,26 +1,27 @@
 import 'package:mine_storage/data/data_sources/remote/user_api.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
 
-/// The parts of auth that are table reads and writes rather than sessions.
-///
-/// Split out so [AuthDataSourceImpl] keeps only what GoTrue genuinely owns —
-/// credentials, the OTP and the session — and everything else goes over REST.
-class AuthTableDataSource {
-  const AuthTableDataSource(this._api);
+class UserProfileDataSourceImpl implements UserProfileDataSource {
+  const UserProfileDataSourceImpl(this._api);
 
   final UserApi _api;
 
+  @override
   Future<String> emailStatus(String email) => _api.emailStatus({'p_email': email});
 
+  @override
   Future<Map<String, dynamic>?> fetchUserRow(String userId) async {
     final body = await _api.fetchUser(id: 'eq.$userId');
     if (body is! List || body.isEmpty) return null;
     return (body.first as Map).cast<String, dynamic>();
   }
 
+  @override
   Future<void> touchLastSignedIn(String userId) {
     return _patch(userId, {'last_signed_in_at': _now()});
   }
 
+  @override
   Future<void> updateProfileRow({
     required String userId,
     required String fullName,
@@ -32,6 +33,7 @@ class AuthTableDataSource {
     });
   }
 
+  @override
   Future<void> stampOnboardingCompleted(String userId) {
     return _patch(userId, {'onboarding_completed_at': _now()});
   }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mine_storage/data/data_sources/remote/auth_table_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source_impl.dart';
 
 import '../support/fake_user_api.dart';
 import '../support/localization_test_harness.dart';
@@ -13,14 +13,14 @@ void main() {
       {'id': 'uid-1', 'email': 'a@b.com', 'full_name': 'Maya'},
     ]);
 
-    final row = await AuthTableDataSource(api).fetchUserRow('uid-1');
+    final row = await UserProfileDataSourceImpl(api).fetchUserRow('uid-1');
 
     expect(api.lastQuery['id'], 'eq.uid-1');
     expect(row!['full_name'], 'Maya');
   });
 
   test('a missing profile row is null, not an error', () async {
-    final row = await AuthTableDataSource(FakeUserApi()).fetchUserRow('uid-1');
+    final row = await UserProfileDataSourceImpl(FakeUserApi()).fetchUserRow('uid-1');
 
     expect(row, isNull);
   });
@@ -28,7 +28,7 @@ void main() {
   test('a profile write patches only the columns it was given', () async {
     final api = FakeUserApi();
 
-    await AuthTableDataSource(api).updateProfileRow(userId: 'uid-1', fullName: 'Maya');
+    await UserProfileDataSourceImpl(api).updateProfileRow(userId: 'uid-1', fullName: 'Maya');
 
     expect(api.lastQuery['id'], 'eq.uid-1');
     expect(api.lastPatch['full_name'], 'Maya');
@@ -39,7 +39,7 @@ void main() {
   test('an avatar url is included when there is one', () async {
     final api = FakeUserApi();
 
-    await AuthTableDataSource(api)
+    await UserProfileDataSourceImpl(api)
         .updateProfileRow(userId: 'uid-1', fullName: 'Maya', avatarUrl: 'https://cdn/x.jpg');
 
     expect(api.lastPatch['avatar_url'], 'https://cdn/x.jpg');
@@ -48,7 +48,7 @@ void main() {
   test('stamping onboarding writes the completion timestamp', () async {
     final api = FakeUserApi();
 
-    await AuthTableDataSource(api).stampOnboardingCompleted('uid-1');
+    await UserProfileDataSourceImpl(api).stampOnboardingCompleted('uid-1');
 
     expect(api.lastPatch['onboarding_completed_at'], isNotNull);
   });
@@ -56,7 +56,7 @@ void main() {
   test('the email-status rpc posts the address as its parameter', () async {
     final api = FakeUserApi(status: 'confirmed');
 
-    final status = await AuthTableDataSource(api).emailStatus('a@b.com');
+    final status = await UserProfileDataSourceImpl(api).emailStatus('a@b.com');
 
     expect(api.lastRpcBody, {'p_email': 'a@b.com'});
     expect(status, 'confirmed');

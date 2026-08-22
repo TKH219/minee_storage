@@ -1,19 +1,21 @@
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._dataSource);
+  AuthRepositoryImpl(this._dataSource, this._profiles);
 
   final AuthDataSource _dataSource;
+  final UserProfileDataSource _profiles;
 
   @override
   Future<EmailStatus> checkEmail(String email) {
     return _guard(() async {
-      final raw = await _dataSource.emailStatus(_normalise(email));
+      final raw = await _profiles.emailStatus(_normalise(email));
       return switch (raw) {
         'unconfirmed' => EmailStatus.unconfirmed,
         'confirmed' => EmailStatus.confirmed,
@@ -63,7 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       try {
-        await _dataSource.touchLastSignedIn(userId);
+        await _profiles.touchLastSignedIn(userId);
       } on Object catch (e) {
         logger.w('Failed to stamp last_signed_in_at', error: e);
       }
@@ -106,7 +108,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) {
     return _guard(() async {
       final id = _requireSession();
-      await _dataSource.updateProfileRow(
+      await _profiles.updateProfileRow(
         userId: id,
         fullName: fullName.trim(),
         avatarUrl: avatarUrl,
@@ -117,7 +119,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> completeOnboarding() {
-    return _guard(() => _dataSource.stampOnboardingCompleted(_requireSession()));
+    return _guard(() => _profiles.stampOnboardingCompleted(_requireSession()));
   }
 
   @override
@@ -125,7 +127,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return _guard(() async {
       final id = _dataSource.currentUserId;
       if (id == null) return null;
-      final row = await _dataSource.fetchUserRow(id);
+      final row = await _profiles.fetchUserRow(id);
       return row == null ? null : UserEntity.fromRow(row);
     });
   }
@@ -144,7 +146,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<UserEntity> _requireUser(String userId) async {
-    final row = await _dataSource.fetchUserRow(userId);
+    final row = await _profiles.fetchUserRow(userId);
     if (row == null) {
       throw const ServerException(
         message: 'Your profile could not be loaded. Please try again.',
