@@ -167,21 +167,21 @@ MockSeed mockSeed() {
         ownerId: 'mock-owner',
         name: 'Northside · Main',
         categoryCode: 'grocery',
-        currencyCode: 'USD',
+        currencyId: 'mock-usd',
         role: StoreRole.owner),
     const Store(
         id: 'northside-depot',
         ownerId: 'mock-owner',
         name: 'Northside · Depot',
         categoryCode: 'warehouse',
-        currencyCode: 'USD',
+        currencyId: 'mock-usd',
         role: StoreRole.manager),
     const Store(
         id: 'riverside-kiosk',
         ownerId: 'mock-owner',
         name: 'Riverside Kiosk',
         categoryCode: 'grocery',
-        currencyCode: 'VND',
+        currencyId: 'mock-vnd',
         role: StoreRole.staff),
   ];
 

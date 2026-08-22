@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/onboarding/create_store/states/create_store_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/app_option_sheet.dart';
@@ -87,7 +88,7 @@ class _CreateStorePageState
               _buildPickerRow(
                 context,
                 label: LocaleKeys.onboarding_store_currency.tr(),
-                value: '${currentState.currency.code}  ${currentState.currency.symbol}',
+                value: '${currentState.displayCurrency.code}  ${currentState.displayCurrency.symbol}',
                 onTap: _pickCurrency,
               ),
               const SizedBox(height: 24),
@@ -243,16 +244,16 @@ class _CreateStorePageState
   }
 
   Future<void> _pickCurrency() async {
-    final code = await showAppOptionSheet<String>(
+    final currency = await showAppOptionSheet<Currency>(
       context: context,
       title: LocaleKeys.onboarding_store_currencyTitle.tr(),
-      selected: currentState.currencyCode,
+      selected: currentState.currency,
       options: [
         for (final currency in currentState.currencies)
-          AppOption(value: currency.code, label: '${currency.code}  ${currency.symbol}'),
+          AppOption(value: currency, label: '${currency.code}  ${currency.symbol}'),
       ],
     );
-    if (code != null) notifier.updateCurrency(code);
+    if (currency != null) notifier.updateCurrency(currency);
   }
 
   Future<void> _pickLogo() async {
