@@ -1,6 +1,7 @@
+import 'package:mine_storage/domain/entities/audit_times.dart';
 import 'package:equatable/equatable.dart';
 
-class UserEntity extends Equatable {
+class UserEntity extends Equatable with AuditTimes {
   const UserEntity({
     required this.id,
     required this.email,
@@ -9,6 +10,9 @@ class UserEntity extends Equatable {
     this.onboardingCompletedAt,
     this.isDeactivated = false,
     this.lastSignedInAt,
+    this.createdTime,
+    this.updatedTime,
+    this.deletedTime,
   });
 
   /// Builds from a `public.users` row as PostgREST returns it.
@@ -26,6 +30,9 @@ class UserEntity extends Equatable {
       onboardingCompletedAt: parse('onboarding_completed_at'),
       isDeactivated: (row['is_deactivated'] as bool?) ?? false,
       lastSignedInAt: parse('last_signed_in_at'),
+      createdTime: parse('created_at'),
+      updatedTime: parse('updated_at'),
+      deletedTime: parse('deleted_at'),
     );
   }
 
@@ -36,6 +43,12 @@ class UserEntity extends Equatable {
   final DateTime? onboardingCompletedAt;
   final bool isDeactivated;
   final DateTime? lastSignedInAt;
+  @override
+  final DateTime? createdTime;
+  @override
+  final DateTime? updatedTime;
+  @override
+  final DateTime? deletedTime;
 
   bool get needsProfile => fullName.trim().isEmpty;
 
@@ -48,5 +61,8 @@ class UserEntity extends Equatable {
     onboardingCompletedAt,
     isDeactivated,
     lastSignedInAt,
+    createdTime,
+    updatedTime,
+    deletedTime,
   ];
 }

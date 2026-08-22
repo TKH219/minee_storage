@@ -3,6 +3,7 @@ export 'user_entity.dart';
 export 'expiry_status.dart';
 export 'lot.dart';
 export 'product.dart';
+export 'audit_times.dart';
 export 'store.dart';
 export 'store_category.dart';
 export 'currency.dart';
