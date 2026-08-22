@@ -64,6 +64,7 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260821000400` | backfill `stores` from `users.shop_name` |
 | `20260821000500` | the public `avatars` bucket, uid-scoped writes |
 | `20260821000600` | drop `users.shop_name` — **irreversible**, applied last |
+| `20260822000100` | `currencies`, 13 seeded rows; `stores.currency` gains a foreign key to it |
 
 Every migration is idempotent (`create table if not exists`,
 `create or replace function`, `drop … if exists`, `on conflict do nothing`), so
@@ -114,8 +115,11 @@ four commands. There is deliberately no `store_members` table yet — with one
 role there is nothing to model, and adding it now would mean a `security
 definer` helper to break the recursion between the two tables' policies.
 
-`public.store_categories` is seeded reference data, readable by `authenticated`
-and writable by nobody. Its `icon` column holds an opaque token that the app
+`public.store_categories` and `public.currencies` are both seeded reference
+data, readable by `authenticated` and writable by nobody. `stores.category_code`
+and `stores.currency` are foreign keys to them, so adding either now needs a
+migration — the accepted cost of having one source of truth rather than a list
+in Dart that can drift from the column it writes. Its `icon` column holds an opaque token that the app
 maps to an icon with a fallback, so a category added later cannot break an
 older client.
 
@@ -134,7 +138,7 @@ None of these are done, and all are required before production auth works:
 - **No SMTP configured.** Without it, no confirmation or recovery email is sent.
 - **Both email templates are still the default, link-based ones.** They must be
   converted to `{{ .Token }}` so the 6-digit code is delivered instead of a link.
-- **Migrations are not applied.** All nine files above must be run against
+- **Migrations are not applied.** All ten files above must be run against
   `otwasmlfyvytvjbdflpg`, in order.
 - **`ANON_KEY` in `lib/env/production/.env` is still a placeholder.** Both env
   files carry `REPLACE_WITH_*_ANON_KEY`; the real publishable keys must be pasted
