@@ -33,6 +33,7 @@ class CreateStoreState extends BaseState with Equatable {
     this.isUploading = false,
     this.urlIsInvalid = false,
     this.categories = const [],
+    this.currencies = const [],
     super.status,
     super.errorMessageKey,
     super.errorMessage,
@@ -47,11 +48,19 @@ class CreateStoreState extends BaseState with Equatable {
   final bool isUploading;
   final bool urlIsInvalid;
   final List<StoreCategory> categories;
+  final List<Currency> currencies;
 
   bool get canSubmit =>
       name.isNotBlank && categoryCode != null && !isLoading && !isUploading;
 
-  Currency get currency => Currency.byCode(currencyCode);
+  /// Falls back to the VND default until the table has loaded — that default
+  /// is also what `stores.currency` carries in the database.
+  Currency get currency {
+    for (final c in currencies) {
+      if (c.code == currencyCode) return c;
+    }
+    return Currency.vnd;
+  }
 
   StoreCategory? get category {
     if (categoryCode == null) return null;
@@ -75,6 +84,7 @@ class CreateStoreState extends BaseState with Equatable {
     bool? isUploading,
     bool? urlIsInvalid,
     List<StoreCategory>? categories,
+    List<Currency>? currencies,
   }) {
     return CreateStoreState(
       name: name ?? this.name,
@@ -86,6 +96,7 @@ class CreateStoreState extends BaseState with Equatable {
       isUploading: isUploading ?? this.isUploading,
       urlIsInvalid: urlIsInvalid ?? this.urlIsInvalid,
       categories: categories ?? this.categories,
+      currencies: currencies ?? this.currencies,
       status: status ?? this.status,
       errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -103,6 +114,7 @@ class CreateStoreState extends BaseState with Equatable {
     isUploading,
     urlIsInvalid,
     categories,
+    currencies,
     status,
     errorMessageKey,
     errorMessage,
@@ -137,13 +149,15 @@ class CreateStoreStateNotifier extends BaseStateNotifier<CreateStoreState> {
   void updateUrl(String value) =>
       updateState(state.copyWith(url: value, urlIsInvalid: false));
 
+  /// Loads both reference tables the form needs; neither is useful alone.
   Future<void> loadCategories() async {
     try {
       showLoading();
       final categories = await _storeRepository.categories();
+      final currencies = await _storeRepository.currencies();
       if (!ref.mounted) return;
       showLoaded();
-      updateState(state.copyWith(categories: categories));
+      updateState(state.copyWith(categories: categories, currencies: currencies));
     } on Object catch (e) {
       if (!ref.mounted) return;
       onError(e);

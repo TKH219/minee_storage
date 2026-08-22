@@ -20,12 +20,14 @@ class FakeStoreRepository implements StoreRepository {
     this.stores = const [],
     this.created,
     this.categoryList = const [],
+    this.currencyList = const [Currency.vnd],
     this.error,
   });
 
   List<Store> stores;
   Store? created;
   List<StoreCategory> categoryList;
+  List<Currency> currencyList;
   Object? error;
 
   final List<String> calls = [];
@@ -55,6 +57,13 @@ class FakeStoreRepository implements StoreRepository {
     final store = created ?? storeFixture(name: name, categoryCode: categoryCode);
     stores = [...stores, store];
     return store;
+  }
+
+  @override
+  Future<List<Currency>> currencies() async {
+    calls.add('currencies');
+    _maybeThrow();
+    return currencyList;
   }
 
   @override
