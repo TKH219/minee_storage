@@ -50,7 +50,9 @@
       "codeSentTitle": "Đã gửi mã",
       "codeSentSubtitle": "Kiểm tra hộp thư của bạn.",
       "didntGetIt": "Chưa nhận được? ",
-      "passwordsDontMatch": "Hai ô không khớp. Nhập lại mật khẩu mới."
+      "passwordsDontMatch": "Hai ô không khớp. Nhập lại mật khẩu mới.",
+      "step1of2": "BƯỚC 1/2",
+      "step2of2": "BƯỚC 2/2"
     },
     "social": {
       "continueWith": "hoặc tiếp tục với",
@@ -74,19 +76,12 @@
       "step2of2Resumed": "BƯỚC 2/2 · LÀM TIẾP",
       "finishSigningUp": "Hoàn tất đăng ký",
       "title": "Tạo tài khoản",
-      "choosePassword": "Chọn mật khẩu",
       "resumedHint": "Bạn đã bắt đầu việc này trước đó. Nhập mã mới chúng tôi vừa gửi.",
-      "continueLabel": "Tiếp tục",
       "createAccount": "Tạo tài khoản",
       "confirmAccount": "Xác nhận tài khoản",
-      "shopName": "Tên cửa hàng",
-      "shopNameHint": "Tạp hoá Bảo An",
-      "shopNameHelp": "Hiển thị trên tài khoản của bạn. Có thể đổi sau.",
-      "confirmPassword": "Xác nhận mật khẩu",
-      "invalidEmailOrShop": "Nhập email hợp lệ và tên cửa hàng của bạn.",
       "emailRegistered": "Email này đã được đăng ký. Hãy đăng nhập.",
       "credentialsHint": "Chúng tôi sẽ gửi mã 6 số tới email để bạn xác nhận.",
-      "passwordHint": "Bạn sẽ dùng mật khẩu này với {email} để đăng nhập."
+      "invalidEmailOrPassword": "Nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên."
     },
     "forgot": {
       "title": "Đặt lại mật khẩu",
@@ -157,5 +152,43 @@
     "themeLight": "Sáng",
     "themeDark": "Tối",
     "language": "Ngôn ngữ"
+  },
+  "onboarding": {
+    "profile": {
+      "title": "Bạn tên là gì?",
+      "subtitle": "Tên của bạn sẽ hiện trên hóa đơn và những gì bạn chia sẻ.",
+      "fullName": "Họ và tên",
+      "fullNameHint": "Nguyễn Thùy Linh",
+      "required": "Bắt buộc.",
+      "addPhoto": "Thêm ảnh",
+      "uploading": "Đang tải lên…",
+      "continueLabel": "Tiếp tục",
+      "nameRequired": "Nhập tên của bạn để tiếp tục.",
+      "photoFailed": "Không tải được ảnh này. Bạn vẫn có thể tiếp tục mà không cần ảnh."
+    },
+    "store": {
+      "title": "Thiết lập cửa hàng",
+      "subtitle": "Bạn có thể thêm cửa hàng khác sau và chuyển qua lại.",
+      "logo": "Ảnh cửa hàng",
+      "optional": "không bắt buộc",
+      "name": "Tên cửa hàng",
+      "nameHint": "Tạp hóa Linh",
+      "category": "Loại hình",
+      "categoryPrompt": "Chọn loại hình",
+      "categoryTitle": "Cửa hàng của bạn thuộc loại nào?",
+      "currency": "Tiền tệ",
+      "currencyTitle": "Dùng tiền tệ nào?",
+      "address": "Địa chỉ",
+      "addressHint": "12 Lê Lợi, Quận 1",
+      "url": "Liên kết cửa hàng",
+      "urlHint": "shopee.vn/cua-hang",
+      "urlHelp": "Dành cho cửa hàng bán online.",
+      "urlInvalid": "Liên kết này không hợp lệ.",
+      "create": "Tạo cửa hàng",
+      "nameRequired": "Đặt tên cho cửa hàng của bạn.",
+      "categoryRequired": "Chọn loại hình cho cửa hàng.",
+      "categoriesFailed": "Không tải được danh sách loại hình.",
+      "retry": "Thử lại"
+    }
   }
 }

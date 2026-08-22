@@ -1,19 +1,21 @@
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/exceptions/supabase_error_mapper.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._dataSource);
+  AuthRepositoryImpl(this._dataSource, this._profiles);
 
   final AuthDataSource _dataSource;
+  final UserProfileDataSource _profiles;
 
   @override
   Future<EmailStatus> checkEmail(String email) {
     return _guard(() async {
-      final raw = await _dataSource.emailStatus(_normalise(email));
+      final raw = await _profiles.emailStatus(_normalise(email));
       return switch (raw) {
         'unconfirmed' => EmailStatus.unconfirmed,
         'confirmed' => EmailStatus.confirmed,
@@ -23,18 +25,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> startSignUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) {
-    return _guard(
-      () => _dataSource.signUp(
-        email: _normalise(email),
-        password: password,
-        shopName: shopName.trim(),
-      ),
-    );
+  Future<void> startSignUp({required String email, required String password}) {
+    return _guard(() => _dataSource.signUp(email: _normalise(email), password: password));
   }
 
   @override
@@ -42,26 +34,14 @@ class AuthRepositoryImpl implements AuthRepository {
       _guard(() => _dataSource.resendSignUpCode(_normalise(email)));
 
   @override
-  Future<UserEntity> confirmSignUp({
-    required String email,
-    required String token,
-    required String shopName,
-    required bool wasResumed,
-  }) {
+  Future<UserEntity> confirmSignUp({required String email, required String token}) {
     return _guard(() async {
       final userId = await _dataSource.verifySignUpCode(
         email: _normalise(email),
         token: token.trim(),
       );
 
-      // The trigger read raw_user_meta_data from the *first* attempt, so a
-      // resumed signup would otherwise silently discard the name just typed.
-      if (wasResumed) {
-        await _dataSource.updateShopName(userId: userId, shopName: shopName.trim());
-      }
-
-      final user = await _requireUser(userId);
-      return wasResumed ? _withShopName(user, shopName.trim()) : user;
+      return _requireUser(userId);
     });
   }
 
@@ -85,7 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       try {
-        await _dataSource.touchLastSignedIn(userId);
+        await _profiles.touchLastSignedIn(userId);
       } on Object catch (e) {
         logger.w('Failed to stamp last_signed_in_at', error: e);
       }
@@ -125,35 +105,55 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() => _guard(() => _dataSource.signOut());
 
   @override
+  Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) {
+    return _guard(() async {
+      final id = _requireSession();
+      await _profiles.updateProfileRow(
+        userId: id,
+        fullName: fullName.trim(),
+        avatarUrl: avatarUrl,
+      );
+      return _requireUser(id);
+    });
+  }
+
+  @override
+  Future<void> completeOnboarding() {
+    return _guard(() => _profiles.stampOnboardingCompleted(_requireSession()));
+  }
+
+  @override
   Future<UserEntity?> currentUser() {
     return _guard(() async {
       final id = _dataSource.currentUserId;
       if (id == null) return null;
-      final row = await _dataSource.fetchUserRow(id);
-      return row == null ? null : UserEntity.fromRow(row);
+      final row = await _profiles.fetchUserRow(id);
+      return row?.toEntity();
     });
   }
 
   @override
   Stream<bool> get authStateChanges => _dataSource.authStateChanges;
 
+  String _requireSession() {
+    final id = _dataSource.currentUserId;
+    if (id == null) {
+      throw const UnauthorizedException(
+        message: 'Your session has expired. Please sign in again.',
+      );
+    }
+    return id;
+  }
+
   Future<UserEntity> _requireUser(String userId) async {
-    final row = await _dataSource.fetchUserRow(userId);
+    final row = await _profiles.fetchUserRow(userId);
     if (row == null) {
       throw const ServerException(
         message: 'Your profile could not be loaded. Please try again.',
       );
     }
-    return UserEntity.fromRow(row);
+    return row.toEntity();
   }
-
-  UserEntity _withShopName(UserEntity user, String shopName) => UserEntity(
-    id: user.id,
-    email: user.email,
-    shopName: shopName,
-    isDeactivated: user.isDeactivated,
-    lastSignedInAt: user.lastSignedInAt,
-  );
 
   String _normalise(String email) => email.trim().toLowerCase();
 

@@ -4,15 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/string_extensions.dart';
-import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/shared/ui/otp_field.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
-enum SignUpStep { credentials, password, code }
+enum SignUpStep { credentials, code }
 
 final signUpStateProvider = NotifierProvider<SignUpStateNotifier, SignUpState>(
   SignUpStateNotifier.new,
@@ -23,7 +23,6 @@ class SignUpState extends BaseState with Equatable {
   const SignUpState({
     this.step = SignUpStep.credentials,
     this.email = '',
-    this.shopName = '',
     this.password = '',
     this.code = '',
     this.obscurePassword = true,
@@ -35,7 +34,6 @@ class SignUpState extends BaseState with Equatable {
 
   final SignUpStep step;
   final String email;
-  final String shopName;
   final String password;
   final String code;
   final bool obscurePassword;
@@ -45,9 +43,7 @@ class SignUpState extends BaseState with Equatable {
   final bool wasResumed;
 
   bool get canSubmitCredentials =>
-      email.isNotBlank && email.contains('@') && shopName.isNotBlank && !isLoading;
-
-  bool get canSubmitPassword => password.trim().length >= 6 && !isLoading;
+      email.isNotBlank && email.contains('@') && password.trim().length >= 6 && !isLoading;
 
   bool get canSubmitCode => code.trim().length == OtpField.codeLength && !isLoading;
 
@@ -58,7 +54,6 @@ class SignUpState extends BaseState with Equatable {
     String? errorMessage,
     SignUpStep? step,
     String? email,
-    String? shopName,
     String? password,
     String? code,
     bool? obscurePassword,
@@ -67,7 +62,6 @@ class SignUpState extends BaseState with Equatable {
     return SignUpState(
       step: step ?? this.step,
       email: email ?? this.email,
-      shopName: shopName ?? this.shopName,
       password: password ?? this.password,
       code: code ?? this.code,
       obscurePassword: obscurePassword ?? this.obscurePassword,
@@ -82,7 +76,6 @@ class SignUpState extends BaseState with Equatable {
   List<Object?> get props => [
     step,
     email,
-    shopName,
     password,
     code,
     obscurePassword,
@@ -94,16 +87,16 @@ class SignUpState extends BaseState with Equatable {
 
 class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
   late final AuthRepository _authRepository;
+  late final OnboardingResolver _resolver;
 
   @override
   SignUpState createInitialState() {
     _authRepository = ref.read(authRepositoryProvider);
+    _resolver = ref.read(onboardingResolverProvider);
     return const SignUpState();
   }
 
   void updateEmail(String value) => updateState(state.copyWith(email: value));
-
-  void updateShopName(String value) => updateState(state.copyWith(shopName: value));
 
   void updatePassword(String value) => updateState(state.copyWith(password: value));
 
@@ -126,17 +119,12 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
       updateState(state.copyWith(obscurePassword: !state.obscurePassword));
 
   void back() {
-    final previous = switch (state.step) {
-      SignUpStep.code => state.wasResumed ? SignUpStep.credentials : SignUpStep.password,
-      SignUpStep.password => SignUpStep.credentials,
-      SignUpStep.credentials => SignUpStep.credentials,
-    };
-    updateState(state.copyWith(step: previous, status: StateLifeCycle.init));
+    updateState(state.copyWith(step: SignUpStep.credentials, status: StateLifeCycle.init));
   }
 
   Future<void> submitCredentials() async {
     if (!state.canSubmitCredentials) {
-      showSnackError(msg: LocaleKeys.auth_signUp_invalidEmailOrShop);
+      showSnackError(msg: LocaleKeys.auth_signUp_invalidEmailOrPassword);
       return;
     }
 
@@ -159,29 +147,13 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
           showLoaded();
           updateState(state.copyWith(step: SignUpStep.code, wasResumed: true));
         case EmailStatus.none:
+          await _authRepository.startSignUp(
+            email: state.email,
+            password: state.password,
+          );
           showLoaded();
-          updateState(state.copyWith(step: SignUpStep.password, wasResumed: false));
+          updateState(state.copyWith(step: SignUpStep.code, wasResumed: false));
       }
-    } on Object catch (e) {
-      _handleError(e);
-    }
-  }
-
-  Future<void> submitPassword() async {
-    if (!state.canSubmitPassword) {
-      showSnackError(msg: LocaleKeys.auth_common_passwordTooShort);
-      return;
-    }
-
-    try {
-      showLoading();
-      await _authRepository.startSignUp(
-        email: state.email,
-        password: state.password,
-        shopName: state.shopName,
-      );
-      showLoaded();
-      updateState(state.copyWith(step: SignUpStep.code));
     } on Object catch (e) {
       _handleError(e);
     }
@@ -195,14 +167,11 @@ class SignUpStateNotifier extends BaseStateNotifier<SignUpState> {
 
     try {
       showLoading();
-      await _authRepository.confirmSignUp(
-        email: state.email,
-        token: state.code,
-        shopName: state.shopName,
-        wasResumed: state.wasResumed,
-      );
+      await _authRepository.confirmSignUp(email: state.email, token: state.code);
       showLoaded();
-      router()?.goNamed(AppRoutes.homeName);
+      final route = await _resolver.resolve();
+      if (!ref.mounted) return;
+      router()?.goNamed(route);
     } on Object catch (e) {
       _handleError(e);
     }

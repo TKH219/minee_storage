@@ -1,3 +1,4 @@
+import '../../support/fake_store_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,6 +27,9 @@ Widget host(
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(FakeAuthRepository(error: error, delay: delay)),
+      storeRepositoryProvider.overrideWithValue(
+        FakeStoreRepository(stores: [storeFixture()]),
+      ),
       sharedPreferencesProvider.overrideWithValue(prefs),
       routerProvider.overrideWithValue(buildTestRouter()),
     ],
@@ -52,6 +56,15 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
+  });
+
+  testWidgets('no social sign-in buttons while the feature is off', (tester) async {
+    await tester.pumpWidget(host(prefs));
+    await tester.pump();
+
+    expect(find.text('Google'), findsNothing);
+    expect(find.text('Apple'), findsNothing);
+    expect(find.text('or continue with'), findsNothing);
   });
 
   testWidgets('the password field reveals and re-hides from its own eye', (tester) async {

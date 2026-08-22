@@ -1,32 +1,47 @@
+import 'package:mine_storage/domain/entities/audit_times.dart';
 import 'package:equatable/equatable.dart';
 
-class UserEntity extends Equatable {
+class UserEntity extends Equatable with AuditTimes {
   const UserEntity({
     required this.id,
     required this.email,
-    required this.shopName,
+    this.fullName = '',
+    this.avatarUrl,
+    this.onboardingCompletedAt,
     this.isDeactivated = false,
     this.lastSignedInAt,
+    this.createdTime,
+    this.updatedTime,
+    this.deletedTime,
   });
-
-  /// Builds from a `public.users` row as PostgREST returns it.
-  factory UserEntity.fromRow(Map<String, dynamic> row) {
-    final signedIn = row['last_signed_in_at'] as String?;
-    return UserEntity(
-      id: row['id'] as String,
-      email: (row['email'] as String?) ?? '',
-      shopName: (row['shop_name'] as String?) ?? '',
-      isDeactivated: (row['is_deactivated'] as bool?) ?? false,
-      lastSignedInAt: signedIn == null ? null : DateTime.parse(signedIn),
-    );
-  }
 
   final String id;
   final String email;
-  final String shopName;
+  final String fullName;
+  final String? avatarUrl;
+  final DateTime? onboardingCompletedAt;
   final bool isDeactivated;
   final DateTime? lastSignedInAt;
+  @override
+  final DateTime? createdTime;
+  @override
+  final DateTime? updatedTime;
+  @override
+  final DateTime? deletedTime;
+
+  bool get needsProfile => fullName.trim().isEmpty;
 
   @override
-  List<Object?> get props => [id, email, shopName, isDeactivated, lastSignedInAt];
+  List<Object?> get props => [
+    id,
+    email,
+    fullName,
+    avatarUrl,
+    onboardingCompletedAt,
+    isDeactivated,
+    lastSignedInAt,
+    createdTime,
+    updatedTime,
+    deletedTime,
+  ];
 }

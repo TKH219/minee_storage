@@ -50,7 +50,9 @@
       "codeSentTitle": "Code sent",
       "codeSentSubtitle": "Check your inbox.",
       "didntGetIt": "Didn't get it? ",
-      "passwordsDontMatch": "These don't match. Retype the new password."
+      "passwordsDontMatch": "These don't match. Retype the new password.",
+      "step1of2": "STEP 1 OF 2",
+      "step2of2": "STEP 2 OF 2"
     },
     "social": {
       "continueWith": "or continue with",
@@ -74,19 +76,12 @@
       "step2of2Resumed": "STEP 2 OF 2 · RESUMED",
       "finishSigningUp": "Finish signing up",
       "title": "Create your account",
-      "choosePassword": "Choose a password",
       "resumedHint": "You started this before. Enter the new code we just sent.",
-      "continueLabel": "Continue",
       "createAccount": "Create account",
       "confirmAccount": "Confirm account",
-      "shopName": "Shop name",
-      "shopNameHint": "Northside Grocers",
-      "shopNameHelp": "Shown on your account. You can change it later.",
-      "confirmPassword": "Confirm password",
-      "invalidEmailOrShop": "Enter a valid email and your shop name.",
       "emailRegistered": "That email is already registered. Sign in instead.",
       "credentialsHint": "We'll email you a 6-digit code to confirm it.",
-      "passwordHint": "You'll use this with {email} to sign in."
+      "invalidEmailOrPassword": "Enter a valid email and a password of at least 6 characters."
     },
     "forgot": {
       "title": "Reset your password",
@@ -157,5 +152,43 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "language": "Language"
+  },
+  "onboarding": {
+    "profile": {
+      "title": "Tell us who you are",
+      "subtitle": "Your name shows on invoices and on anything you share.",
+      "fullName": "Full name",
+      "fullNameHint": "Maya Chen",
+      "required": "Required.",
+      "addPhoto": "Add a photo",
+      "uploading": "Uploading…",
+      "continueLabel": "Continue",
+      "nameRequired": "Enter your name to continue.",
+      "photoFailed": "That photo could not be uploaded. You can carry on without it."
+    },
+    "store": {
+      "title": "Set up your shop",
+      "subtitle": "You can add more shops later, and switch between them.",
+      "logo": "Shop logo",
+      "optional": "optional",
+      "name": "Shop name",
+      "nameHint": "Northside Grocers",
+      "category": "Category",
+      "categoryPrompt": "Choose a category",
+      "categoryTitle": "What kind of shop?",
+      "currency": "Currency",
+      "currencyTitle": "Which currency?",
+      "address": "Address",
+      "addressHint": "12 Lê Lợi, District 1",
+      "url": "Shop link",
+      "urlHint": "shopee.vn/your-shop",
+      "urlHelp": "For a shop that sells online.",
+      "urlInvalid": "That doesn't look like a valid link.",
+      "create": "Create shop",
+      "nameRequired": "Give your shop a name.",
+      "categoryRequired": "Choose a category for your shop.",
+      "categoriesFailed": "Categories could not be loaded.",
+      "retry": "Try again"
+    }
   }
 }

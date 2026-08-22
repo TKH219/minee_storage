@@ -3,12 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/network/dio_builder.dart';
-import 'package:mine_storage/core/network/interceptors/auth_interceptor.dart';
 import 'package:mine_storage/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
+import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/store_data_source_impl.dart';
+import 'package:mine_storage/data/repositories/supabase_store_repository_impl.dart';
+import 'package:mine_storage/data/data_sources/remote/storage_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/storage_data_source_impl.dart';
+import 'package:mine_storage/data/repositories/media_repository_impl.dart';
+import 'package:mine_storage/domain/repositories/media_repository.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
+import 'package:mine_storage/core/network/interceptors/supabase_rest_interceptor.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source_impl.dart';
+import 'package:mine_storage/data/data_sources/remote/store_api.dart';
+import 'package:mine_storage/data/data_sources/remote/user_api.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
@@ -16,7 +29,6 @@ import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/data/mock/mock_database.dart';
 import 'package:mine_storage/data/repositories/mock_product_repository_impl.dart';
-import 'package:mine_storage/data/repositories/mock_store_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
@@ -73,12 +85,17 @@ final authorizedDioProvider = Provider<Dio>((ref) {
   final dio = buildDio(
     baseUrl: Env.apiUrl,
     interceptors: (dio) => [
-      AuthInterceptor(
+      // PostgREST and Storage both want `apikey` alongside the bearer.
+      SupabaseRestInterceptor(
+        anonKey: Env.anonKey,
         accessToken: () =>
             ref.read(supabaseClientProvider).auth.currentSession?.accessToken,
       ),
+      // Drops the session straight through GoTrue rather than the repository:
+      // the repository reaches back into this Dio for its table calls, and
+      // routing through it would make the two mutually dependent.
       UnauthorizedInterceptor(
-        onUnauthorized: () => ref.read(authRepositoryProvider).signOut(),
+        onUnauthorized: () => ref.read(supabaseClientProvider).auth.signOut(),
       ),
     ],
   );
@@ -98,7 +115,10 @@ final postApiProvider = Provider<PostApi>(
 
 /// Repositories
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
+  (ref) => AuthRepositoryImpl(
+    ref.watch(authDataSourceProvider),
+    ref.watch(userProfileDataSourceProvider),
+  ),
 );
 
 final postRepositoryProvider = Provider<PostRepository>(
@@ -113,6 +133,44 @@ final productRepositoryProvider = Provider<ProductRepository>(
   (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
 );
 
+final onboardingResolverProvider = Provider<OnboardingResolver>(
+  (ref) => OnboardingResolver(
+    ref.watch(authRepositoryProvider),
+    ref.watch(storeRepositoryProvider),
+    SharedPreferences.getInstance,
+  ),
+);
+
+final storageDataSourceProvider = Provider<StorageDataSource>(
+  (ref) => StorageDataSourceImpl(
+    ref.watch(authorizedDioProvider),
+    currentUserId: () => ref.read(supabaseClientProvider).auth.currentUser?.id,
+  ),
+);
+
+final mediaRepositoryProvider = Provider<MediaRepository>(
+  (ref) => MediaRepositoryImpl(ref.watch(storageDataSourceProvider)),
+);
+
+final storeApiProvider = Provider<StoreApi>(
+  (ref) => StoreApi(ref.watch(authorizedDioProvider)),
+);
+
+final userApiProvider = Provider<UserApi>(
+  (ref) => UserApi(ref.watch(authorizedDioProvider)),
+);
+
+final userProfileDataSourceProvider = Provider<UserProfileDataSource>(
+  (ref) => UserProfileDataSourceImpl(ref.watch(userApiProvider)),
+);
+
+final storeDataSourceProvider = Provider<StoreDataSource>(
+  (ref) => StoreDataSourceImpl(
+    ref.watch(storeApiProvider),
+    currentUserId: () => ref.read(supabaseClientProvider).auth.currentUser?.id,
+  ),
+);
+
 final storeRepositoryProvider = Provider<StoreRepository>(
-  (ref) => MockStoreRepositoryImpl(ref.watch(mockDatabaseProvider)),
+  (ref) => SupabaseStoreRepositoryImpl(ref.watch(storeDataSourceProvider)),
 );

@@ -1,11 +1,9 @@
+/// Credentials, the one-time code, and the session — everything GoTrue owns.
+///
+/// Profile rows live next door in [UserProfileDataSource] and travel over REST;
+/// the two are kept apart so neither has to know how the other talks.
 abstract class AuthDataSource {
-  Future<String> emailStatus(String email);
-
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  });
+  Future<void> signUp({required String email, required String password});
 
   Future<void> resendSignUpCode(String email);
 
@@ -20,12 +18,6 @@ abstract class AuthDataSource {
   Future<void> updatePassword(String password);
 
   Future<void> signOut();
-
-  Future<Map<String, dynamic>?> fetchUserRow(String userId);
-
-  Future<void> touchLastSignedIn(String userId);
-
-  Future<void> updateShopName({required String userId, required String shopName});
 
   String? get currentUserId;
 

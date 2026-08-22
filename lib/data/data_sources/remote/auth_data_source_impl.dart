@@ -8,25 +8,8 @@ class AuthDataSourceImpl implements AuthDataSource {
   final SupabaseClient _client;
 
   @override
-  Future<String> emailStatus(String email) async {
-    final result = await _client.rpc<dynamic>(
-      'email_status',
-      params: {'p_email': email},
-    );
-    return result as String;
-  }
-
-  @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
-    await _client.auth.signUp(
-      email: email,
-      password: password,
-      data: {'shop_name': shopName},
-    );
+  Future<void> signUp({required String email, required String password}) async {
+    await _client.auth.signUp(email: email, password: password);
   }
 
   @override
@@ -72,30 +55,6 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<void> signOut() => _client.auth.signOut();
-
-  @override
-  Future<Map<String, dynamic>?> fetchUserRow(String userId) {
-    return _client.from('users').select().eq('id', userId).maybeSingle();
-  }
-
-  @override
-  Future<void> touchLastSignedIn(String userId) async {
-    await _client
-        .from('users')
-        .update({'last_signed_in_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', userId);
-  }
-
-  @override
-  Future<void> updateShopName({required String userId, required String shopName}) async {
-    await _client
-        .from('users')
-        .update({
-          'shop_name': shopName,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', userId);
-  }
 
   @override
   String? get currentUserId => _client.auth.currentUser?.id;

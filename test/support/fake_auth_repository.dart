@@ -18,6 +18,8 @@ class FakeAuthRepository implements AuthRepository {
   /// Held so widget tests can observe an in-flight state.
   Duration delay;
 
+  String? lastAvatarUrl;
+
   final List<String> calls = [];
   final StreamController<bool> authStateController = StreamController<bool>.broadcast();
 
@@ -33,12 +35,8 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> startSignUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
-    calls.add('startSignUp:$email:$shopName');
+  Future<void> startSignUp({required String email, required String password}) async {
+    calls.add('startSignUp:$email');
     _maybeThrow();
   }
 
@@ -49,15 +47,13 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> confirmSignUp({
-    required String email,
-    required String token,
-    required String shopName,
-    required bool wasResumed,
-  }) async {
-    calls.add('confirmSignUp:$token:resumed=$wasResumed');
+  Future<UserEntity> confirmSignUp({required String email, required String token}) async {
+    calls.add('confirmSignUp:$token');
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, shopName: shopName);
+    // Confirming leaves a real session behind, so currentUser() must see it.
+    final confirmed = user ?? UserEntity(id: 'uid-1', email: email);
+    user = confirmed;
+    return confirmed;
   }
 
   @override
@@ -65,7 +61,9 @@ class FakeAuthRepository implements AuthRepository {
     calls.add('signIn:$email');
     if (delay > Duration.zero) await Future<void>.delayed(delay);
     _maybeThrow();
-    return user ?? UserEntity(id: 'uid-1', email: email, shopName: 'S');
+    final signedIn = user ?? UserEntity(id: 'uid-1', email: email, fullName: 'S');
+    user = signedIn;
+    return signedIn;
   }
 
   @override
@@ -91,6 +89,30 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async => calls.add('signOut');
+
+  @override
+  Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) async {
+    // Mirrors AuthRepositoryImpl, which trims before it writes.
+    final trimmed = fullName.trim();
+    calls.add('updateProfile:$trimmed');
+    lastAvatarUrl = avatarUrl;
+    _maybeThrow();
+    final updated = UserEntity(
+      id: user?.id ?? 'uid-1',
+      email: user?.email ?? 'a@b.com',
+      fullName: trimmed,
+      avatarUrl: avatarUrl,
+      onboardingCompletedAt: user?.onboardingCompletedAt,
+    );
+    user = updated;
+    return updated;
+  }
+
+  @override
+  Future<void> completeOnboarding() async {
+    calls.add('completeOnboarding');
+    _maybeThrow();
+  }
 
   @override
   Future<UserEntity?> currentUser() async {

@@ -1,3 +1,4 @@
+import '../support/fake_store_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,9 @@ void main() {
   Widget host() => ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+      storeRepositoryProvider.overrideWithValue(
+        FakeStoreRepository(stores: [storeFixture()]),
+      ),
       sharedPreferencesProvider.overrideWithValue(prefs),
       routerProvider.overrideWithValue(buildTestRouter()),
     ],

@@ -7,24 +7,14 @@ abstract class AuthRepository {
   Future<EmailStatus> checkEmail(String email);
 
   /// Creates the account and sends the 8-digit confirmation code.
-  Future<void> startSignUp({
-    required String email,
-    required String password,
-    required String shopName,
-  });
+  Future<void> startSignUp({required String email, required String password});
 
   /// Re-sends the confirmation code for an account that exists but was never
   /// confirmed. Needs no password, so a returning user is not asked for one.
   Future<void> resendSignUpCode(String email);
 
-  /// Verifies the code. When [wasResumed], the trigger already wrote the row
-  /// from the *first* attempt's metadata, so [shopName] is written over it.
-  Future<UserEntity> confirmSignUp({
-    required String email,
-    required String token,
-    required String shopName,
-    required bool wasResumed,
-  });
+  /// Verifies the code and returns the profile row the trigger created.
+  Future<UserEntity> confirmSignUp({required String email, required String token});
 
   Future<UserEntity> signIn({required String email, required String password});
 
@@ -35,6 +25,12 @@ abstract class AuthRepository {
   Future<void> setNewPassword(String password);
 
   Future<void> signOut();
+
+  Future<UserEntity> updateProfile({required String fullName, String? avatarUrl});
+
+  /// Stamps `onboarding_completed_at`, which is what stops the gate from
+  /// sending the user back through onboarding on the next launch.
+  Future<void> completeOnboarding();
 
   Future<UserEntity?> currentUser();
 

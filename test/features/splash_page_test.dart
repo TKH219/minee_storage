@@ -1,3 +1,4 @@
+import '../support/fake_store_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,6 +19,9 @@ Widget host(SharedPreferences prefs, {Brightness brightness = Brightness.light})
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+      storeRepositoryProvider.overrideWithValue(
+        FakeStoreRepository(stores: [storeFixture()]),
+      ),
       sharedPreferencesProvider.overrideWithValue(prefs),
       routerProvider.overrideWithValue(router),
     ],

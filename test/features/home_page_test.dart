@@ -1,3 +1,4 @@
+import '../support/fake_store_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,6 +37,9 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(preferences),
           postRepositoryProvider.overrideWithValue(repository),
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          storeRepositoryProvider.overrideWithValue(
+            FakeStoreRepository(stores: [storeFixture()]),
+          ),
           routerProvider.overrideWithValue(buildTestRouter()),
         ],
         child: MaterialApp(

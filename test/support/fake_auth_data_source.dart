@@ -1,6 +1,10 @@
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
+import 'package:mine_storage/data/models/models.dart';
 
-class FakeAuthDataSource implements AuthDataSource {
+/// Implements both halves so a repository test can pass it twice and keep
+/// asserting on one [calls] list.
+class FakeAuthDataSource implements AuthDataSource, UserProfileDataSource {
   FakeAuthDataSource({
     this.status = 'none',
     this.userId = 'uid-1',
@@ -11,14 +15,15 @@ class FakeAuthDataSource implements AuthDataSource {
   });
 
   String status;
-  String userId;
-  Map<String, dynamic>? row;
+  String? userId;
+  UserModel? row;
   Object? signInError;
   Object? verifyError;
   Object? touchError;
 
   final List<String> calls = [];
   String? lastShopName;
+  String? lastAvatarUrl;
   String? lastPassword;
 
   @override
@@ -28,13 +33,8 @@ class FakeAuthDataSource implements AuthDataSource {
   }
 
   @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String shopName,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     calls.add('signUp:$email');
-    lastShopName = shopName;
   }
 
   @override
@@ -44,7 +44,7 @@ class FakeAuthDataSource implements AuthDataSource {
   Future<String> verifySignUpCode({required String email, required String token}) async {
     calls.add('verifySignUp:$token');
     if (verifyError != null) throw verifyError!;
-    return userId;
+    return userId!;
   }
 
   @override
@@ -54,7 +54,7 @@ class FakeAuthDataSource implements AuthDataSource {
   }) async {
     calls.add('signIn:$email');
     if (signInError != null) throw signInError!;
-    return userId;
+    return userId!;
   }
 
   @override
@@ -76,7 +76,7 @@ class FakeAuthDataSource implements AuthDataSource {
   Future<void> signOut() async => calls.add('signOut');
 
   @override
-  Future<Map<String, dynamic>?> fetchUserRow(String id) async {
+  Future<UserModel?> fetchUserRow(String id) async {
     calls.add('fetchRow:$id');
     return row;
   }
@@ -88,9 +88,18 @@ class FakeAuthDataSource implements AuthDataSource {
   }
 
   @override
-  Future<void> updateShopName({required String userId, required String shopName}) async {
-    calls.add('updateShopName:$shopName');
-    lastShopName = shopName;
+  Future<void> updateProfileRow({
+    required String userId,
+    required String fullName,
+    String? avatarUrl,
+  }) async {
+    calls.add('updateProfileRow:$userId:$fullName');
+    lastAvatarUrl = avatarUrl;
+  }
+
+  @override
+  Future<void> stampOnboardingCompleted(String userId) async {
+    calls.add('stampOnboardingCompleted:$userId');
   }
 
   @override

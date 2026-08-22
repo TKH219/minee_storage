@@ -5,36 +5,34 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
+import 'package:mine_storage/data/models/models.dart';
+
 import '../support/fake_auth_data_source.dart';
+import '../support/model_fixtures.dart';
 
 import '../support/localization_test_harness.dart';
 
-Map<String, dynamic> row({bool deactivated = false, String shop = 'Minee'}) => {
-  'id': 'uid-1',
-  'email': 'a@b.com',
-  'shop_name': shop,
-  'is_deactivated': deactivated,
-  'last_signed_in_at': null,
-};
+UserModel row({bool deactivated = false, String shop = 'Minee'}) =>
+    userModelFixture(fullName: shop, isDeactivated: deactivated);
 
 void main() {
   setUp(useLocale);
 
   test('signIn returns the user and stamps last_signed_in_at', () async {
     final source = FakeAuthDataSource(row: row());
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     final user = await repository.signIn(email: 'A@B.com ', password: 'secret');
 
     expect(user.id, 'uid-1');
-    expect(user.shopName, 'Minee');
+    expect(user.fullName, 'Minee');
     expect(source.calls, contains('signIn:a@b.com'));
     expect(source.calls, contains('touch:uid-1'));
   });
 
   test('signIn refuses a deactivated user and signs them out', () async {
     final source = FakeAuthDataSource(row: row(deactivated: true));
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await expectLater(
       () => repository.signIn(email: 'a@b.com', password: 'secret'),
@@ -54,7 +52,7 @@ void main() {
       row: row(),
       touchError: const ServerException(message: 'nope'),
     );
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     final user = await repository.signIn(email: 'a@b.com', password: 'secret');
 
@@ -65,7 +63,7 @@ void main() {
     final source = FakeAuthDataSource(
       signInError: const AuthException('Invalid login credentials'),
     );
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await expectLater(
       () => repository.signIn(email: 'a@b.com', password: 'wrong'),
@@ -75,7 +73,7 @@ void main() {
 
   test('signIn throws when the users row is missing', () async {
     final source = FakeAuthDataSource(row: null);
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await expectLater(
       () => repository.signIn(email: 'a@b.com', password: 'secret'),
@@ -90,82 +88,53 @@ void main() {
       'confirmed': EmailStatus.confirmed,
     }.entries) {
       final source = FakeAuthDataSource(status: entry.key);
-      final repository = AuthRepositoryImpl(source);
+      final repository = AuthRepositoryImpl(source, source);
 
       expect(await repository.checkEmail('a@b.com'), entry.value);
     }
   });
 
   test('checkEmail treats an unrecognised rpc value as none', () async {
-    final repository = AuthRepositoryImpl(FakeAuthDataSource(status: 'weird'));
+    final source = FakeAuthDataSource(status: 'weird');
+    final repository = AuthRepositoryImpl(source, source);
 
     expect(await repository.checkEmail('a@b.com'), EmailStatus.none);
   });
 
-  test('startSignUp forwards a normalised email and the shop name', () async {
+  test('startSignUp forwards a normalised email', () async {
     final source = FakeAuthDataSource();
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
-    await repository.startSignUp(
-      email: ' A@B.com ',
-      password: 'secret',
-      shopName: 'Minee Storage',
-    );
+    await repository.startSignUp(email: ' A@B.com ', password: 'secret');
 
     expect(source.calls, contains('signUp:a@b.com'));
-    expect(source.lastShopName, 'Minee Storage');
   });
 
-  test('confirmSignUp returns the user without touching shop_name', () async {
+  test('confirmSignUp returns the profile row the trigger created', () async {
     final source = FakeAuthDataSource(row: row(shop: 'Original'));
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
-    final user = await repository.confirmSignUp(
-      email: 'a@b.com',
-      token: '123456',
-      shopName: 'Original',
-      wasResumed: false,
-    );
+    final user = await repository.confirmSignUp(email: 'a@b.com', token: '123456');
 
-    expect(user.shopName, 'Original');
-    expect(source.calls.where((c) => c.startsWith('updateShopName')), isEmpty);
-  });
-
-  test('a resumed signup overwrites the shop name the trigger stored', () async {
-    final source = FakeAuthDataSource(row: row(shop: 'Old Name'));
-    final repository = AuthRepositoryImpl(source);
-
-    final user = await repository.confirmSignUp(
-      email: 'a@b.com',
-      token: '123456',
-      shopName: 'New Name',
-      wasResumed: true,
-    );
-
-    expect(source.calls, contains('updateShopName:New Name'));
-    expect(user.shopName, 'New Name');
+    expect(user.fullName, 'Original');
+    expect(source.calls.where((c) => c.startsWith('updateProfileRow')), isEmpty);
   });
 
   test('confirmSignUp maps a bad code', () async {
     final source = FakeAuthDataSource(
       verifyError: const AuthException('Token has expired or is invalid'),
     );
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await expectLater(
-      () => repository.confirmSignUp(
-        email: 'a@b.com',
-        token: '00000000',
-        shopName: 'S',
-        wasResumed: false,
-      ),
+      () => repository.confirmSignUp(email: 'a@b.com', token: '00000000'),
       throwsA(isA<InvalidCodeException>()),
     );
   });
 
   test('startPasswordReset sends to a normalised email', () async {
     final source = FakeAuthDataSource();
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await repository.startPasswordReset(' A@B.com ');
 
@@ -176,7 +145,7 @@ void main() {
     final source = FakeAuthDataSource(
       verifyError: const AuthException('Token has expired or is invalid'),
     );
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await expectLater(
       () => repository.verifyPasswordResetCode(email: 'a@b.com', token: '00000000'),
@@ -186,7 +155,7 @@ void main() {
 
   test('setNewPassword updates then signs out, in that order', () async {
     final source = FakeAuthDataSource();
-    final repository = AuthRepositoryImpl(source);
+    final repository = AuthRepositoryImpl(source, source);
 
     await repository.setNewPassword('brand-new');
 
@@ -194,6 +163,43 @@ void main() {
     expect(
       source.calls.indexOf('updatePassword') < source.calls.indexOf('signOut'),
       isTrue,
+    );
+  });
+
+  test('updateProfile writes a trimmed name and returns the refreshed user', () async {
+    final source = FakeAuthDataSource(row: row(shop: 'Linh Nguyen'));
+    final repository = AuthRepositoryImpl(source, source);
+
+    final user = await repository.updateProfile(fullName: '  Linh Nguyen  ');
+
+    expect(source.calls, contains('updateProfileRow:uid-1:Linh Nguyen'));
+    expect(user.fullName, 'Linh Nguyen');
+  });
+
+  test('updateProfile carries the avatar url through', () async {
+    final source = FakeAuthDataSource(row: row());
+    final repository = AuthRepositoryImpl(source, source);
+
+    await repository.updateProfile(fullName: 'Linh', avatarUrl: 'https://cdn/x.jpg');
+
+    expect(source.lastAvatarUrl, 'https://cdn/x.jpg');
+  });
+
+  test('completeOnboarding stamps the current user', () async {
+    final source = FakeAuthDataSource(row: row());
+
+    await AuthRepositoryImpl(source, source).completeOnboarding();
+
+    expect(source.calls, contains('stampOnboardingCompleted:uid-1'));
+  });
+
+  test('a profile write without a session is refused', () async {
+    final source = FakeAuthDataSource(userId: null);
+    final repository = AuthRepositoryImpl(source, source);
+
+    expect(
+      () => repository.updateProfile(fullName: 'Linh'),
+      throwsA(isA<UnauthorizedException>()),
     );
   });
 }
