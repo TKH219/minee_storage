@@ -7,7 +7,7 @@ abstract class StoreRepository {
   Future<Store> create({
     required String name,
     required String categoryCode,
-    required String currencyCode,
+    required String currencyId,
     String? address,
     String? url,
     String? logoUrl,

@@ -6,13 +6,13 @@ Store storeFixture({
   String ownerId = 'uid-1',
   String name = 'Tạp hóa Linh',
   String categoryCode = 'grocery',
-  String currencyCode = 'VND',
+  String currencyId = 'cur-vnd',
 }) => Store(
   id: id,
   ownerId: ownerId,
   name: name,
   categoryCode: categoryCode,
-  currencyCode: currencyCode,
+  currencyId: currencyId,
 );
 
 class FakeStoreRepository implements StoreRepository {
@@ -20,7 +20,9 @@ class FakeStoreRepository implements StoreRepository {
     this.stores = const [],
     this.created,
     this.categoryList = const [],
-    this.currencyList = const [Currency.vnd],
+    this.currencyList = const [
+      Currency(id: 'cur-vnd', code: 'VND', symbol: '₫', decimals: 0, sortOrder: 10),
+    ],
     this.error,
   });
 
@@ -47,12 +49,12 @@ class FakeStoreRepository implements StoreRepository {
   Future<Store> create({
     required String name,
     required String categoryCode,
-    required String currencyCode,
+    required String currencyId,
     String? address,
     String? url,
     String? logoUrl,
   }) async {
-    calls.add('create:$name:$categoryCode:$currencyCode');
+    calls.add('create:$name:$categoryCode:$currencyId');
     _maybeThrow();
     final store = created ?? storeFixture(name: name, categoryCode: categoryCode);
     stores = [...stores, store];

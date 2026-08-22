@@ -1,40 +1,42 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:mine_storage/core/exceptions/exceptions.dart';
+import 'package:mine_storage/data/data_sources/remote/store_api.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source.dart';
 
 class StoreDataSourceImpl implements StoreDataSource {
-  StoreDataSourceImpl(this._client);
+  StoreDataSourceImpl(this._api, {required String? Function() currentUserId})
+    : _currentUserId = currentUserId;
 
-  final SupabaseClient _client;
+  final StoreApi _api;
+  final String? Function() _currentUserId;
 
   @override
-  String? get currentUserId => _client.auth.currentUser?.id;
+  String? get currentUserId => _currentUserId();
 
   @override
   Future<List<Map<String, dynamic>>> fetchMine(String ownerId) async {
-    final rows = await _client
-        .from('stores')
-        .select()
-        .eq('owner_id', ownerId)
-        .eq('is_archived', false)
-        .order('created_at');
-    return rows.cast<Map<String, dynamic>>();
+    return _rows(await _api.fetchStores(ownerId: 'eq.$ownerId', isArchived: 'eq.false'));
   }
 
   @override
-  Future<List<Map<String, dynamic>>> fetchCategories() async {
-    final rows = await _client.from('store_categories').select().order('sort_order');
-    return rows.cast<Map<String, dynamic>>();
-  }
+  Future<List<Map<String, dynamic>>> fetchCategories() async =>
+      _rows(await _api.fetchCategories());
 
   @override
-  Future<List<Map<String, dynamic>>> fetchCurrencies() async {
-    final rows = await _client.from('currencies').select().order('sort_order');
-    return rows.cast<Map<String, dynamic>>();
-  }
+  Future<List<Map<String, dynamic>>> fetchCurrencies() async =>
+      _rows(await _api.fetchCurrencies());
 
   @override
   Future<Map<String, dynamic>> insertStore(Map<String, dynamic> values) async {
-    return _client.from('stores').insert(values).select().single();
+    // `Prefer: return=representation` makes PostgREST echo the created rows.
+    final rows = _rows(await _api.insertStore(values));
+    if (rows.isEmpty) {
+      throw const ServerException(message: 'The shop could not be created. Please try again.');
+    }
+    return rows.first;
+  }
+
+  List<Map<String, dynamic>> _rows(dynamic body) {
+    if (body is! List) return const [];
+    return body.cast<Map<String, dynamic>>();
   }
 }

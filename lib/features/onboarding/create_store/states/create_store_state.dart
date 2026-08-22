@@ -26,7 +26,7 @@ class CreateStoreState extends BaseState with Equatable {
   const CreateStoreState({
     this.name = '',
     this.categoryCode,
-    this.currencyCode = 'VND',
+    this.currency,
     this.address = '',
     this.url = '',
     this.logoUrl,
@@ -41,7 +41,9 @@ class CreateStoreState extends BaseState with Equatable {
 
   final String name;
   final String? categoryCode;
-  final String currencyCode;
+  /// Null until the currencies table has loaded and a row has been picked.
+  /// Nothing can be submitted before then — the database wants a real id.
+  final Currency? currency;
   final String address;
   final String url;
   final String? logoUrl;
@@ -51,16 +53,11 @@ class CreateStoreState extends BaseState with Equatable {
   final List<Currency> currencies;
 
   bool get canSubmit =>
-      name.isNotBlank && categoryCode != null && !isLoading && !isUploading;
+      name.isNotBlank && categoryCode != null && currency != null && !isLoading && !isUploading;
 
-  /// Falls back to the VND default until the table has loaded — that default
-  /// is also what `stores.currency` carries in the database.
-  Currency get currency {
-    for (final c in currencies) {
-      if (c.code == currencyCode) return c;
-    }
-    return Currency.vnd;
-  }
+  /// What the row shows. Falls back to the VND default so the field is never
+  /// blank while the table is still loading.
+  Currency get displayCurrency => currency ?? Currency.vnd;
 
   StoreCategory? get category {
     if (categoryCode == null) return null;
@@ -77,7 +74,7 @@ class CreateStoreState extends BaseState with Equatable {
     String? errorMessage,
     String? name,
     String? categoryCode,
-    String? currencyCode,
+    Currency? currency,
     String? address,
     String? url,
     String? logoUrl,
@@ -89,7 +86,7 @@ class CreateStoreState extends BaseState with Equatable {
     return CreateStoreState(
       name: name ?? this.name,
       categoryCode: categoryCode ?? this.categoryCode,
-      currencyCode: currencyCode ?? this.currencyCode,
+      currency: currency ?? this.currency,
       address: address ?? this.address,
       url: url ?? this.url,
       logoUrl: logoUrl ?? this.logoUrl,
@@ -107,7 +104,7 @@ class CreateStoreState extends BaseState with Equatable {
   List<Object?> get props => [
     name,
     categoryCode,
-    currencyCode,
+    currency,
     address,
     url,
     logoUrl,
@@ -140,7 +137,7 @@ class CreateStoreStateNotifier extends BaseStateNotifier<CreateStoreState> {
   void updateCategory(String code) =>
       updateState(state.copyWith(categoryCode: code, status: StateLifeCycle.init));
 
-  void updateCurrency(String code) => updateState(state.copyWith(currencyCode: code));
+  void updateCurrency(Currency value) => updateState(state.copyWith(currency: value));
 
   void updateAddress(String value) => updateState(state.copyWith(address: value));
 
@@ -157,11 +154,27 @@ class CreateStoreStateNotifier extends BaseStateNotifier<CreateStoreState> {
       final currencies = await _storeRepository.currencies();
       if (!ref.mounted) return;
       showLoaded();
-      updateState(state.copyWith(categories: categories, currencies: currencies));
+      updateState(
+        state.copyWith(
+          categories: categories,
+          currencies: currencies,
+          currency: state.currency ?? _defaultCurrency(currencies),
+        ),
+      );
     } on Object catch (e) {
       if (!ref.mounted) return;
       onError(e);
     }
+  }
+
+  /// Prefers VND, which is what the column defaulted to before shops carried
+  /// a currency id at all.
+  Currency? _defaultCurrency(List<Currency> currencies) {
+    if (currencies.isEmpty) return null;
+    for (final c in currencies) {
+      if (c.code == Currency.vnd.code) return c;
+    }
+    return currencies.first;
   }
 
   Future<void> pickedLogo({
@@ -204,7 +217,7 @@ class CreateStoreStateNotifier extends BaseStateNotifier<CreateStoreState> {
       final store = await _storeRepository.create(
         name: state.name,
         categoryCode: state.categoryCode!,
-        currencyCode: state.currencyCode,
+        currencyId: state.currency!.id,
         address: state.address,
         url: state.url,
         logoUrl: state.logoUrl,

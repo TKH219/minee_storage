@@ -10,7 +10,7 @@ class Store extends Equatable {
     this.categoryCode,
     this.address,
     this.url,
-    this.currencyCode = 'VND',
+    this.currencyId = '',
     this.phone,
     this.timezone = 'Asia/Ho_Chi_Minh',
     this.logoUrl,
@@ -29,7 +29,7 @@ class Store extends Equatable {
     categoryCode: row['category_code'] as String?,
     address: row['address'] as String?,
     url: row['url'] as String?,
-    currencyCode: (row['currency'] as String?) ?? 'VND',
+    currencyId: (row['currency_id'] as String?) ?? '',
     phone: row['phone'] as String?,
     timezone: (row['timezone'] as String?) ?? 'Asia/Ho_Chi_Minh',
     logoUrl: row['logo_url'] as String?,
@@ -42,7 +42,7 @@ class Store extends Equatable {
   final String? categoryCode;
   final String? address;
   final String? url;
-  final String currencyCode;
+  final String currencyId;
   final String? phone;
   final String timezone;
   final String? logoUrl;
@@ -57,7 +57,7 @@ class Store extends Equatable {
     categoryCode,
     address,
     url,
-    currencyCode,
+    currencyId,
     phone,
     timezone,
     logoUrl,

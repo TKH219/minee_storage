@@ -1,20 +1,18 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/auth_table_data_source.dart';
 
 class AuthDataSourceImpl implements AuthDataSource {
-  AuthDataSourceImpl(this._client);
+  AuthDataSourceImpl(this._client, this._tables);
 
   final SupabaseClient _client;
 
+  /// Table reads and writes go over REST; GoTrue keeps only the session.
+  final AuthTableDataSource _tables;
+
   @override
-  Future<String> emailStatus(String email) async {
-    final result = await _client.rpc<dynamic>(
-      'email_status',
-      params: {'p_email': email},
-    );
-    return result as String;
-  }
+  Future<String> emailStatus(String email) => _tables.emailStatus(email);
 
   @override
   Future<void> signUp({required String email, required String password}) async {
@@ -66,44 +64,27 @@ class AuthDataSourceImpl implements AuthDataSource {
   Future<void> signOut() => _client.auth.signOut();
 
   @override
-  Future<Map<String, dynamic>?> fetchUserRow(String userId) {
-    return _client.from('users').select().eq('id', userId).maybeSingle();
-  }
+  Future<Map<String, dynamic>?> fetchUserRow(String userId) => _tables.fetchUserRow(userId);
 
   @override
-  Future<void> touchLastSignedIn(String userId) async {
-    await _client
-        .from('users')
-        .update({'last_signed_in_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', userId);
-  }
+  Future<void> touchLastSignedIn(String userId) => _tables.touchLastSignedIn(userId);
 
   @override
   Future<void> updateProfileRow({
     required String userId,
     required String fullName,
     String? avatarUrl,
-  }) async {
-    await _client
-        .from('users')
-        .update({
-          'full_name': fullName,
-          'avatar_url': ?avatarUrl,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', userId);
+  }) {
+    return _tables.updateProfileRow(
+      userId: userId,
+      fullName: fullName,
+      avatarUrl: avatarUrl,
+    );
   }
 
   @override
-  Future<void> stampOnboardingCompleted(String userId) async {
-    await _client
-        .from('users')
-        .update({
-          'onboarding_completed_at': DateTime.now().toUtc().toIso8601String(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', userId);
-  }
+  Future<void> stampOnboardingCompleted(String userId) =>
+      _tables.stampOnboardingCompleted(userId);
 
   @override
   String? get currentUserId => _client.auth.currentUser?.id;

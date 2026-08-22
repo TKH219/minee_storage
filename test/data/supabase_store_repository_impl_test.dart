@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
@@ -16,7 +17,7 @@ void main() {
     await repository.create(
       name: '  Tạp hóa Linh  ',
       categoryCode: 'grocery',
-      currencyCode: 'VND',
+      currencyId: 'cur-vnd',
       address: '  12 Lê Lợi  ',
       url: 'shopee.vn/linh',
     );
@@ -24,7 +25,7 @@ void main() {
     expect(source.inserted['owner_id'], 'uid-1');
     expect(source.inserted['name'], 'Tạp hóa Linh');
     expect(source.inserted['category_code'], 'grocery');
-    expect(source.inserted['currency'], 'VND');
+    expect(source.inserted['currency_id'], 'cur-vnd');
     expect(source.inserted['address'], '12 Lê Lợi');
     expect(source.inserted['url'], 'https://shopee.vn/linh');
   });
@@ -36,7 +37,7 @@ void main() {
     await repository.create(
       name: 'S',
       categoryCode: 'other',
-      currencyCode: 'VND',
+      currencyId: 'cur-vnd',
       address: '   ',
       url: '',
     );
@@ -52,7 +53,7 @@ void main() {
     final store = await repository.create(
       name: 'Tạp hóa Linh',
       categoryCode: 'grocery',
-      currencyCode: 'VND',
+      currencyId: 'cur-vnd',
     );
 
     expect(store.id, 's-new');
@@ -92,7 +93,7 @@ void main() {
     final repository = SupabaseStoreRepositoryImpl(FakeStoreDataSource(currentId: null));
 
     expect(
-      () => repository.create(name: 'S', categoryCode: 'other', currencyCode: 'VND'),
+      () => repository.create(name: 'S', categoryCode: 'other', currencyId: 'cur-vnd'),
       throwsA(isA<UnauthorizedException>()),
     );
   });
@@ -107,5 +108,25 @@ void main() {
 
     expect(currencies.map((c) => c.code), ['VND', 'USD']);
     expect(currencies.first.decimals, 0);
+  });
+
+  test('a REST failure keeps the typed exception the interceptor produced', () async {
+    // ErrorInterceptor rejects with a DioException carrying the AppException;
+    // wrapping that again would flatten a network error into "unknown".
+    final source = FakeStoreDataSource(
+      error: DioException(
+        requestOptions: RequestOptions(path: '/rest/v1/stores'),
+        error: const NetworkException(message: 'offline'),
+      ),
+    );
+
+    // The repository propagates it untouched; BaseStateNotifier is what
+    // unwraps DioException.error into the typed exception the user sees.
+    await expectLater(
+      () => SupabaseStoreRepositoryImpl(source).categories(),
+      throwsA(
+        isA<DioException>().having((e) => e.error, 'error', isA<NetworkException>()),
+      ),
+    );
   });
 }
