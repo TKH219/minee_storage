@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/data_sources/remote/store_data_source_impl.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 import '../support/fake_store_api.dart';
 import '../support/localization_test_harness.dart';
@@ -35,7 +36,14 @@ void main() {
     final api = FakeStoreApi();
     final source = StoreDataSourceImpl(api, currentUserId: () => 'uid-1');
 
-    final row = await source.insertStore({'name': 'Tạp hóa Linh'});
+    final row = await source.insertStore(
+      const CreateStoreRequest(
+        ownerId: 'uid-1',
+        name: 'Tạp hóa Linh',
+        categoryCode: 'grocery',
+        currencyId: 'cur-vnd',
+      ),
+    );
 
     expect(row['id'], 's-new');
     expect(row['name'], 'Tạp hóa Linh');
@@ -47,7 +55,14 @@ void main() {
     final source = StoreDataSourceImpl(api, currentUserId: () => 'uid-1');
 
     expect(
-      () => source.insertStore({'name': 'S'}),
+      () => source.insertStore(
+        const CreateStoreRequest(
+          ownerId: 'uid-1',
+          name: 'S',
+          categoryCode: 'other',
+          currencyId: 'cur-vnd',
+        ),
+      ),
       throwsA(isA<ServerException>()),
     );
   });
@@ -61,5 +76,5 @@ void main() {
 
 class _EmptyInsertApi extends FakeStoreApi {
   @override
-  Future<dynamic> insertStore(Map<String, dynamic> values) async => <dynamic>[];
+  Future<dynamic> insertStore(CreateStoreRequest request) async => <dynamic>[];
 }
