@@ -131,6 +131,22 @@ was dropped in its favour. Note the consequence — a deleted store leaves repor
 entirely, where an archived one used to remain readable; if that older meaning is
 wanted back it needs a separate flag.
 
+**Per-request auth.** `SupabaseRestInterceptor` attaches the session token by
+default. An endpoint that runs before anyone is signed in opts out:
+
+```dart
+@POST('/rest/v1/rpc/email_status')
+@Extra({SupabaseRestInterceptor.requiresAuthKey: false})
+Future<String> emailStatus(@Body() Map<String, dynamic> body);
+```
+
+It then goes out with the anon key as both `apikey` and bearer. This is not
+cosmetic: `email_status` is called from signup step 1 and forgot-password, and
+PostgREST answers a stale bearer with `401 PGRST301 JWT cryptographic operation
+failed` — so a user holding an expired session could not have signed up or reset
+their password. The flag defaults to *requiring* auth, so an endpoint keeps its
+token unless it deliberately gives it up.
+
 **Both are read over REST, not the Supabase SDK.** Table and storage access goes
 through Dio + Retrofit against `/rest/v1` and `/storage/v1` — see
 `store_api.dart`, `user_api.dart` and `SupabaseRestInterceptor`, which supplies
