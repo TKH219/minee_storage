@@ -15,7 +15,7 @@ abstract class StoreApi {
   factory StoreApi(Dio dio, {String? baseUrl}) = _StoreApi;
 
   @GET('/rest/v1/stores')
-  Future<dynamic> fetchStores({
+  Future<List<StoreModel>> fetchStores({
     @Query('owner_id') required String ownerId,
     @Query('deleted_at') required String deletedAt,
     @Query('select') String select = '*',
@@ -24,17 +24,17 @@ abstract class StoreApi {
 
   @POST('/rest/v1/stores')
   @Headers({'Prefer': 'return=representation'})
-  Future<dynamic> insertStore(@Body() CreateStoreRequest request);
+  Future<List<StoreModel>> insertStore(@Body() CreateStoreRequest request);
 
   @GET('/rest/v1/store_categories')
-  Future<dynamic> fetchCategories({
+  Future<List<StoreCategoryModel>> fetchCategories({
     @Query('deleted_at') String deletedAt = 'is.null',
     @Query('select') String select = '*',
     @Query('order') String order = 'sort_order.asc',
   });
 
   @GET('/rest/v1/currencies')
-  Future<dynamic> fetchCurrencies({
+  Future<List<CurrencyModel>> fetchCurrencies({
     @Query('deleted_at') String deletedAt = 'is.null',
     @Query('select') String select = '*',
     @Query('order') String order = 'sort_order.asc',

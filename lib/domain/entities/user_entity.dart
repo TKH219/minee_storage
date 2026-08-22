@@ -15,27 +15,6 @@ class UserEntity extends Equatable with AuditTimes {
     this.deletedTime,
   });
 
-  /// Builds from a `public.users` row as PostgREST returns it.
-  factory UserEntity.fromRow(Map<String, dynamic> row) {
-    DateTime? parse(String key) {
-      final raw = row[key] as String?;
-      return raw == null ? null : DateTime.parse(raw);
-    }
-
-    return UserEntity(
-      id: row['id'] as String,
-      email: (row['email'] as String?) ?? '',
-      fullName: (row['full_name'] as String?) ?? '',
-      avatarUrl: row['avatar_url'] as String?,
-      onboardingCompletedAt: parse('onboarding_completed_at'),
-      isDeactivated: (row['is_deactivated'] as bool?) ?? false,
-      lastSignedInAt: parse('last_signed_in_at'),
-      createdTime: parse('created_at'),
-      updatedTime: parse('updated_at'),
-      deletedTime: parse('deleted_at'),
-    );
-  }
-
   final String id;
   final String email;
   final String fullName;

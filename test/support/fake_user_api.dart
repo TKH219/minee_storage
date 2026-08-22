@@ -1,9 +1,10 @@
 import 'package:mine_storage/data/data_sources/remote/user_api.dart';
+import 'package:mine_storage/data/models/models.dart';
 
 class FakeUserApi implements UserApi {
   FakeUserApi({this.userRows = const [], this.status = 'none'});
 
-  List<Map<String, dynamic>> userRows;
+  List<UserModel> userRows;
   String status;
 
   final List<String> calls = [];
@@ -12,23 +13,23 @@ class FakeUserApi implements UserApi {
   Map<String, dynamic> lastRpcBody = {};
 
   @override
-  Future<dynamic> fetchUser({required String id, String select = '*'}) async {
+  Future<List<UserModel>> fetchUser({required String id, String select = '*'}) async {
     calls.add('fetchUser');
     lastQuery['id'] = id;
     return userRows;
   }
 
   @override
-  Future<void> updateUser(String id, Map<String, dynamic> values) async {
+  Future<void> updateUser(String id, UpdateUserRequest request) async {
     calls.add('updateUser');
     lastQuery['id'] = id;
-    lastPatch = values;
+    lastPatch = request.toJson();
   }
 
   @override
-  Future<String> emailStatus(Map<String, dynamic> body) async {
+  Future<String> emailStatus(EmailStatusRequest request) async {
     calls.add('emailStatus');
-    lastRpcBody = body;
+    lastRpcBody = request.toJson();
     return status;
   }
 }

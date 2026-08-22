@@ -5,17 +5,15 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 
+import 'package:mine_storage/data/models/models.dart';
+
 import '../support/fake_auth_data_source.dart';
+import '../support/model_fixtures.dart';
 
 import '../support/localization_test_harness.dart';
 
-Map<String, dynamic> row({bool deactivated = false, String shop = 'Minee'}) => {
-  'id': 'uid-1',
-  'email': 'a@b.com',
-  'full_name': shop,
-  'is_deactivated': deactivated,
-  'last_signed_in_at': null,
-};
+UserModel row({bool deactivated = false, String shop = 'Minee'}) =>
+    userModelFixture(fullName: shop, isDeactivated: deactivated);
 
 void main() {
   setUp(useLocale);

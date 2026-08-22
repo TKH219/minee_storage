@@ -5,6 +5,7 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/supabase_store_repository_impl.dart';
 
 import '../support/fake_store_data_source.dart';
+import '../support/model_fixtures.dart';
 import '../support/localization_test_harness.dart';
 
 void main() {
@@ -62,8 +63,8 @@ void main() {
 
   test('categories arrive sorted by sort order', () async {
     final source = FakeStoreDataSource(categoryRows: [
-      {'code': 'other', 'name_vi': 'Khác', 'name_en': 'Other', 'icon': 'other', 'sort_order': 130},
-      {'code': 'grocery', 'name_vi': 'Tạp hóa', 'name_en': 'Grocery', 'icon': 'basket', 'sort_order': 10},
+      categoryModelFixture(code: 'other', nameVi: 'Khác', nameEn: 'Other', icon: 'other', sortOrder: 130),
+      categoryModelFixture(code: 'grocery', sortOrder: 10),
     ]);
 
     final categories = await SupabaseStoreRepositoryImpl(source).categories();
@@ -72,9 +73,7 @@ void main() {
   });
 
   test('listMine scopes to the signed-in owner', () async {
-    final source = FakeStoreDataSource(storeRows: [
-      {'id': 's-1', 'owner_id': 'uid-1', 'name': 'Tạp hóa Linh'},
-    ]);
+    final source = FakeStoreDataSource(storeRows: [storeModelFixture()]);
 
     final stores = await SupabaseStoreRepositoryImpl(source).listMine();
 
@@ -100,8 +99,8 @@ void main() {
 
   test('currencies arrive sorted by sort order', () async {
     final source = FakeStoreDataSource(currencyRows: [
-      {'code': 'USD', 'symbol': r'$', 'decimals': 2, 'sort_order': 20},
-      {'code': 'VND', 'symbol': '₫', 'decimals': 0, 'sort_order': 10},
+      currencyModelFixture(id: 'cur-usd', code: 'USD', symbol: r'$', decimals: 2, sortOrder: 20),
+      currencyModelFixture(sortOrder: 10),
     ]);
 
     final currencies = await SupabaseStoreRepositoryImpl(source).currencies();

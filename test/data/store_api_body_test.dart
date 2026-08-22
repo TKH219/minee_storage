@@ -19,7 +19,10 @@ class _RecordingAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     captured = options;
-    return ResponseBody.fromString('[{"id":"s-new"}]', 201, headers: {
+    return ResponseBody.fromString(
+        '[{"id":"s-new","owner_id":"uid-1","name":"T","currency_id":"c",'
+        '"timezone":"Asia/Ho_Chi_Minh","created_at":"2026-08-01T09:00:00.000Z",'
+        '"updated_at":"2026-08-02T09:00:00.000Z"}]', 201, headers: {
       Headers.contentTypeHeader: [Headers.jsonContentType],
     });
   }
