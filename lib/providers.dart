@@ -18,7 +18,8 @@ import 'package:mine_storage/data/repositories/media_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/media_repository.dart';
 import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/core/network/interceptors/supabase_rest_interceptor.dart';
-import 'package:mine_storage/data/data_sources/remote/auth_table_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/store_api.dart';
 import 'package:mine_storage/data/data_sources/remote/user_api.dart';
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
@@ -105,10 +106,7 @@ final authorizedDioProvider = Provider<Dio>((ref) {
 
 /// Data sources
 final authDataSourceProvider = Provider<AuthDataSource>(
-  (ref) => AuthDataSourceImpl(
-    ref.watch(supabaseClientProvider),
-    ref.watch(authTableDataSourceProvider),
-  ),
+  (ref) => AuthDataSourceImpl(ref.watch(supabaseClientProvider)),
 );
 
 final postApiProvider = Provider<PostApi>(
@@ -117,7 +115,10 @@ final postApiProvider = Provider<PostApi>(
 
 /// Repositories
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
+  (ref) => AuthRepositoryImpl(
+    ref.watch(authDataSourceProvider),
+    ref.watch(userProfileDataSourceProvider),
+  ),
 );
 
 final postRepositoryProvider = Provider<PostRepository>(
@@ -159,8 +160,8 @@ final userApiProvider = Provider<UserApi>(
   (ref) => UserApi(ref.watch(authorizedDioProvider)),
 );
 
-final authTableDataSourceProvider = Provider<AuthTableDataSource>(
-  (ref) => AuthTableDataSource(ref.watch(userApiProvider)),
+final userProfileDataSourceProvider = Provider<UserProfileDataSource>(
+  (ref) => UserProfileDataSourceImpl(ref.watch(userApiProvider)),
 );
 
 final storeDataSourceProvider = Provider<StoreDataSource>(

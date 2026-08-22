@@ -1,6 +1,9 @@
 import 'package:mine_storage/data/data_sources/remote/auth_data_source.dart';
+import 'package:mine_storage/data/data_sources/remote/user_profile_data_source.dart';
 
-class FakeAuthDataSource implements AuthDataSource {
+/// Implements both halves so a repository test can pass it twice and keep
+/// asserting on one [calls] list.
+class FakeAuthDataSource implements AuthDataSource, UserProfileDataSource {
   FakeAuthDataSource({
     this.status = 'none',
     this.userId = 'uid-1',
