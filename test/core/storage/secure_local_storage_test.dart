@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mine_storage/core/storage/fresh_install_guard.dart';
 import 'package:mine_storage/core/storage/secure_local_storage.dart';
 
 import '../../support/localization_test_harness.dart';
@@ -15,6 +17,9 @@ void main() {
 
   setUp(() {
     store = {};
+    SharedPreferences.setMockInitialValues({
+      FreshInstallGuard.installMarkerKey: true,
+    });
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
           final args = (call.arguments as Map?)?.cast<String, dynamic>() ?? {};
@@ -29,6 +34,11 @@ void main() {
               return null;
             case 'containsKey':
               return store.containsKey(args['key'] as String);
+            case 'deleteAll':
+              store.clear();
+              return null;
+            case 'readAll':
+              return store;
             default:
               return null;
           }
@@ -54,5 +64,24 @@ void main() {
 
     expect(await storage.hasAccessToken(), isFalse);
     expect(await storage.accessToken(), isNull);
+  });
+
+  test('initialize discards a session left by a previous install', () async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = SecureLocalStorage();
+    await storage.persistSession('{"access_token":"abc"}');
+
+    await storage.initialize();
+
+    expect(await storage.hasAccessToken(), isFalse);
+  });
+
+  test('initialize keeps the session of an install already seen', () async {
+    final storage = SecureLocalStorage();
+    await storage.persistSession('{"access_token":"abc"}');
+
+    await storage.initialize();
+
+    expect(await storage.hasAccessToken(), isTrue);
   });
 }
