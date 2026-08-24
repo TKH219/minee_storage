@@ -7,11 +7,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mine_storage/app.dart';
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/core/storage/fresh_install_guard.dart';
 import 'package:mine_storage/core/storage/secure_local_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  // Ahead of anything that reads the keychain: a reinstall inherits the
+  // previous install's entries, and they have to be gone before the app can
+  // act on them. Repeated by SecureLocalStorage.initialize, which is harmless.
+  await FreshInstallGuard().clearCredentialsIfReinstalled();
 
   // Opened here so the theme provider can read synchronously from the very
   // first frame — otherwise the app flashes the wrong brightness on launch.
