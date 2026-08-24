@@ -1,28 +1,53 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/theme.dart';
-import 'package:mine_storage/domain/entities/lot.dart';
-import 'package:mine_storage/domain/entities/product.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
+import 'package:mine_storage/features/settings/states/settings_state.dart';
 import 'package:mine_storage/shared/ui/product_row.dart';
+import 'package:mine_storage/shared/utils/currency_formatter.dart';
 
 import '../../../support/localization_test_harness.dart';
 
-final milk = Product(
-  id: 'milk', storeId: 's1', name: 'Whole Milk 1L', brand: 'Dairyland', location: 'Cold room A',
-  lots: [
-    Lot(id: 'l1', productId: 'milk', purchasedOn: DateTime(2026, 8, 8),
-        expiresOn: DateTime(2026, 8, 22), unitPrice: 1.10, initialQuantity: 12, remainingQuantity: 2),
+final milk = ProductEntity(
+  id: 'milk',
+  name: 'Whole Milk 1L',
+  brand: 'Dairyland',
+  storageLocation: 'Cold room A',
+  createdAt: DateTime(2026, 8, 8),
+  updatedAt: DateTime(2026, 8, 8),
+  batches: [
+    ProductBatchEntity(
+      id: 'l1',
+      productId: 'milk',
+      purchasedAt: DateTime(2026, 8, 8),
+      expiryDate: DateTime(2026, 8, 22),
+      unitPrice: Decimal.parse('1.10'),
+      initialQuantity: Decimal.fromInt(12),
+      remainingQuantity: Decimal.fromInt(2),
+      createdAt: DateTime(2026, 8, 8),
+    ),
   ],
 );
 
-Widget host(Widget child, {bool reducedMotion = false}) => MaterialApp(
-      theme: AppTheme.light(),
-      home: MediaQuery(
-        data: MediaQueryData(disableAnimations: reducedMotion),
-        child: Scaffold(body: SizedBox(width: 390, child: child)),
-      ),
-    );
+/// Overriding the formatter keeps [currencyProvider] out of the tree, which
+/// would otherwise reach for the preferences the app installs in `main()`.
+Widget host(Widget child, {bool reducedMotion = false}) => ProviderScope(
+  overrides: [
+    currencyFormatterProvider.overrideWithValue(
+      const CurrencyFormatter(Currency(code: 'USD', symbol: r'$', decimals: 2)),
+    ),
+  ],
+  child: MaterialApp(
+    theme: AppTheme.light(),
+    home: MediaQuery(
+      data: MediaQueryData(disableAnimations: reducedMotion),
+      child: Scaffold(body: SizedBox(width: 390, child: child)),
+    ),
+  ),
+);
 
 void main() {
   setUp(useLocale);

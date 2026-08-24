@@ -1,13 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
-import 'package:mine_storage/domain/entities/lot.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/features/settings/states/settings_state.dart';
 
 import 'quantity_format.dart';
 
-class LotCard extends StatelessWidget {
+class LotCard extends ConsumerWidget {
   const LotCard({
     super.key,
     required this.lot,
@@ -15,16 +17,17 @@ class LotCard extends StatelessWidget {
     this.today,
   });
 
-  final Lot lot;
+  final ProductBatchEntity lot;
   final bool isNextOut;
   final DateTime? today;
 
   static final DateFormat _full = DateFormat('d MMM y');
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final texts = context.textStyles;
+    final money = ref.watch(currencyFormatterProvider);
 
     return Container(
       key: const Key('lot-card-container'),
@@ -41,7 +44,9 @@ class LotCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  lot.expiresOn == null ? LocaleKeys.stock_notTracked.tr() : _full.format(lot.expiresOn!),
+                  lot.expiryDate == null
+                      ? LocaleKeys.stock_notTracked.tr()
+                      : _full.format(lot.expiryDate!),
                   style: texts.sansBodyBold.copyWith(fontSize: 15),
                 ),
               ),
@@ -56,9 +61,9 @@ class LotCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _field(context, LocaleKeys.stock_purchased.tr(), _full.format(lot.purchasedOn)),
-          _field(context, LocaleKeys.stock_unitPrice.tr(), formatMoney(lot.unitPrice)),
-          _field(context, LocaleKeys.stock_lotTotal.tr(), formatMoney(lot.lotTotal)),
+          _field(context, LocaleKeys.stock_purchased.tr(), _full.format(lot.purchasedAt)),
+          _field(context, LocaleKeys.stock_unitPrice.tr(), money.format(lot.unitPrice)),
+          _field(context, LocaleKeys.stock_lotTotal.tr(), money.format(lot.totalCost)),
           _remaining(context),
         ],
       ),

@@ -1,33 +1,63 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/theme.dart';
-import 'package:mine_storage/domain/entities/lot.dart';
-import 'package:mine_storage/domain/entities/product.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/features/settings/states/settings_state.dart';
 import 'package:mine_storage/shared/ui/expiry_badge.dart';
 import 'package:mine_storage/shared/ui/product_row.dart';
+import 'package:mine_storage/shared/utils/currency_formatter.dart';
 
 import '../../support/localization_test_harness.dart';
 
 final today = DateTime(2026, 8, 20);
 
-final milk = Product(
+/// The row renders whatever currency the shop trades in; these expectations are
+/// written against dollars, so the test names that rather than inheriting the
+/// VND default.
+const usd = Currency(code: 'USD', symbol: r'$', decimals: 2);
+
+final milk = ProductEntity(
   id: 'milk',
-  storeId: 's1',
   name: 'Whole Milk 1L',
   brand: 'Dairyland',
-  location: 'Cold room A',
-  lots: [
-    Lot(id: 'l1', productId: 'milk', purchasedOn: DateTime(2026, 8, 8),
-        expiresOn: DateTime(2026, 8, 22), unitPrice: 1.10, initialQuantity: 12, remainingQuantity: 2),
-    Lot(id: 'l2', productId: 'milk', purchasedOn: DateTime(2026, 8, 15),
-        expiresOn: DateTime(2026, 9, 12), unitPrice: 1.25, initialQuantity: 10, remainingQuantity: 8),
+  storageLocation: 'Cold room A',
+  createdAt: DateTime(2026, 8, 8),
+  updatedAt: DateTime(2026, 8, 15),
+  batches: [
+    ProductBatchEntity(
+      id: 'l1',
+      productId: 'milk',
+      purchasedAt: DateTime(2026, 8, 8),
+      expiryDate: DateTime(2026, 8, 22),
+      unitPrice: Decimal.parse('1.10'),
+      initialQuantity: Decimal.fromInt(12),
+      remainingQuantity: Decimal.fromInt(2),
+      createdAt: DateTime(2026, 8, 8),
+    ),
+    ProductBatchEntity(
+      id: 'l2',
+      productId: 'milk',
+      purchasedAt: DateTime(2026, 8, 15),
+      expiryDate: DateTime(2026, 9, 12),
+      unitPrice: Decimal.parse('1.25'),
+      initialQuantity: Decimal.fromInt(10),
+      remainingQuantity: Decimal.fromInt(8),
+      createdAt: DateTime(2026, 8, 15),
+    ),
   ],
 );
 
-Widget host(Widget child) => MaterialApp(
-      theme: AppTheme.light(),
-      home: Scaffold(body: SizedBox(width: 390, child: child)),
-    );
+Widget host(Widget child) => ProviderScope(
+  overrides: [
+    currencyFormatterProvider.overrideWithValue(const CurrencyFormatter(usd)),
+  ],
+  child: MaterialApp(
+    theme: AppTheme.light(),
+    home: Scaffold(body: SizedBox(width: 390, child: child)),
+  ),
+);
 
 void main() {
   setUp(useLocale);

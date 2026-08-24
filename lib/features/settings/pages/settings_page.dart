@@ -5,8 +5,13 @@ import 'package:go_router/go_router.dart';
 
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
+import 'package:mine_storage/providers.dart';
+import 'package:mine_storage/shared/ui/app_option_sheet.dart';
+import 'package:mine_storage/shared/ui/app_snack.dart';
 
+import '../states/settings_state.dart';
 import '../widgets/language_picker_sheet.dart';
 import '../widgets/settings_metrics.dart';
 import '../widgets/settings_tile.dart';
@@ -18,6 +23,7 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final themeMode = ref.watch(themeModeProvider);
+    final currency = ref.watch(currencyProvider);
 
     return Scaffold(
       backgroundColor: colors.neutral1,
@@ -58,12 +64,55 @@ class SettingsPage extends ConsumerWidget {
                   value: _endonymFor(context.locale),
                   onTap: () => showLanguagePicker(context),
                 ),
+                Divider(
+                  height: SettingsMetrics.dividerThickness,
+                  thickness: SettingsMetrics.dividerThickness,
+                  color: colors.neutral2,
+                ),
+                SettingsTile(
+                  icon: Icons.payments_outlined,
+                  label: LocaleKeys.settings_currency.tr(),
+                  value: '${currency.code} ${currency.symbol}',
+                  onTap: () => _pickCurrency(context, ref, currency),
+                ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// The list is read on tap rather than watched: the table changes about once
+  /// a year, and a settings row must not sit empty waiting on the network.
+  static Future<void> _pickCurrency(
+    BuildContext context,
+    WidgetRef ref,
+    Currency selected,
+  ) async {
+    final List<Currency> currencies;
+    try {
+      currencies = await ref.read(storeRepositoryProvider).currencies();
+    } on Object {
+      showErrorSnack(LocaleKeys.errors_generic.tr());
+      return;
+    }
+    if (!context.mounted) return;
+
+    final picked = await showAppOptionSheet<Currency>(
+      context: context,
+      title: LocaleKeys.settings_currency.tr(),
+      options: [
+        for (final currency in currencies)
+          AppOption(value: currency, label: '${currency.code}  ${currency.symbol}'),
+      ],
+      selected: currencies.firstWhere(
+        (currency) => currency.code == selected.code,
+        orElse: () => selected,
+      ),
+    );
+    if (picked == null) return;
+    await ref.read(currencyProvider.notifier).setCurrency(picked);
   }
 
   /// The dashboard reaches settings with `go`, so there is usually nothing on

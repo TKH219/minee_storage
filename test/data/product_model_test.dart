@@ -1,0 +1,91 @@
+import 'package:decimal/decimal.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:mine_storage/data/models/models.dart';
+
+Map<String, dynamic> batchJson({String remaining = '2.500'}) => {
+  'id': 'b1',
+  'productId': 'p1',
+  'purchasedAt': '2026-08-01T00:00:00.000Z',
+  'unitPrice': '12.75',
+  'expiryDate': '2026-09-01T00:00:00.000Z',
+  'initialQuantity': '5.000',
+  'remainingQuantity': remaining,
+  'isArchived': false,
+  'createdAt': '2026-08-01T00:00:00.000Z',
+};
+
+Map<String, dynamic> productJson() => {
+  'id': 'p1',
+  'name': 'Olive oil',
+  'barcode': '8934567890123',
+  'brand': 'Basso',
+  'category': 'Pantry',
+  'storageLocation': 'Shelf A',
+  'notes': 'Cold pressed',
+  'photoUrl': 'https://cdn.example.com/p1.jpg',
+  'isArchived': false,
+  'createdAt': '2026-07-01T00:00:00.000Z',
+  'updatedAt': '2026-07-02T00:00:00.000Z',
+  'batches': [batchJson()],
+};
+
+void main() {
+  test('parses decimal strings without loss', () {
+    final entity = ProductBatchModel.fromJson(batchJson()).toEntity();
+
+    expect(entity.unitPrice, Decimal.parse('12.75'));
+    expect(entity.remainingQuantity, Decimal.parse('2.500'));
+    expect(entity.initialQuantity, Decimal.parse('5.000'));
+  });
+
+  test('parses timestamps', () {
+    final entity = ProductBatchModel.fromJson(batchJson()).toEntity();
+
+    expect(entity.purchasedAt, DateTime.parse('2026-08-01T00:00:00.000Z'));
+    expect(entity.expiryDate, DateTime.parse('2026-09-01T00:00:00.000Z'));
+  });
+
+  test('maps every product field and nests its batches', () {
+    final entity = ProductModel.fromJson(productJson()).toEntity();
+
+    expect(entity.id, 'p1');
+    expect(entity.name, 'Olive oil');
+    expect(entity.barcode, '8934567890123');
+    expect(entity.brand, 'Basso');
+    expect(entity.category, 'Pantry');
+    expect(entity.storageLocation, 'Shelf A');
+    expect(entity.notes, 'Cold pressed');
+    expect(entity.photoUrl, 'https://cdn.example.com/p1.jpg');
+    expect(entity.isArchived, isFalse);
+    expect(entity.batches, hasLength(1));
+    expect(entity.batches.single.id, 'b1');
+  });
+
+  test('tolerates absent optional fields and an absent batch list', () {
+    final entity = ProductModel.fromJson({
+      'id': 'p2',
+      'name': 'Rice',
+      'isArchived': false,
+      'createdAt': '2026-07-01T00:00:00.000Z',
+      'updatedAt': '2026-07-01T00:00:00.000Z',
+    }).toEntity();
+
+    expect(entity.barcode, isNull);
+    expect(entity.photoUrl, isNull);
+    expect(entity.batches, isEmpty);
+  });
+
+  test('maps a page, preserving order', () {
+    final paged = PagedProductsModel.fromJson({
+      'items': [
+        productJson(),
+        {...productJson(), 'id': 'p2', 'name': 'Rice'},
+      ],
+      'hasMore': true,
+    }).toEntity();
+
+    expect(paged.hasMore, isTrue);
+    expect(paged.items.map((p) => p.id), ['p1', 'p2']);
+  });
+}
