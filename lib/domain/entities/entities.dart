@@ -8,6 +8,7 @@ export 'product_batch_entity.dart';
 export 'product_draft.dart';
 export 'product_entity.dart';
 export 'product_filter.dart';
+export 'product_unit.dart';
 export 'store.dart';
 export 'store_category.dart';
 export 'currency.dart';
