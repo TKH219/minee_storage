@@ -15,7 +15,11 @@ void main() {
   late Map<String, String> secureStore;
 
   setUp(() {
-    secureStore = {'supabase_session': '{"access_token":"abc"}'};
+    secureStore = {
+      'supabase_session': '{"access_token":"abc"}',
+      'pin_code': '1234',
+      'cached_token': 'xyz',
+    };
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
           switch (call.method) {
@@ -55,5 +59,44 @@ void main() {
     await FreshInstallGuard().clearCredentialsIfReinstalled();
 
     expect(secureStore, isNotEmpty);
+  });
+
+  test('wipes every secure entry, not just the session', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    await FreshInstallGuard().clearCredentialsIfReinstalled();
+
+    expect(secureStore, isEmpty);
+  });
+
+  test('install, relaunch, reinstall', () async {
+    // First install: nothing of the previous install may survive.
+    SharedPreferences.setMockInitialValues({});
+    await FreshInstallGuard().clearCredentialsIfReinstalled();
+    expect(secureStore, isEmpty);
+
+    // The user signs in, so the session is written.
+    secureStore['supabase_session'] = '{"access_token":"fresh"}';
+
+    // Closing and reopening keeps it.
+    await FreshInstallGuard().clearCredentialsIfReinstalled();
+    expect(secureStore['supabase_session'], '{"access_token":"fresh"}');
+
+    // Uninstalling takes the preferences with it; the keychain keeps its
+    // entries. Reinstalling must therefore start empty again.
+    SharedPreferences.setMockInitialValues({});
+    await FreshInstallGuard().clearCredentialsIfReinstalled();
+    expect(secureStore, isEmpty);
+  });
+
+  test('running twice on one launch is harmless', () async {
+    SharedPreferences.setMockInitialValues({});
+    final guard = FreshInstallGuard();
+
+    await guard.clearCredentialsIfReinstalled();
+    secureStore['supabase_session'] = '{"access_token":"fresh"}';
+    await guard.clearCredentialsIfReinstalled();
+
+    expect(secureStore['supabase_session'], '{"access_token":"fresh"}');
   });
 }
