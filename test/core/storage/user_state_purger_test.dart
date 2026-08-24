@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mine_storage/app/theme/theme_mode_provider.dart';
+import 'package:mine_storage/core/storage/fresh_install_guard.dart';
 import 'package:mine_storage/core/storage/user_state_purger.dart';
 
 import '../../support/localization_test_harness.dart';
@@ -63,4 +64,15 @@ void main() {
     expect(prefs.getKeys(), isEmpty);
   });
 
+  test('keeps the install marker so the next launch is not read as a reinstall', () async {
+    SharedPreferences.setMockInitialValues({
+      FreshInstallGuard.installMarkerKey: true,
+      'cached_products': '[]',
+    });
+
+    await purger().purge();
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool(FreshInstallGuard.installMarkerKey), isTrue);
+  });
 }

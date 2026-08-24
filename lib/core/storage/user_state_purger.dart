@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mine_storage/app/theme/theme_mode_provider.dart';
+import 'package:mine_storage/core/storage/fresh_install_guard.dart';
 
 /// Wipes everything belonging to the signed-in user.
 ///
@@ -16,8 +17,13 @@ class UserStatePurger {
   }) : _secureStorage = secureStorage,
        _preferences = preferences;
 
-  /// Device settings that outlive whoever is signed in.
-  static const Set<String> keptPreferenceKeys = {ThemeModeNotifier.storageKey};
+  /// Device settings that outlive whoever is signed in. The install marker
+  /// belongs here because dropping it would make the next launch look like a
+  /// reinstall and wipe the session of whoever signed in after this purge.
+  static const Set<String> keptPreferenceKeys = {
+    ThemeModeNotifier.storageKey,
+    FreshInstallGuard.installMarkerKey,
+  };
 
   final FlutterSecureStorage _secureStorage;
   final Future<SharedPreferences> Function() _preferences;
