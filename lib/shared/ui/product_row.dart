@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
-import 'package:mine_storage/domain/entities/product.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/features/settings/states/settings_state.dart';
 
 import 'expiry_badge.dart';
 import 'product_metrics.dart';
 import 'quantity_format.dart';
 
-class ProductRow extends StatelessWidget {
+class ProductRow extends ConsumerWidget {
   const ProductRow({
     super.key,
     required this.product,
@@ -15,15 +17,17 @@ class ProductRow extends StatelessWidget {
     this.onTap,
   });
 
-  final Product product;
+  final ProductEntity product;
   final DateTime today;
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final texts = context.textStyles;
-    final subtitle = [product.brand, product.location].whereType<String>().join(' · ');
+    final money = ref.watch(currencyFormatterProvider);
+    final subtitle =
+        [product.brand, product.storageLocation].whereType<String>().join(' · ');
 
     return InkWell(
       onTap: onTap,
@@ -66,7 +70,7 @@ class ProductRow extends StatelessWidget {
                       const SizedBox(width: 8),
                       if (product.latestUnitPrice != null)
                         Text(
-                          formatMoney(product.latestUnitPrice!),
+                          money.format(product.latestUnitPrice!),
                           style: texts.monoBody.copyWith(
                             fontSize: ProductRowMetrics.priceSize,
                             color: colors.neutral7,
@@ -99,7 +103,7 @@ class ProductRow extends StatelessWidget {
                         status: product.statusOn(today),
                         expiry: product.nearestExpiry,
                         today: today,
-                        archived: product.archived,
+                        archived: product.isArchived,
                       ),
                     ],
                   ),

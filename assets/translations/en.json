@@ -115,7 +115,8 @@
     "rateLimited": "Too many emails sent. Please wait a minute and try again.",
     "emailNotConfirmed": "Please confirm your email first.",
     "unknownNetwork": "An unknown network error occurred.",
-    "unknown": "An unknown error occurred: {error}"
+    "unknown": "An unknown error occurred: {error}",
+    "insufficientStock": "There is not enough stock left."
   },
   "dashboard": {
     "emptyTitle": "No stock yet",
@@ -124,7 +125,19 @@
   "products": {
     "title": "Products",
     "emptyTitle": "Your shelves are empty",
-    "emptySubtitle": "Add your first product, or scan a barcode to start counting what you hold."
+    "emptySubtitle": "Add your first product, or scan a barcode to start counting what you hold.",
+    "searchHint": "Search by name",
+    "filtersTitle": "Filters",
+    "filterAll": "All",
+    "filterExpiringSoon": "Expiring soon",
+    "filterExpired": "Expired",
+    "filterArchived": "Archived",
+    "addedBetween": "Added between",
+    "expiresBetween": "Expires between",
+    "anyDate": "Any date",
+    "category": "Category",
+    "clearAll": "Clear all",
+    "apply": "Apply"
   },
   "sales": {
     "title": "Sales",
@@ -151,7 +164,8 @@
     "themeSystem": "System",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "language": "Language"
+    "language": "Language",
+    "currency": "Currency"
   },
   "onboarding": {
     "profile": {

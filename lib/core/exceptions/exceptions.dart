@@ -1,3 +1,5 @@
+import 'package:decimal/decimal.dart';
+
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 /// Base type for every error this app raises out of the data layer.
 ///
@@ -172,4 +174,24 @@ class UnknownSupabaseException extends SupabaseException {
 
   @override
   String get messageKey => LocaleKeys.errors_generic;
+}
+
+/// Raised by the FEFO allocator before any request leaves the device, so a
+/// short consume attempt changes nothing.
+///
+/// Deliberately not an [HttpException]: nothing was sent. The quantities are
+/// carried so a feature can word the shortfall itself; [messageKey] stays
+/// generic because a translation key cannot interpolate them on its own.
+class InsufficientStockException extends AppException {
+  const InsufficientStockException({required this.requested, required this.available});
+
+  final Decimal requested;
+  final Decimal available;
+
+  @override
+  String get messageKey => LocaleKeys.errors_insufficientStock;
+
+  @override
+  String toString() =>
+      'InsufficientStockException: requested $requested, available $available';
 }

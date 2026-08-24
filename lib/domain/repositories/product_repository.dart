@@ -1,23 +1,33 @@
-import 'package:mine_storage/data/mock/mock_database.dart' show Allocation;
-import 'package:mine_storage/domain/entities/lot.dart';
-import 'package:mine_storage/domain/entities/product.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
 
 abstract class ProductRepository {
-  Future<List<Product>> list({
-    required String storeId,
-    bool includeArchived = false,
-    String? query,
+  Future<PagedProducts> getProducts({
+    required ProductFilter filter,
+    required int page,
+    int limit,
   });
 
-  Future<Product> byId(String id);
+  Future<ProductEntity> getProduct(String id);
 
-  Future<List<Allocation>> previewConsumption(String productId, double quantity);
+  /// Null when no product of the caller's carries this barcode.
+  Future<ProductEntity?> findByBarcode(String barcode);
 
-  Future<void> consume(String productId, double quantity);
+  Future<List<String>> getCategories();
 
-  Future<void> addLot(Lot lot);
+  Future<ProductEntity> createProduct(ProductDraft draft);
 
-  Future<void> archive(String id);
+  Future<ProductEntity> updateProduct(String id, ProductDraft draft);
 
-  Future<void> restore(String id);
+  Future<ProductEntity> archiveProduct(String id);
+
+  Future<ProductEntity> restoreProduct(String id);
+
+  Future<ProductEntity> addBatch(String productId, BatchDraft draft);
+
+  Future<ProductEntity> updateBatch(String productId, String batchId, BatchDraft draft);
+
+  Future<ProductEntity> archiveBatch(String productId, String batchId);
+
+  /// Applies an allocation already resolved by `FefoAllocator`. All or nothing.
+  Future<ProductEntity> consume(String productId, List<BatchAllocation> allocations);
 }

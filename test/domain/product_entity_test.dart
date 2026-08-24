@@ -1,72 +1,181 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mine_storage/domain/entities/expiry_status.dart';
-import 'package:mine_storage/domain/entities/lot.dart';
-import 'package:mine_storage/domain/entities/product.dart';
 
-import '../support/localization_test_harness.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
 
-Lot lot({
-  required String id,
-  DateTime? expiresOn,
-  required DateTime purchasedOn,
-  required double unitPrice,
-  required double initial,
-  required double remaining,
-}) => Lot(
-      id: id,
-      productId: 'p1',
-      purchasedOn: purchasedOn,
-      expiresOn: expiresOn,
-      unitPrice: unitPrice,
-      initialQuantity: initial,
-      remainingQuantity: remaining,
-    );
+ProductBatchEntity batch({
+  String id = 'b1',
+  String? expiry = '2026-09-01',
+  String purchased = '2026-08-01',
+  String price = '10.00',
+  String initial = '5',
+  String remaining = '5',
+  bool isArchived = false,
+}) {
+  return ProductBatchEntity(
+    id: id,
+    productId: 'p1',
+    purchasedAt: DateTime.parse(purchased),
+    unitPrice: Decimal.parse(price),
+    expiryDate: expiry == null ? null : DateTime.parse(expiry),
+    initialQuantity: Decimal.parse(initial),
+    remainingQuantity: Decimal.parse(remaining),
+    createdAt: DateTime.parse(purchased),
+    isArchived: isArchived,
+  );
+}
+
+ProductEntity product(List<ProductBatchEntity> batches) {
+  return ProductEntity(
+    id: 'p1',
+    name: 'Olive oil',
+    createdAt: DateTime.parse('2026-07-01'),
+    updatedAt: DateTime.parse('2026-07-01'),
+    batches: batches,
+  );
+}
 
 void main() {
-  setUp(useLocale);
+  group('ProductBatchEntity', () {
+    test('totalCost is unit price times initial quantity', () {
+      expect(batch(price: '2.50', initial: '4').totalCost, Decimal.parse('10.00'));
+    });
 
-  final today = DateTime(2026, 8, 20);
-
-  test('lot total is price times initial quantity, not remaining', () {
-    final l = lot(id: 'l1', purchasedOn: DateTime(2026, 8, 8), unitPrice: 1.10, initial: 12, remaining: 2);
-    expect(l.lotTotal, closeTo(13.20, 0.001));
+    test('hasStock is false once the batch is depleted', () {
+      expect(batch(remaining: '0').hasStock, isFalse);
+      expect(batch(remaining: '0.001').hasStock, isTrue);
+    });
   });
 
-  test('header figures are derived from lots', () {
-    final p = Product(id: 'p1', storeId: 's1', name: 'Whole Milk 1L', lots: [
-      lot(id: 'l1', purchasedOn: DateTime(2026, 8, 8), expiresOn: DateTime(2026, 8, 22), unitPrice: 1.10, initial: 12, remaining: 2),
-      lot(id: 'l2', purchasedOn: DateTime(2026, 8, 15), expiresOn: DateTime(2026, 9, 12), unitPrice: 1.25, initial: 10, remaining: 8),
-    ]);
-    expect(p.totalRemaining, 10);
-    expect(p.nearestExpiry, DateTime(2026, 8, 22));
-    expect(p.latestUnitPrice, 1.25);
+  group('totalRemaining', () {
+    test('sums remaining quantity across batches', () {
+      final p = product([
+        batch(id: 'b1', remaining: '2.5'),
+        batch(id: 'b2', remaining: '1.25'),
+      ]);
+
+      expect(p.totalRemaining, Decimal.parse('3.75'));
+    });
+
+    test('adds decimals exactly, without floating point drift', () {
+      final p = product([
+        batch(id: 'b1', remaining: '0.1'),
+        batch(id: 'b2', remaining: '0.2'),
+      ]);
+
+      expect(p.totalRemaining, Decimal.parse('0.3'));
+      expect(p.totalRemaining.toString(), '0.3');
+    });
+
+    test('ignores archived batches', () {
+      final p = product([
+        batch(id: 'b1', remaining: '2'),
+        batch(id: 'b2', remaining: '9', isArchived: true),
+      ]);
+
+      expect(p.totalRemaining, Decimal.parse('2'));
+    });
+
+    test('is zero when there are no batches', () {
+      expect(product([]).totalRemaining, Decimal.zero);
+    });
   });
 
-  test('a depleted expired lot does not make the product read expired', () {
-    final p = Product(id: 'p1', storeId: 's1', name: 'Cheddar Block 400g', lots: [
-      lot(id: 'l1', purchasedOn: DateTime(2026, 7, 1), expiresOn: DateTime(2026, 8, 1), unitPrice: 4.15, initial: 5, remaining: 0),
-    ]);
-    expect(p.hasStock, isFalse);
-    expect(p.nearestExpiry, isNull);
-    expect(p.statusOn(today), ExpiryStatus.none);
-    expect(p.latestUnitPrice, 4.15);
+  group('nearestExpiry', () {
+    test('is the earliest expiry among batches that still have stock', () {
+      final p = product([
+        batch(id: 'b1', expiry: '2026-12-01'),
+        batch(id: 'b2', expiry: '2026-09-15'),
+        batch(id: 'b3', expiry: '2026-10-01'),
+      ]);
+
+      expect(p.nearestExpiry, DateTime.parse('2026-09-15'));
+    });
+
+    test('skips depleted batches even when they expire soonest', () {
+      final p = product([
+        batch(id: 'b1', expiry: '2026-08-10', remaining: '0'),
+        batch(id: 'b2', expiry: '2026-11-01', remaining: '3'),
+      ]);
+
+      expect(p.nearestExpiry, DateTime.parse('2026-11-01'));
+    });
+
+    test('is null when nothing remains', () {
+      final p = product([batch(remaining: '0')]);
+
+      expect(p.nearestExpiry, isNull);
+    });
   });
 
-  test('FEFO orders dated lots by expiry and puts undated lots last', () {
-    final p = Product(id: 'p1', storeId: 's1', name: 'Mixed', lots: [
-      lot(id: 'undated', purchasedOn: DateTime(2026, 3, 14), unitPrice: 2.20, initial: 21, remaining: 21),
-      lot(id: 'far', purchasedOn: DateTime(2026, 1, 1), expiresOn: DateTime(2027, 1, 1), unitPrice: 2.05, initial: 5, remaining: 5),
-      lot(id: 'near', purchasedOn: DateTime(2026, 8, 1), expiresOn: DateTime(2026, 8, 22), unitPrice: 2.00, initial: 3, remaining: 3),
-    ]);
-    expect(p.lotsFefo.map((l) => l.id), ['near', 'far', 'undated']);
+  group('latestUnitPrice', () {
+    test('is the price of the most recently purchased batch', () {
+      final p = product([
+        batch(id: 'b1', purchased: '2026-07-01', price: '8.00'),
+        batch(id: 'b2', purchased: '2026-08-01', price: '9.50'),
+        batch(id: 'b3', purchased: '2026-07-15', price: '8.75'),
+      ]);
+
+      expect(p.latestUnitPrice, Decimal.parse('9.50'));
+    });
+
+    test('considers depleted batches, because price history outlives stock', () {
+      final p = product([
+        batch(id: 'b1', purchased: '2026-08-01', price: '9.50', remaining: '0'),
+      ]);
+
+      expect(p.latestUnitPrice, Decimal.parse('9.50'));
+    });
+
+    test('is null when there are no batches', () {
+      expect(product([]).latestUnitPrice, isNull);
+    });
   });
 
-  test('undated lots order among themselves by purchase date', () {
-    final p = Product(id: 'p1', storeId: 's1', name: 'Sea Salt 1kg', lots: [
-      lot(id: 'later', purchasedOn: DateTime(2026, 6, 1), unitPrice: 1, initial: 4, remaining: 4),
-      lot(id: 'earlier', purchasedOn: DateTime(2026, 2, 1), unitPrice: 1, initial: 4, remaining: 4),
-    ]);
-    expect(p.lotsFefo.map((l) => l.id), ['earlier', 'later']);
-    expect(p.statusOn(today), ExpiryStatus.ok);
+  group('statusOn', () {
+    final now = DateTime.parse('2026-08-06');
+
+    test('is expired when the nearest expiry has passed', () {
+      final p = product([batch(expiry: '2026-08-05')]);
+
+      expect(p.statusOn(now), ExpiryStatus.expired);
+    });
+
+    test('is expired at exactly zero days remaining', () {
+      final p = product([batch(expiry: '2026-08-06')]);
+
+      expect(p.statusOn(now), ExpiryStatus.expired);
+    });
+
+    test('is critical inside the seven day window', () {
+      final p = product([batch(expiry: '2026-08-12')]);
+
+      expect(p.statusOn(now), ExpiryStatus.critical);
+    });
+
+    test('is warning at exactly the 30 day boundary', () {
+      final p = product([batch(expiry: '2026-09-05')]);
+
+      expect(p.statusOn(now), ExpiryStatus.warning);
+      expect(p.statusOn(now).isExpiringSoon, isTrue);
+    });
+
+    test('is ok one day past the 30 day boundary', () {
+      final p = product([batch(expiry: '2026-09-07')]);
+
+      expect(p.statusOn(now), ExpiryStatus.ok);
+    });
+
+    test('reads as no stock when nothing remains', () {
+      final p = product([batch(remaining: '0')]);
+
+      expect(p.statusOn(now), ExpiryStatus.none);
+    });
+
+    test('is ok when stock is held but nothing is dated', () {
+      final p = product([batch(expiry: null)]);
+
+      expect(p.statusOn(now), ExpiryStatus.ok);
+    });
   });
 }

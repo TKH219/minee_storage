@@ -27,12 +27,14 @@ import 'package:mine_storage/data/data_sources/remote/auth_data_source_impl.dart
 import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
-import 'package:mine_storage/data/mock/mock_database.dart';
-import 'package:mine_storage/data/repositories/mock_product_repository_impl.dart';
+import 'package:mine_storage/data/data_sources/remote/product_api.dart';
+import 'package:mine_storage/data/repositories/fake_product_repository.dart';
+import 'package:mine_storage/data/repositories/product_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
+import 'package:mine_storage/app/config/app_features.dart';
 import 'package:mine_storage/app/env/env.dart';
 
 export 'package:mine_storage/shared/ui/app_snack.dart' show snackbarKey;
@@ -125,13 +127,19 @@ final postRepositoryProvider = Provider<PostRepository>(
   (ref) => PostRepositoryImpl(postApi: ref.watch(postApiProvider)),
 );
 
-/// Mock data layer. The Supabase spec replaces only these three bindings —
-/// nothing above the repository interfaces changes.
-final mockDatabaseProvider = Provider<MockDatabase>((ref) => MockDatabase());
-
-final productRepositoryProvider = Provider<ProductRepository>(
-  (ref) => MockProductRepositoryImpl(ref.watch(mockDatabaseProvider)),
+final productApiProvider = Provider<ProductApi>(
+  (ref) => ProductApi(ref.watch(authorizedDioProvider)),
 );
+
+/// The only place that knows whether products come from a backend.
+///
+/// [ProductRepositoryImpl] is complete but has no tables behind it yet, so the
+/// in-memory stand-in is what the app actually runs on — see
+/// [AppFeatures.fakeProductsEnabled].
+final productRepositoryProvider = Provider<ProductRepository>((ref) {
+  if (AppFeatures.fakeProductsEnabled) return FakeProductRepository();
+  return ProductRepositoryImpl(productApi: ref.watch(productApiProvider));
+});
 
 final onboardingResolverProvider = Provider<OnboardingResolver>(
   (ref) => OnboardingResolver(

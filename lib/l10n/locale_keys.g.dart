@@ -108,6 +108,7 @@ abstract class  LocaleKeys {
   static const errors_emailNotConfirmed = 'errors.emailNotConfirmed';
   static const errors_unknownNetwork = 'errors.unknownNetwork';
   static const errors_unknown = 'errors.unknown';
+  static const errors_insufficientStock = 'errors.insufficientStock';
   static const errors = 'errors';
   static const dashboard_emptyTitle = 'dashboard.emptyTitle';
   static const dashboard_emptySubtitle = 'dashboard.emptySubtitle';
@@ -115,6 +116,18 @@ abstract class  LocaleKeys {
   static const products_title = 'products.title';
   static const products_emptyTitle = 'products.emptyTitle';
   static const products_emptySubtitle = 'products.emptySubtitle';
+  static const products_searchHint = 'products.searchHint';
+  static const products_filtersTitle = 'products.filtersTitle';
+  static const products_filterAll = 'products.filterAll';
+  static const products_filterExpiringSoon = 'products.filterExpiringSoon';
+  static const products_filterExpired = 'products.filterExpired';
+  static const products_filterArchived = 'products.filterArchived';
+  static const products_addedBetween = 'products.addedBetween';
+  static const products_expiresBetween = 'products.expiresBetween';
+  static const products_anyDate = 'products.anyDate';
+  static const products_category = 'products.category';
+  static const products_clearAll = 'products.clearAll';
+  static const products_apply = 'products.apply';
   static const products = 'products';
   static const sales_title = 'sales.title';
   static const sales_emptyTitle = 'sales.emptyTitle';
@@ -138,6 +151,7 @@ abstract class  LocaleKeys {
   static const settings_themeLight = 'settings.themeLight';
   static const settings_themeDark = 'settings.themeDark';
   static const settings_language = 'settings.language';
+  static const settings_currency = 'settings.currency';
   static const settings = 'settings';
   static const onboarding_profile_title = 'onboarding.profile.title';
   static const onboarding_profile_subtitle = 'onboarding.profile.subtitle';

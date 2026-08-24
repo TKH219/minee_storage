@@ -115,7 +115,8 @@
     "rateLimited": "Đã gửi quá nhiều email. Vui lòng đợi một phút rồi thử lại.",
     "emailNotConfirmed": "Vui lòng xác nhận email của bạn trước.",
     "unknownNetwork": "Lỗi mạng không xác định.",
-    "unknown": "Lỗi không xác định: {error}"
+    "unknown": "Lỗi không xác định: {error}",
+    "insufficientStock": "Không còn đủ hàng trong kho."
   },
   "dashboard": {
     "emptyTitle": "Chưa có hàng",
@@ -124,7 +125,19 @@
   "products": {
     "title": "Sản phẩm",
     "emptyTitle": "Kệ hàng của bạn đang trống",
-    "emptySubtitle": "Thêm sản phẩm đầu tiên, hoặc quét mã vạch để bắt đầu đếm hàng bạn đang có."
+    "emptySubtitle": "Thêm sản phẩm đầu tiên, hoặc quét mã vạch để bắt đầu đếm hàng bạn đang có.",
+    "searchHint": "Tìm theo tên",
+    "filtersTitle": "Bộ lọc",
+    "filterAll": "Tất cả",
+    "filterExpiringSoon": "Sắp hết hạn",
+    "filterExpired": "Đã hết hạn",
+    "filterArchived": "Đã lưu trữ",
+    "addedBetween": "Thêm trong khoảng",
+    "expiresBetween": "Hết hạn trong khoảng",
+    "anyDate": "Mọi ngày",
+    "category": "Danh mục",
+    "clearAll": "Xoá tất cả",
+    "apply": "Áp dụng"
   },
   "sales": {
     "title": "Bán hàng",
@@ -151,7 +164,8 @@
     "themeSystem": "Theo hệ thống",
     "themeLight": "Sáng",
     "themeDark": "Tối",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "currency": "Tiền tệ"
   },
   "onboarding": {
     "profile": {
