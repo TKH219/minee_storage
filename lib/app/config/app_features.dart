@@ -6,8 +6,7 @@ class AppFeatures {
   /// buttons stay hidden rather than shipping as inert controls.
   static const bool socialSignInEnabled = false;
 
-  /// Products have no tables in Supabase yet, so the repository is served from
-  /// memory. Flip this once the schema lands and `ProductRepositoryImpl` has
-  /// something to talk to.
-  static const bool fakeProductsEnabled = true;
+  /// The products tables and both Edge Functions are live, so the app talks to
+  /// them. Flip this back to serve the in-memory stand-in when working offline.
+  static const bool fakeProductsEnabled = false;
 }

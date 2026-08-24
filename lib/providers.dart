@@ -127,8 +127,19 @@ final postRepositoryProvider = Provider<PostRepository>(
   (ref) => PostRepositoryImpl(postApi: ref.watch(postApiProvider)),
 );
 
+/// The contract's paths live under the Edge Functions, while PostgREST and
+/// Storage live at the project root — so the base URL is overridden here rather
+/// than on the shared Dio, which [storeApiProvider] and [storageDataSourceProvider]
+/// also use.
+final functionsBaseUrlProvider = Provider<String>(
+  (ref) => '${Env.apiUrl.replaceAll(RegExp(r'/+$'), '')}/functions/v1',
+);
+
 final productApiProvider = Provider<ProductApi>(
-  (ref) => ProductApi(ref.watch(authorizedDioProvider)),
+  (ref) => ProductApi(
+    ref.watch(authorizedDioProvider),
+    baseUrl: ref.watch(functionsBaseUrlProvider),
+  ),
 );
 
 /// The only place that knows whether products come from a backend.
