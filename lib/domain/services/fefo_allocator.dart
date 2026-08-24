@@ -17,7 +17,7 @@ abstract class FefoAllocator {
       throw ArgumentError.value(quantity, 'quantity', 'must be greater than zero');
     }
 
-    final available = batches.where((batch) => !batch.isArchived && batch.hasStock).toList()
+    final available = batches.where((batch) => !batch.archived && batch.hasStock).toList()
       ..sort(compareBatchesFefo);
 
     final total = available.fold(

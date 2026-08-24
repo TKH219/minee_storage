@@ -5,9 +5,13 @@ import 'package:mine_storage/domain/entities/entities.dart';
 part 'consume_request.g.dart';
 
 class ConsumeRequest {
-  const ConsumeRequest({required this.allocations});
+  const ConsumeRequest({required this.storeId, required this.allocations});
 
-  factory ConsumeRequest.fromAllocations(List<BatchAllocation> allocations) => ConsumeRequest(
+  factory ConsumeRequest.fromAllocations(
+    List<BatchAllocation> allocations, {
+    required String storeId,
+  }) => ConsumeRequest(
+    storeId: storeId,
     allocations: allocations
         .map(
           (allocation) => BatchAllocationRequest(
@@ -18,12 +22,14 @@ class ConsumeRequest {
         .toList(),
   );
 
+  final String storeId;
   final List<BatchAllocationRequest> allocations;
 
   /// Written by hand: json_serializable emits the nested requests as objects
   /// rather than maps, which only survives because jsonEncode happens to find
   /// their toJson at runtime.
   Map<String, dynamic> toJson() => {
+    'storeId': storeId,
     'allocations': allocations.map((allocation) => allocation.toJson()).toList(),
   };
 }

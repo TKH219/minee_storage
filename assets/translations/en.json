@@ -137,7 +137,9 @@
     "anyDate": "Any date",
     "category": "Category",
     "clearAll": "Clear all",
-    "apply": "Apply"
+    "apply": "Apply",
+    "noActiveStore": "Choose a shop before adding stock.",
+    "expiringSoonCount": "{count} expiring soon"
   },
   "sales": {
     "title": "Sales",

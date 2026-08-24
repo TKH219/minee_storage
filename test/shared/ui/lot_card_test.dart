@@ -18,12 +18,15 @@ const usd = Currency(code: 'USD', symbol: r'$', decimals: 2);
 final lotOne = ProductBatchEntity(
   id: 'l1',
   productId: 'milk',
+  storeId: 'store-a',
+  batchCode: '#B-0001',
   purchasedAt: DateTime(2026, 8, 8),
   expiryDate: DateTime(2026, 8, 22),
   unitPrice: Decimal.parse('1.10'),
   initialQuantity: Decimal.fromInt(12),
   remainingQuantity: Decimal.fromInt(2),
   createdAt: DateTime(2026, 8, 8),
+  updatedAt: DateTime(2026, 8, 8),
 );
 
 Widget host(Widget child) => ProviderScope(
@@ -62,11 +65,14 @@ void main() {
     final undated = ProductBatchEntity(
       id: 'u1',
       productId: 'salt',
+      storeId: 'store-a',
+      batchCode: '#B-0001',
       purchasedAt: DateTime(2026, 3, 14),
       unitPrice: Decimal.parse('2.05'),
       initialQuantity: Decimal.fromInt(21),
       remainingQuantity: Decimal.fromInt(21),
       createdAt: DateTime(2026, 3, 14),
+      updatedAt: DateTime(2026, 3, 14),
     );
     await tester.pumpWidget(host(LotCard(lot: undated, today: DateTime(2026, 8, 20))));
     expect(find.text('Not tracked'), findsOneWidget);

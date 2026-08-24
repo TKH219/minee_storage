@@ -8,6 +8,7 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
@@ -23,7 +24,10 @@ void main() {
 
   setUp(() async {
     useLocale();
-    SharedPreferences.setMockInitialValues({});
+    // Stock belongs to a store, so the list refuses to load without one.
+    SharedPreferences.setMockInitialValues({
+      OnboardingResolver.activeStoreKey: 'store-a',
+    });
     preferences = await SharedPreferences.getInstance();
   });
 
@@ -122,6 +126,7 @@ class _EmptyRepository extends FakeProductRepository {
 
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = 20,
@@ -133,6 +138,7 @@ class _FailingRepository extends FakeProductRepository {
 
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = 20,
@@ -143,16 +149,24 @@ class _RecordingRepository extends FakeProductRepository {
   _RecordingRepository() : super(latency: Duration.zero);
 
   ProductFilter? lastFilter;
+  String? lastStoreId;
   int callCount = 0;
 
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = 20,
   }) async {
     lastFilter = filter;
+    lastStoreId = storeId;
     callCount++;
-    return super.getProducts(filter: filter, page: page, limit: limit);
+    return super.getProducts(
+      storeId: storeId,
+      filter: filter,
+      page: page,
+      limit: limit,
+    );
   }
 }

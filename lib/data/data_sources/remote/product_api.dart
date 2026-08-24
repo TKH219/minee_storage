@@ -12,15 +12,22 @@ abstract class ProductApi {
   @GET('/products')
   Future<BaseResponse<PagedProductsModel>> getProducts(
     @Queries() Map<String, dynamic> filter, {
+    @Query('storeId') required String storeId,
     @Query('page') required int page,
     @Query('limit') required int limit,
   });
 
   @GET('/products/{id}')
-  Future<BaseResponse<ProductModel>> getProduct(@Path('id') String id);
+  Future<BaseResponse<ProductModel>> getProduct(
+    @Path('id') String id, {
+    @Query('storeId') required String storeId,
+  });
 
   @GET('/products/barcode/{barcode}')
-  Future<BaseResponse<ProductModel>> getProductByBarcode(@Path('barcode') String barcode);
+  Future<BaseResponse<ProductModel>> getProductByBarcode(
+    @Path('barcode') String barcode, {
+    @Query('storeId') required String storeId,
+  });
 
   @GET('/products/categories')
   Future<BaseResponse<List<String>>> getCategories();
@@ -35,10 +42,16 @@ abstract class ProductApi {
   );
 
   @POST('/products/{id}/archive')
-  Future<BaseResponse<ProductModel>> archiveProduct(@Path('id') String id);
+  Future<BaseResponse<ProductModel>> archiveProduct(
+    @Path('id') String id, {
+    @Query('storeId') required String storeId,
+  });
 
   @POST('/products/{id}/restore')
-  Future<BaseResponse<ProductModel>> restoreProduct(@Path('id') String id);
+  Future<BaseResponse<ProductModel>> restoreProduct(
+    @Path('id') String id, {
+    @Query('storeId') required String storeId,
+  });
 
   @POST('/products/{id}/batches')
   Future<BaseResponse<ProductModel>> addBatch(
@@ -56,8 +69,9 @@ abstract class ProductApi {
   @POST('/products/{id}/batches/{batchId}/archive')
   Future<BaseResponse<ProductModel>> archiveBatch(
     @Path('id') String id,
-    @Path('batchId') String batchId,
-  );
+    @Path('batchId') String batchId, {
+    @Query('storeId') required String storeId,
+  });
 
   @POST('/products/{id}/consumptions')
   Future<BaseResponse<ProductModel>> consume(

@@ -137,7 +137,9 @@
     "anyDate": "Mọi ngày",
     "category": "Danh mục",
     "clearAll": "Xoá tất cả",
-    "apply": "Áp dụng"
+    "apply": "Áp dụng",
+    "noActiveStore": "Hãy chọn một cửa hàng trước khi thêm hàng.",
+    "expiringSoonCount": "{count} sắp hết hạn"
   },
   "sales": {
     "title": "Bán hàng",

@@ -128,6 +128,8 @@ abstract class  LocaleKeys {
   static const products_category = 'products.category';
   static const products_clearAll = 'products.clearAll';
   static const products_apply = 'products.apply';
+  static const products_noActiveStore = 'products.noActiveStore';
+  static const products_expiringSoonCount = 'products.expiringSoonCount';
   static const products = 'products';
   static const sales_title = 'sales.title';
   static const sales_emptyTitle = 'sales.emptyTitle';

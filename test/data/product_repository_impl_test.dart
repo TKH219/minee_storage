@@ -10,20 +10,24 @@ import 'package:mine_storage/domain/entities/entities.dart';
 Map<String, dynamic> productJson({String id = 'p1'}) => {
   'id': id,
   'name': 'Olive oil',
-  'isArchived': false,
+  'unit': 'litre',
   'createdAt': '2026-07-01T00:00:00.000Z',
   'updatedAt': '2026-07-01T00:00:00.000Z',
+  'deletedAt': null,
   'batches': [
     {
       'id': 'b1',
       'productId': id,
+      'storeId': 'store-a',
+      'batchCode': '#B-0001',
       'purchasedAt': '2026-08-01T00:00:00.000Z',
       'unitPrice': '12.75',
-      'expiryDate': '2026-09-01T00:00:00.000Z',
+      'expiryDate': '2026-09-01',
       'initialQuantity': '5.000',
       'remainingQuantity': '2.500',
-      'isArchived': false,
       'createdAt': '2026-08-01T00:00:00.000Z',
+      'updatedAt': '2026-08-01T00:00:00.000Z',
+      'deletedAt': null,
     },
   ],
 };
@@ -39,7 +43,7 @@ void main() {
       ),
     );
 
-    final result = await repository.getProducts(filter: const ProductFilter(), page: 1);
+    final result = await repository.getProducts(storeId: 'store-a', filter: const ProductFilter(), page: 1);
 
     expect(result.items.map((p) => p.id), ['p1', 'p2']);
     expect(result.hasMore, isTrue);
@@ -53,6 +57,7 @@ void main() {
     final repository = ProductRepositoryImpl(productApi: api);
 
     await repository.getProducts(
+      storeId: 'store-a',
       filter: const ProductFilter(
         query: 'oil',
         quickFilter: ProductQuickFilter.expiringSoon,
@@ -65,6 +70,7 @@ void main() {
     expect(api.lastFilter?['status'], 'expiringSoon');
     expect(api.lastPage, 3);
     expect(api.lastLimit, 50);
+    expect(api.lastStoreId, 'store-a');
   });
 
   test('returns null when a barcode lookup is not found', () async {
@@ -72,7 +78,7 @@ void main() {
       productApi: _FakeProductApi(error: const NotFoundException(message: 'nope')),
     );
 
-    expect(await repository.findByBarcode('123'), isNull);
+    expect(await repository.findByBarcode('123', storeId: 'store-a'), isNull);
   });
 
   test('returns the product when a barcode lookup hits', () async {
@@ -80,7 +86,7 @@ void main() {
       productApi: _FakeProductApi(product: ProductModel.fromJson(productJson())),
     );
 
-    expect((await repository.findByBarcode('123'))?.id, 'p1');
+    expect((await repository.findByBarcode('123', storeId: 'store-a'))?.id, 'p1');
   });
 
   test('lets non-404 errors propagate from a barcode lookup', () async {
@@ -88,17 +94,21 @@ void main() {
       productApi: _FakeProductApi(error: const NetworkException(message: 'offline')),
     );
 
-    expect(() => repository.findByBarcode('123'), throwsA(isA<NetworkException>()));
+    expect(() => repository.findByBarcode('123', storeId: 'store-a'), throwsA(isA<NetworkException>()));
   });
 
   test('sends allocations in the order the allocator resolved them', () async {
     final api = _FakeProductApi(product: ProductModel.fromJson(productJson()));
     final repository = ProductRepositoryImpl(productApi: api);
 
-    await repository.consume('p1', [
-      BatchAllocation(batchId: 'b1', quantity: Decimal.parse('1.5')),
-      BatchAllocation(batchId: 'b2', quantity: Decimal.parse('0.5')),
-    ]);
+    await repository.consume(
+      'p1',
+      [
+        BatchAllocation(batchId: 'b1', quantity: Decimal.parse('1.5')),
+        BatchAllocation(batchId: 'b2', quantity: Decimal.parse('0.5')),
+      ],
+      storeId: 'store-a',
+    );
 
     final sent = api.lastConsume!.toJson()['allocations'] as List<dynamic>;
     expect((sent.first as Map)['batchId'], 'b1');
@@ -111,7 +121,11 @@ void main() {
     );
 
     expect(
-      () => repository.getProducts(filter: const ProductFilter(), page: 1),
+      () => repository.getProducts(
+        storeId: 'store-a',
+        filter: const ProductFilter(),
+        page: 1,
+      ),
       throwsA(isA<NetworkException>()),
     );
   });
@@ -127,6 +141,7 @@ class _FakeProductApi implements ProductApi {
   Map<String, dynamic>? lastFilter;
   int? lastPage;
   int? lastLimit;
+  String? lastStoreId;
   ConsumeRequest? lastConsume;
 
   BaseResponse<T> _envelope<T>(T value) => BaseResponse<T>(code: 'OK', data: value);
@@ -134,18 +149,23 @@ class _FakeProductApi implements ProductApi {
   @override
   Future<BaseResponse<PagedProductsModel>> getProducts(
     Map<String, dynamic> filter, {
+    required String storeId,
     required int page,
     required int limit,
   }) async {
     lastFilter = filter;
     lastPage = page;
     lastLimit = limit;
+    lastStoreId = storeId;
     if (error != null) throw error!;
     return _envelope(this.page!);
   }
 
   @override
-  Future<BaseResponse<ProductModel>> getProductByBarcode(String barcode) async {
+  Future<BaseResponse<ProductModel>> getProductByBarcode(
+    String barcode, {
+    required String storeId,
+  }) async {
     if (error != null) throw error!;
     return _envelope(product!);
   }
@@ -158,7 +178,8 @@ class _FakeProductApi implements ProductApi {
   }
 
   @override
-  Future<BaseResponse<ProductModel>> getProduct(String id) => throw UnimplementedError();
+  Future<BaseResponse<ProductModel>> getProduct(String id, {required String storeId}) =>
+      throw UnimplementedError();
 
   @override
   Future<BaseResponse<List<String>>> getCategories() => throw UnimplementedError();
@@ -172,10 +193,12 @@ class _FakeProductApi implements ProductApi {
       throw UnimplementedError();
 
   @override
-  Future<BaseResponse<ProductModel>> archiveProduct(String id) => throw UnimplementedError();
+  Future<BaseResponse<ProductModel>> archiveProduct(String id, {required String storeId}) =>
+      throw UnimplementedError();
 
   @override
-  Future<BaseResponse<ProductModel>> restoreProduct(String id) => throw UnimplementedError();
+  Future<BaseResponse<ProductModel>> restoreProduct(String id, {required String storeId}) =>
+      throw UnimplementedError();
 
   @override
   Future<BaseResponse<ProductModel>> addBatch(String id, BatchRequest body) =>
@@ -189,6 +212,9 @@ class _FakeProductApi implements ProductApi {
   ) => throw UnimplementedError();
 
   @override
-  Future<BaseResponse<ProductModel>> archiveBatch(String id, String batchId) =>
-      throw UnimplementedError();
+  Future<BaseResponse<ProductModel>> archiveBatch(
+    String id,
+    String batchId, {
+    required String storeId,
+  }) => throw UnimplementedError();
 }

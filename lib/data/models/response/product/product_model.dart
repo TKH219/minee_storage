@@ -10,15 +10,15 @@ class ProductModel {
   const ProductModel({
     required this.id,
     required this.name,
-    required this.isArchived,
     required this.createdAt,
     required this.updatedAt,
+    this.unit,
     this.barcode,
     this.brand,
     this.category,
-    this.storageLocation,
     this.notes,
     this.photoUrl,
+    this.deletedAt,
     this.batches = const [],
   });
 
@@ -26,29 +26,29 @@ class ProductModel {
 
   final String id;
   final String name;
-  final bool isArchived;
+  final String? unit;
   final String createdAt;
   final String updatedAt;
   final String? barcode;
   final String? brand;
   final String? category;
-  final String? storageLocation;
   final String? notes;
   final String? photoUrl;
+  final String? deletedAt;
   final List<ProductBatchModel> batches;
 
   ProductEntity toEntity() => ProductEntity(
     id: id,
     name: name,
+    unit: ProductUnit.fromCode(unit),
     createdAt: DateTime.parse(createdAt),
     updatedAt: DateTime.parse(updatedAt),
     barcode: barcode,
     brand: brand,
     category: category,
-    storageLocation: storageLocation,
     notes: notes,
     photoUrl: photoUrl,
-    isArchived: isArchived,
+    deletedAt: deletedAt == null ? null : DateTime.parse(deletedAt!),
     batches: batches.map((batch) => batch.toEntity()).toList(),
   );
 }

@@ -15,19 +15,21 @@ final milk = ProductEntity(
   id: 'milk',
   name: 'Whole Milk 1L',
   brand: 'Dairyland',
-  storageLocation: 'Cold room A',
   createdAt: DateTime(2026, 8, 8),
   updatedAt: DateTime(2026, 8, 8),
   batches: [
     ProductBatchEntity(
       id: 'l1',
       productId: 'milk',
+      storeId: 'store-a',
+      batchCode: '#B-0001',
       purchasedAt: DateTime(2026, 8, 8),
       expiryDate: DateTime(2026, 8, 22),
       unitPrice: Decimal.parse('1.10'),
       initialQuantity: Decimal.fromInt(12),
       remainingQuantity: Decimal.fromInt(2),
       createdAt: DateTime(2026, 8, 8),
+      updatedAt: DateTime(2026, 8, 8),
     ),
   ],
 );

@@ -1,47 +1,48 @@
 import 'package:decimal/decimal.dart';
 import 'package:equatable/equatable.dart';
 
+import 'package:mine_storage/domain/entities/product_unit.dart';
+
 /// What a form hands the repository. Keeps request models out of features.
 class ProductDraft extends Equatable {
   const ProductDraft({
     required this.name,
+    this.unit = ProductUnit.piece,
     this.barcode,
     this.brand,
     this.category,
-    this.storageLocation,
     this.notes,
     this.photoUrl,
   });
 
   final String name;
+  final ProductUnit unit;
   final String? barcode;
   final String? brand;
   final String? category;
-  final String? storageLocation;
   final String? notes;
   final String? photoUrl;
 
   @override
-  List<Object?> get props => [
-    name,
-    barcode,
-    brand,
-    category,
-    storageLocation,
-    notes,
-    photoUrl,
-  ];
+  List<Object?> get props => [name, unit, barcode, brand, category, notes, photoUrl];
 }
 
 class BatchDraft extends Equatable {
   const BatchDraft({
+    required this.storeId,
     required this.purchasedAt,
     required this.unitPrice,
     required this.initialQuantity,
     this.expiryDate,
     this.remainingQuantity,
+    this.supplier,
+    this.storageLocation,
+    this.note,
   });
 
+  /// Which shop the delivery landed at. The product is user-wide, so this is
+  /// the only thing that files the stock anywhere.
+  final String storeId;
   final DateTime purchasedAt;
   final Decimal unitPrice;
 
@@ -51,13 +52,20 @@ class BatchDraft extends Equatable {
 
   /// Null on create — the server seeds it from [initialQuantity].
   final Decimal? remainingQuantity;
+  final String? supplier;
+  final String? storageLocation;
+  final String? note;
 
   @override
   List<Object?> get props => [
+    storeId,
     purchasedAt,
     unitPrice,
     expiryDate,
     initialQuantity,
     remainingQuantity,
+    supplier,
+    storageLocation,
+    note,
   ];
 }
