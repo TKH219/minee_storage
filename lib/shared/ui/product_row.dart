@@ -26,8 +26,12 @@ class ProductRow extends ConsumerWidget {
     final colors = context.colors;
     final texts = context.textStyles;
     final money = ref.watch(currencyFormatterProvider);
-    final subtitle =
-        [product.brand, product.storageLocation].whereType<String>().join(' · ');
+    // Where the stock sits is a property of the delivery, so the sub line
+    // names the location of the batch that will go out next.
+    final location = product.availableBatches.isEmpty
+        ? null
+        : product.availableBatches.first.storageLocation;
+    final subtitle = [product.brand, location].whereType<String>().join(' · ');
 
     return InkWell(
       onTap: onTap,
@@ -103,7 +107,7 @@ class ProductRow extends ConsumerWidget {
                         status: product.statusOn(today),
                         expiry: product.nearestExpiry,
                         today: today,
-                        archived: product.isArchived,
+                        archived: product.archived,
                       ),
                     ],
                   ),

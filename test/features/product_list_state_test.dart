@@ -5,13 +5,21 @@ import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/features/products/states/active_store_state.dart';
 import 'package:mine_storage/features/products/states/product_list_state.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
 
 void main() {
-  ProviderContainer containerWith(ProductRepository repository) {
+  ProviderContainer containerWith(
+    ProductRepository repository, {
+    String? activeStore = 'store-a',
+  }) {
     final container = ProviderContainer(
-      overrides: [productRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        productRepositoryProvider.overrideWithValue(repository),
+        activeStoreProvider.overrideWithValue(activeStore),
+      ],
     );
     addTearDown(container.dispose);
     // The provider is autoDispose; without a live listener it is torn down
@@ -123,6 +131,26 @@ void main() {
 
     expect(container.read(productListStateProvider).categories, contains('Pantry'));
   });
+
+  test('refuses to load without an active store rather than guessing one', () async {
+    final container = containerWith(FakeProductRepository(), activeStore: null);
+
+    await container.read(productListStateProvider.notifier).loadInitial();
+
+    final state = container.read(productListStateProvider);
+    expect(state.isError, isTrue);
+    expect(state.errorMessageKey, LocaleKeys.products_noActiveStore);
+    expect(state.products, isEmpty);
+  });
+
+  test('every page request names the active store', () async {
+    final repository = _RecordingRepository();
+    final container = containerWith(repository);
+
+    await container.read(productListStateProvider.notifier).loadInitial();
+
+    expect(repository.lastStoreId, 'store-a');
+  });
 }
 
 /// getCategories resolves after getProducts, which is what surfaced the
@@ -140,10 +168,32 @@ class _SlowCategoriesRepository extends FakeProductRepository {
 class _FailingRepository extends FakeProductRepository {
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
+    required ProductFilter filter,
+    required int page,
+    int limit = 20,
+  }) async => throw const NetworkException(message: 'offline');
+}
+
+class _RecordingRepository extends FakeProductRepository {
+  _RecordingRepository() : super(latency: Duration.zero);
+
+  String? lastStoreId;
+
+  @override
+  Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = 20,
   }) async {
-    throw const NetworkException(message: 'offline');
+    lastStoreId = storeId;
+    return super.getProducts(
+      storeId: storeId,
+      filter: filter,
+      page: page,
+      limit: limit,
+    );
   }
 }
+

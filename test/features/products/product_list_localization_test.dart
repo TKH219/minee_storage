@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
@@ -16,7 +17,9 @@ void main() {
   Widget host(Widget child) => Theme(data: AppTheme.light(), child: child);
 
   testWidgets('products empty state translates to Vietnamese', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({
+      OnboardingResolver.activeStoreKey: 'store-a',
+    });
     final prefs = await SharedPreferences.getInstance();
 
     await pumpLocalized(
@@ -49,6 +52,7 @@ class _EmptyProductRepository extends FakeProductRepository {
 
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = 20,

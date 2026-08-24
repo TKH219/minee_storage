@@ -91,9 +91,10 @@ flutter_launcher_icons:
   image_path_ios: "assets/launcher_icon/app_icon.png"
   remove_alpha_ios: true
 
-  # API 26+ composites these two layers itself. The foreground art is re-centred
-  # and pre-scaled so that after the generator's own 16% inset the carton lands
-  # inside the 66dp safe circle every launcher mask honours.
+  # API 26+ composites these two layers itself, mapping the foreground onto the
+  # 108dp layer with no inset of its own — so the foreground art is drawn
+  # smaller than the square icon, sized to land inside the 66dp safe circle
+  # every launcher mask honours.
   min_sdk_android: 24
   adaptive_icon_background: "#D4F5FC"
   adaptive_icon_foreground: "assets/launcher_icon/app_icon_foreground.png"

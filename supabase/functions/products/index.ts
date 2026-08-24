@@ -44,7 +44,7 @@ Deno.serve(async (request: Request) => {
       return await updateBatch(supabase, id, after[2], request);
     }
     if (after.length === 4 && after[1] === 'batches' && after[3] === 'archive' && method === 'POST') {
-      return await archiveBatch(supabase, id, after[2], request);
+      return await archiveBatch(supabase, id, after[2], url);
     }
     if (after.length === 2 && after[1] === 'consumptions' && method === 'POST') {
       return await consume(supabase, id, request);
@@ -215,10 +215,9 @@ async function archiveBatch(
   supabase: SupabaseClient,
   productId: string,
   batchId: string,
-  request: Request,
+  url: URL,
 ) {
-  const body = await request.json().catch(() => ({}));
-  const storeId = requireStoreFromBody(body);
+  const storeId = requireStoreFromQuery(url);
 
   const { error } = await supabase
     .from('batches')

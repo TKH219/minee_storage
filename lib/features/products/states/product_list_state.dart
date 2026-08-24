@@ -5,6 +5,8 @@ import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/features/products/states/active_store_state.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
 
@@ -22,6 +24,7 @@ class ProductListState extends BaseState with Equatable {
     this.page = 1,
     this.hasReachedEnd = false,
     this.isLoadingMore = false,
+    this.expiringSoonCount = 0,
     super.status,
     super.errorMessageKey,
     super.errorMessage,
@@ -33,6 +36,9 @@ class ProductListState extends BaseState with Equatable {
   final int page;
   final bool hasReachedEnd;
   final bool isLoadingMore;
+
+  /// Drives the count line beside the Expiring soon chip.
+  final int expiringSoonCount;
 
   bool get isEmpty => isLoaded && products.isEmpty;
 
@@ -50,6 +56,7 @@ class ProductListState extends BaseState with Equatable {
     int? page,
     bool? hasReachedEnd,
     bool? isLoadingMore,
+    int? expiringSoonCount,
   }) {
     return ProductListState(
       products: products ?? this.products,
@@ -58,6 +65,7 @@ class ProductListState extends BaseState with Equatable {
       page: page ?? this.page,
       hasReachedEnd: hasReachedEnd ?? this.hasReachedEnd,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      expiringSoonCount: expiringSoonCount ?? this.expiringSoonCount,
       status: status ?? this.status,
       errorMessageKey: errorMessageKey ?? this.errorMessageKey,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -72,6 +80,7 @@ class ProductListState extends BaseState with Equatable {
     page,
     hasReachedEnd,
     isLoadingMore,
+    expiringSoonCount,
     status,
     errorMessageKey,
     errorMessage,
@@ -80,11 +89,26 @@ class ProductListState extends BaseState with Equatable {
 
 class ProductListStateNotifier extends BaseStateNotifier<ProductListState> {
   late final ProductRepository _repository;
+  String? _storeId;
 
   @override
   ProductListState createInitialState() {
     _repository = ref.read(productRepositoryProvider);
+    _storeId = ref.read(activeStoreProvider);
     return const ProductListState();
+  }
+
+  /// Stock belongs to a store, so there is nothing truthful to show without
+  /// one. Guessing a store would show the wrong shop's shelves.
+  bool get _hasStore => _storeId != null;
+
+  void _refuseWithoutStore() {
+    updateState(
+      state.copyWith(
+        status: StateLifeCycle.error,
+        errorMessageKey: LocaleKeys.products_noActiveStore,
+      ),
+    );
   }
 
   Future<void> loadInitial() async {
@@ -124,14 +148,20 @@ class ProductListStateNotifier extends BaseStateNotifier<ProductListState> {
   }
 
   Future<void> _fetchFirstPage() async {
+    if (!_hasStore) return _refuseWithoutStore();
     try {
-      final result = await _repository.getProducts(filter: state.filter, page: 1);
+      final result = await _repository.getProducts(
+        storeId: _storeId!,
+        filter: state.filter,
+        page: 1,
+      );
       updateState(
         state.copyWith(
           status: StateLifeCycle.loaded,
           products: result.items,
           page: 1,
           hasReachedEnd: !result.hasMore,
+          expiringSoonCount: _countExpiringSoon(result.items),
         ),
       );
     } on Object catch (e) {
@@ -141,27 +171,36 @@ class ProductListStateNotifier extends BaseStateNotifier<ProductListState> {
 
   Future<void> loadMore() async {
     if (state.isLoadingMore || state.hasReachedEnd || state.products.isEmpty) return;
+    if (!_hasStore) return;
 
     final nextPage = state.page + 1;
     updateState(state.copyWith(isLoadingMore: true));
     try {
       final result = await _repository.getProducts(
+        storeId: _storeId!,
         filter: state.filter,
         page: nextPage,
         limit: Constants.defaultPageSize,
       );
+      final products = [...state.products, ...result.items];
       updateState(
         state.copyWith(
           status: StateLifeCycle.loaded,
-          products: [...state.products, ...result.items],
+          products: products,
           page: nextPage,
           hasReachedEnd: !result.hasMore,
           isLoadingMore: false,
+          expiringSoonCount: _countExpiringSoon(products),
         ),
       );
     } on Object catch (e) {
       updateState(state.copyWith(isLoadingMore: false));
       onError(e);
     }
+  }
+
+  int _countExpiringSoon(List<ProductEntity> products) {
+    final now = DateTime.now();
+    return products.where((product) => product.statusOn(now).isExpiringSoon).length;
   }
 }

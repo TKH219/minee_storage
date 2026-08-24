@@ -5,32 +5,47 @@ import 'package:mine_storage/domain/entities/entities.dart';
 
 ProductBatchEntity batch({
   String id = 'b1',
+  String storeId = 'store-a',
+  String batchCode = '#B-0001',
   String? expiry = '2026-09-01',
   String purchased = '2026-08-01',
   String price = '10.00',
   String initial = '5',
   String remaining = '5',
-  bool isArchived = false,
+  String? deletedAt,
+  String? supplier,
+  String? storageLocation,
 }) {
   return ProductBatchEntity(
     id: id,
     productId: 'p1',
+    storeId: storeId,
+    batchCode: batchCode,
     purchasedAt: DateTime.parse(purchased),
     unitPrice: Decimal.parse(price),
     expiryDate: expiry == null ? null : DateTime.parse(expiry),
     initialQuantity: Decimal.parse(initial),
     remainingQuantity: Decimal.parse(remaining),
     createdAt: DateTime.parse(purchased),
-    isArchived: isArchived,
+    updatedAt: DateTime.parse(purchased),
+    deletedAt: deletedAt == null ? null : DateTime.parse(deletedAt),
+    supplier: supplier,
+    storageLocation: storageLocation,
   );
 }
 
-ProductEntity product(List<ProductBatchEntity> batches) {
+ProductEntity product(
+  List<ProductBatchEntity> batches, {
+  ProductUnit unit = ProductUnit.piece,
+  String? deletedAt,
+}) {
   return ProductEntity(
     id: 'p1',
     name: 'Olive oil',
+    unit: unit,
     createdAt: DateTime.parse('2026-07-01'),
     updatedAt: DateTime.parse('2026-07-01'),
+    deletedAt: deletedAt == null ? null : DateTime.parse(deletedAt),
     batches: batches,
   );
 }
@@ -70,7 +85,7 @@ void main() {
     test('ignores archived batches', () {
       final p = product([
         batch(id: 'b1', remaining: '2'),
-        batch(id: 'b2', remaining: '9', isArchived: true),
+        batch(id: 'b2', remaining: '9', deletedAt: '2026-08-01'),
       ]);
 
       expect(p.totalRemaining, Decimal.parse('2'));
@@ -176,6 +191,48 @@ void main() {
       final p = product([batch(expiry: null)]);
 
       expect(p.statusOn(now), ExpiryStatus.ok);
+    });
+  });
+
+  group('archived reads from the deletion stamp', () {
+    test('a product with no stamp is live', () {
+      expect(product([batch()]).archived, isFalse);
+    });
+
+    test('a product with a stamp is archived', () {
+      expect(product([batch()], deletedAt: '2026-08-01').archived, isTrue);
+    });
+
+    test('an archived batch is left out of every derived figure', () {
+      final p = product([
+        batch(id: 'live', remaining: '4'),
+        batch(id: 'gone', batchCode: '#B-0002', remaining: '9', deletedAt: '2026-08-01'),
+      ]);
+
+      expect(p.totalRemaining, Decimal.parse('4'));
+      expect(p.availableBatches.map((b) => b.id), ['live']);
+    });
+  });
+
+  group('unit', () {
+    test('defaults to piece and survives copyWith', () {
+      expect(product([]).unit, ProductUnit.piece);
+      expect(product([]).copyWith(unit: ProductUnit.kg).unit, ProductUnit.kg);
+    });
+  });
+
+  group('batch identity', () {
+    test('a batch names the store it was filed into and its code', () {
+      final b = batch(id: 'b9', storeId: 'store-b', batchCode: '#B-0007');
+
+      expect(b.storeId, 'store-b');
+      expect(b.batchCode, '#B-0007');
+      expect(b.archived, isFalse);
+    });
+
+    test('a batch carries where the delivery physically sits', () {
+      expect(batch(storageLocation: 'Cold room A').storageLocation, 'Cold room A');
+      expect(batch(supplier: 'Dairyland').supplier, 'Dairyland');
     });
   });
 }

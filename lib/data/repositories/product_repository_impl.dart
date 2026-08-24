@@ -12,12 +12,14 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<PagedProducts> getProducts({
+    required String storeId,
     required ProductFilter filter,
     required int page,
     int limit = Constants.defaultPageSize,
   }) async {
     final response = await productApi.getProducts(
       filter.toQueryParameters(),
+      storeId: storeId,
       page: page,
       limit: limit,
     );
@@ -25,17 +27,17 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<ProductEntity> getProduct(String id) async {
-    final response = await productApi.getProduct(id);
+  Future<ProductEntity> getProduct(String id, {required String storeId}) async {
+    final response = await productApi.getProduct(id, storeId: storeId);
     return response.data!.toEntity();
   }
 
   /// The only try/catch in the data layer, and deliberately narrow: a 404 here
   /// is not a failure, it is the "no such barcode" answer the scanner needs.
   @override
-  Future<ProductEntity?> findByBarcode(String barcode) async {
+  Future<ProductEntity?> findByBarcode(String barcode, {required String storeId}) async {
     try {
-      final response = await productApi.getProductByBarcode(barcode);
+      final response = await productApi.getProductByBarcode(barcode, storeId: storeId);
       return response.data!.toEntity();
     } on NotFoundException {
       return null;
@@ -49,26 +51,38 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<ProductEntity> createProduct(ProductDraft draft) async {
-    final response = await productApi.createProduct(ProductRequest.fromDraft(draft));
+  Future<ProductEntity> createProduct(
+    ProductDraft draft, {
+    required String storeId,
+  }) async {
+    final response = await productApi.createProduct(
+      ProductRequest.fromDraft(draft, storeId: storeId),
+    );
     return response.data!.toEntity();
   }
 
   @override
-  Future<ProductEntity> updateProduct(String id, ProductDraft draft) async {
-    final response = await productApi.updateProduct(id, ProductRequest.fromDraft(draft));
+  Future<ProductEntity> updateProduct(
+    String id,
+    ProductDraft draft, {
+    required String storeId,
+  }) async {
+    final response = await productApi.updateProduct(
+      id,
+      ProductRequest.fromDraft(draft, storeId: storeId),
+    );
     return response.data!.toEntity();
   }
 
   @override
-  Future<ProductEntity> archiveProduct(String id) async {
-    final response = await productApi.archiveProduct(id);
+  Future<ProductEntity> archiveProduct(String id, {required String storeId}) async {
+    final response = await productApi.archiveProduct(id, storeId: storeId);
     return response.data!.toEntity();
   }
 
   @override
-  Future<ProductEntity> restoreProduct(String id) async {
-    final response = await productApi.restoreProduct(id);
+  Future<ProductEntity> restoreProduct(String id, {required String storeId}) async {
+    final response = await productApi.restoreProduct(id, storeId: storeId);
     return response.data!.toEntity();
   }
 
@@ -93,19 +107,24 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<ProductEntity> archiveBatch(String productId, String batchId) async {
-    final response = await productApi.archiveBatch(productId, batchId);
+  Future<ProductEntity> archiveBatch(
+    String productId,
+    String batchId, {
+    required String storeId,
+  }) async {
+    final response = await productApi.archiveBatch(productId, batchId, storeId: storeId);
     return response.data!.toEntity();
   }
 
   @override
   Future<ProductEntity> consume(
     String productId,
-    List<BatchAllocation> allocations,
-  ) async {
+    List<BatchAllocation> allocations, {
+    required String storeId,
+  }) async {
     final response = await productApi.consume(
       productId,
-      ConsumeRequest.fromAllocations(allocations),
+      ConsumeRequest.fromAllocations(allocations, storeId: storeId),
     );
     return response.data!.toEntity();
   }

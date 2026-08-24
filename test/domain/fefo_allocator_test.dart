@@ -7,21 +7,24 @@ import 'package:mine_storage/domain/services/fefo_allocator.dart';
 
 ProductBatchEntity batch({
   required String id,
-  required String expiry,
+  String? expiry = '2026-09-01',
   String purchased = '2026-08-01',
   String remaining = '5',
-  bool isArchived = false,
+  bool archived = false,
 }) {
   return ProductBatchEntity(
     id: id,
     productId: 'p1',
+    storeId: 'store-a',
+    batchCode: '#B-0001',
     purchasedAt: DateTime.parse(purchased),
     unitPrice: Decimal.parse('10.00'),
-    expiryDate: DateTime.parse(expiry),
+    expiryDate: expiry == null ? null : DateTime.parse(expiry),
     initialQuantity: Decimal.parse(remaining),
     remainingQuantity: Decimal.parse(remaining),
     createdAt: DateTime.parse(purchased),
-    isArchived: isArchived,
+    updatedAt: DateTime.parse(purchased),
+    deletedAt: archived ? DateTime.parse('2026-08-02') : null,
   );
 }
 
@@ -117,7 +120,7 @@ void main() {
     final result = FefoAllocator.allocate(
       quantity: Decimal.parse('1'),
       batches: [
-        batch(id: 'archived', expiry: '2026-08-01', isArchived: true),
+        batch(id: 'archived', expiry: '2026-08-01', archived: true),
         batch(id: 'live', expiry: '2026-12-01'),
       ],
     );
