@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 
@@ -19,7 +21,10 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colors.neutral1,
-      appBar: AppBar(title: Text(LocaleKeys.settings_title.tr())),
+      appBar: AppBar(
+        leading: BackButton(onPressed: () => _leaveSettings(context)),
+        title: Text(LocaleKeys.settings_title.tr()),
+      ),
       body: ListView(
         children: [
           Padding(
@@ -59,6 +64,16 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// The dashboard reaches settings with `go`, so there is usually nothing on
+  /// the stack to pop back to.
+  static void _leaveSettings(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed(AppRoutes.dashboardName);
+    }
   }
 
   static String _endonymFor(Locale locale) {
