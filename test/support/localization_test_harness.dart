@@ -115,16 +115,23 @@ Widget localizedApp(Widget child, {Locale locale = enLocale}) {
   );
 }
 
+/// Set [settle] false for a screen carrying an indefinite animation — the scan
+/// sweep never stops, so `pumpAndSettle` would time out on it.
 Future<void> pumpLocalizedApp(
   WidgetTester tester,
   Widget child, {
   Locale locale = enLocale,
+  bool settle = true,
 }) async {
   // Without this the controller has no storage, its load fails silently, and
   // every key renders as its own path.
   await initLocalization();
   await tester.pumpWidget(localizedApp(child, locale: locale));
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 
   // `EasyLocalizationController._savedLocale` is static, so a locale chosen by
   // an earlier test in the same file can outlive it and beat `startLocale`.
@@ -132,6 +139,10 @@ Future<void> pumpLocalizedApp(
   final context = tester.element(find.byType(MaterialApp));
   if (context.locale != locale) {
     await context.setLocale(locale);
-    await tester.pumpAndSettle();
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
   }
 }
