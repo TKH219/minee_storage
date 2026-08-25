@@ -32,6 +32,14 @@ class AppRoutes {
   static const String products = '/products';
   static const String productsName = 'products';
 
+  /// Registered before `/products/:id` in the router — otherwise `new` is
+  /// swallowed as an id.
+  static const String productNew = '/products/new';
+  static const String productNewName = 'productNew';
+
+  static const String productEdit = '/products/:id/edit';
+  static const String productEditName = 'productEdit';
+
   static const String sales = '/sales';
   static const String salesName = 'sales';
 

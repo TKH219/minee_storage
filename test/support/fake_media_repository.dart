@@ -33,4 +33,14 @@ class FakeMediaRepository implements MediaRepository {
     _maybeThrow();
     return returnedUrl;
   }
+
+  @override
+  Future<String> uploadProductPhoto({
+    required Uint8List bytes,
+    required String fileExtension,
+  }) async {
+    calls.add('uploadProductPhoto');
+    _maybeThrow();
+    return returnedUrl;
+  }
 }
