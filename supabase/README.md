@@ -68,6 +68,14 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260822000200` | `currencies` gains a generated `id`; `stores.currency_id` added and backfilled |
 | `20260822000300` | drop `stores.currency` — **irreversible**, applied after the backfill was verified |
 | `20260822000400` | `created_at`/`updated_at`/`deleted_at` on every table; `stores.is_archived` dropped in favour of `deleted_at` |
+| `20260822001000` | `public.touch_updated_at()` and its triggers on `users` and `stores` — the first trigger of its kind; before this, `updated_at` only ever held the insert time |
+| `20260822001100` | backfill the ten applied versions the history table was missing |
+| `20260822001200` | `products`, user-scoped RLS, the barcode index that spans archived rows |
+| `20260822001300` | `batches`, two-parent RLS, the owner-mismatch trigger, `#B-0001` code sequencing |
+| `20260822001400` | the public `product-images` bucket, uid-scoped writes |
+| `20260822001500` | `apply_consumption` and `product_as_json` |
+| `20260822001600` | `list_products` and `list_product_categories` |
+| `20260822001700` | `product_store_holdings` |
 
 Every migration is idempotent (`create table if not exists`,
 `create or replace function`, `drop … if exists`, `on conflict do nothing`), so
@@ -95,7 +103,94 @@ curl -s -X POST -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
   -d '{"p_email":"nobody@example.com"}'
 ```
 
+## Edge Functions
+
+The products contract in `.ai/contracts/products-api.yaml` cannot be served by
+PostgREST: it has its own paths and a `{code, message, data}` envelope. Two
+functions adapt the shape.
+
+| Function | Serves |
+| --- | --- |
+| `products` | everything under `/products/*` — list, create, read, update, archive, restore, categories, barcode lookup, holdings, batch create/update/archive, consumptions |
+| `media` | `POST /media` — multipart image upload into `product-images` |
+
+Both run on the **caller's** JWT, forwarded to PostgREST, so row-level security
+stays the enforcement point and neither function is one. **Neither reads the
+service-role key**, and neither should ever be given it: a function holding that
+key would silently become the security boundary.
+
+Base URL is `https://<ref>.supabase.co/functions/v1`. The app keeps `Env.apiUrl`
+as the bare project URL that `Supabase.initialize` needs and appends the suffix
+only for `ProductApi`, because PostgREST and Storage still live at the root.
+
+### Deploying
+
+Neither `deno` nor the `supabase` CLI is installed, so functions deploy through
+the Management API. `_shared` files must keep their relative path in the bundle
+or the imports will not resolve:
+
+```bash
+PAT=$(python3 -c "import json;print(json.load(open('.ai/configs/mcp_config.json'))['mcpServers']['supabase_staging']['env']['SUPABASE_ACCESS_TOKEN'])")
+REF=hqhgknwhwgvznqhpnxqy
+
+deploy() {
+  name=$1
+  curl -s -X POST "https://api.supabase.com/v1/projects/$REF/functions/deploy?slug=$name" \
+    -H "Authorization: Bearer $PAT" \
+    -F "metadata={\"entrypoint_path\":\"$name/index.ts\",\"name\":\"$name\",\"verify_jwt\":true};type=application/json" \
+    -F "file=@supabase/functions/$name/index.ts;filename=$name/index.ts;type=application/typescript" \
+    -F "file=@supabase/functions/_shared/envelope.ts;filename=_shared/envelope.ts;type=application/typescript" \
+    -F "file=@supabase/functions/_shared/errors.ts;filename=_shared/errors.ts;type=application/typescript" \
+    -F "file=@supabase/functions/_shared/client.ts;filename=_shared/client.ts;type=application/typescript"
+}
+deploy products
+deploy media
+```
+
+A `201` carrying `"status":"ACTIVE"` means it deployed, not that it works.
+There is no local function runtime and no offline test, so the only verification
+is `curl` against staging with a real user's JWT:
+
+```bash
+ANON=$(curl -s "https://api.supabase.com/v1/projects/$REF/api-keys" -H "Authorization: Bearer $PAT" \
+       | python3 -c "import json,sys;print([k['api_key'] for k in json.load(sys.stdin) if k['name']=='anon'][0])")
+JWT=$(curl -s -X POST "https://$REF.supabase.co/auth/v1/token?grant_type=password" \
+      -H "apikey: $ANON" -H "Content-Type: application/json" \
+      -d '{"email":"<test account>","password":"<password>"}' \
+      | python3 -c "import json,sys;print(json.load(sys.stdin)['access_token'])")
+
+curl -s -H "apikey: $ANON" -H "Authorization: Bearer $JWT" \
+     "https://$REF.supabase.co/functions/v1/products?storeId=<store>"
+```
+
+Exercise it with **two** accounts. A route that returns the caller's own data
+correctly can still leak someone else's, and only a second token shows that.
+
 ## Schema notes
+
+### `products` and `batches`
+
+A product belongs to a **user** and carries identity only — no price, no expiry,
+no quantity, no store. A batch belongs to a product **and** a store, and carries
+everything that varies per delivery. One catalogue entry therefore serves every
+shop its owner runs, and a rename lands in all of them at once.
+
+Two consequences worth knowing before touching either table:
+
+- **The barcode index spans archived rows.** `products(user_id, barcode)` is
+  unique where `barcode is not null`, with no `deleted_at` predicate, so an
+  archived product keeps its barcode reserved. That is deliberate: it is the
+  same physical item, and Restore must never collide with something created
+  meanwhile.
+- **A batch is authorised through both parents.** The policies check the
+  product's `user_id` *and* the store's `owner_id`, and `batches_parents_agree()`
+  rejects any row whose two parents have different owners. The policies alone
+  would let a caller who owns both file one user's stock against another user's
+  shop.
+
+`batch_code` runs per product **across every store**, so one store's list can
+legitimately show `#B-0001`, `#B-0003` with the gap sitting in another shop.
+
 
 `public.users` is the **profile** table: `full_name`, `avatar_url`,
 `onboarding_completed_at`, plus `email`, `is_deactivated` and `last_signed_in_at`.
