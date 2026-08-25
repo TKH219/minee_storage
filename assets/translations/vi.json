@@ -221,7 +221,9 @@
     "scanMissTitle": "Sản phẩm mới",
     "scanMissBody": "Chưa có sản phẩm nào dùng mã này. Tạo mới với mã đã điền sẵn.",
     "createProduct": "Tạo sản phẩm",
-    "openProduct": "Mở sản phẩm"
+    "openProduct": "Mở sản phẩm",
+    "applyCount": "Hiện {count}",
+    "applyNone": "Không có kết quả"
   },
   "sales": {
     "title": "Bán hàng",

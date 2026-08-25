@@ -221,7 +221,9 @@
     "scanMissTitle": "New to you",
     "scanMissBody": "Nothing carries this barcode yet. Create it with the barcode already filled in.",
     "createProduct": "Create product",
-    "openProduct": "Open product"
+    "openProduct": "Open product",
+    "applyCount": "Show {count}",
+    "applyNone": "No matches"
   },
   "sales": {
     "title": "Sales",
