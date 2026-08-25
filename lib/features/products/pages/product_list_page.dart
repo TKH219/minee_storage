@@ -131,6 +131,7 @@ class _ProductListPageState
           children: [
             _buildSearchRow(context),
             _buildQuickFilters(context),
+            _buildExpiringSoonCount(context),
             Expanded(child: _buildBody(context)),
           ],
         ),
@@ -185,6 +186,29 @@ class _ProductListPageState
             const SizedBox(width: 8),
           ],
         ],
+      ),
+    );
+  }
+
+  /// Sits under the chips rather than on one: it counts what is expiring soon
+  /// regardless of which chip is selected, so putting it inside the chip would
+  /// read as that chip's own count.
+  Widget _buildExpiringSoonCount(BuildContext context) {
+    if (currentState.expiringSoonCount == 0) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          key: const Key('expiring-soon-count'),
+          LocaleKeys.products_expiringSoonCount.tr(
+            namedArgs: {'count': '${currentState.expiringSoonCount}'},
+          ),
+          style: context.textStyles.sansCaption.copyWith(
+            color: context.colors.orange6,
+          ),
+        ),
       ),
     );
   }

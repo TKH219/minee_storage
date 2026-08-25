@@ -212,6 +212,8 @@ abstract class  LocaleKeys {
   static const products_scanMissBody = 'products.scanMissBody';
   static const products_createProduct = 'products.createProduct';
   static const products_openProduct = 'products.openProduct';
+  static const products_applyCount = 'products.applyCount';
+  static const products_applyNone = 'products.applyNone';
   static const products = 'products';
   static const sales_title = 'sales.title';
   static const sales_emptyTitle = 'sales.emptyTitle';

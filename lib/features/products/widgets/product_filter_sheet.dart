@@ -1,13 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mine_storage/app/extensions/date_time_extensions.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
+import 'package:mine_storage/features/products/states/active_store_state.dart';
+import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/app_filter_chip.dart';
 
-class ProductFilterSheet extends StatefulWidget {
+class ProductFilterSheet extends ConsumerStatefulWidget {
   const ProductFilterSheet({
     super.key,
     required this.current,
@@ -30,10 +35,48 @@ class ProductFilterSheet extends StatefulWidget {
   }
 
   @override
-  State<ProductFilterSheet> createState() => _ProductFilterSheetState();
+  ConsumerState<ProductFilterSheet> createState() => _ProductFilterSheetState();
 }
 
-class _ProductFilterSheetState extends State<ProductFilterSheet> {
+class _ProductFilterSheetState extends ConsumerState<ProductFilterSheet> {
+  Timer? _countDebounce;
+  int? _matchCount;
+  bool _counting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _recount());
+  }
+
+  @override
+  void dispose() {
+    _countDebounce?.cancel();
+    super.dispose();
+  }
+
+  /// The apply button says what applying would do, so the sheet is not a guess
+  /// followed by an empty list. Debounced because every tap re-queries.
+  void _recount() {
+    _countDebounce?.cancel();
+    _countDebounce = Timer(const Duration(milliseconds: 250), () async {
+      final storeId = ref.read(activeStoreProvider);
+      if (storeId == null) return;
+      if (mounted) setState(() => _counting = true);
+      try {
+        final page = await ref.read(productRepositoryProvider).getProducts(
+          storeId: storeId,
+          filter: _draft,
+          page: 1,
+          limit: 200,
+        );
+        if (mounted) setState(() { _matchCount = page.items.length; _counting = false; });
+      } on Object {
+        if (mounted) setState(() { _matchCount = null; _counting = false; });
+      }
+    });
+  }
+
   late ProductFilter _draft = widget.current;
 
   Future<void> _pickRange({required bool created}) async {
@@ -48,6 +91,7 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
           ? _draft.copyWith(createdFrom: range.start, createdTo: range.end)
           : _draft.copyWith(expiryFrom: range.start, expiryTo: range.end);
     });
+    _recount();
   }
 
   @override
@@ -72,9 +116,12 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
               onTap: () => _pickRange(created: true),
               onClear: _draft.createdFrom == null
                   ? null
-                  : () => setState(
-                      () => _draft = _draft.copyWith(clearCreatedRange: true),
-                    ),
+                  : () {
+                      setState(
+                        () => _draft = _draft.copyWith(clearCreatedRange: true),
+                      );
+                      _recount();
+                    },
             ),
             _RangeTile(
               label: LocaleKeys.products_expiresBetween.tr(),
@@ -84,9 +131,12 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
               onTap: () => _pickRange(created: false),
               onClear: _draft.expiryFrom == null
                   ? null
-                  : () => setState(
-                      () => _draft = _draft.copyWith(clearExpiryRange: true),
-                    ),
+                  : () {
+                      setState(
+                        () => _draft = _draft.copyWith(clearExpiryRange: true),
+                      );
+                      _recount();
+                    },
             ),
             if (widget.categories.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -102,11 +152,14 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
                     AppFilterChip(
                       label: category,
                       selected: _draft.category == category,
-                      onTap: () => setState(() {
-                        _draft = _draft.category == category
-                            ? _draft.copyWith(clearCategory: true)
-                            : _draft.copyWith(category: category);
-                      }),
+                      onTap: () {
+                        setState(() {
+                          _draft = _draft.category == category
+                              ? _draft.copyWith(clearCategory: true)
+                              : _draft.copyWith(category: category);
+                        });
+                        _recount();
+                      },
                     ),
                 ],
               ),
@@ -116,6 +169,7 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
               children: [
                 Expanded(
                   child: TextButton(
+                    key: const Key('filter-clear-button'),
                     onPressed: () => Navigator.of(context).pop(
                       ProductFilter(
                         query: _draft.query,
@@ -128,8 +182,20 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(_draft),
-                    child: Text(LocaleKeys.products_apply.tr()),
+                    key: const Key('filter-apply-button'),
+                    onPressed: _matchCount == 0
+                        ? null
+                        : () => Navigator.of(context).pop(_draft),
+                    child: Text(
+                      switch ((_counting, _matchCount)) {
+                        (true, _) => LocaleKeys.products_apply.tr(),
+                        (_, null) => LocaleKeys.products_apply.tr(),
+                        (_, 0) => LocaleKeys.products_applyNone.tr(),
+                        (_, final n) => LocaleKeys.products_applyCount.tr(
+                          namedArgs: {'count': '$n'},
+                        ),
+                      },
+                    ),
                   ),
                 ),
               ],
