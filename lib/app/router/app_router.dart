@@ -10,6 +10,7 @@ import 'package:mine_storage/features/dashboard/pages/dashboard_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/features/onboarding/create_store/pages/create_store_page.dart';
 import 'package:mine_storage/features/onboarding/profile/pages/profile_page.dart';
+import 'package:mine_storage/features/products/form/pages/product_form_page.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
@@ -70,6 +71,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.settings,
         name: AppRoutes.settingsName,
         builder: (context, state) => const SettingsPage(),
+      ),
+      // Ahead of the shell so the form covers the nav bar, and `new` before
+      // any `/products/:id` route so it is not read as an id.
+      GoRoute(
+        path: AppRoutes.productNew,
+        name: AppRoutes.productNewName,
+        builder: (context, state) => ProductFormPage(
+          initialBarcode: state.uri.queryParameters['barcode'],
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.productEdit,
+        name: AppRoutes.productEditName,
+        builder: (context, state) =>
+            ProductFormPage(productId: state.pathParameters['id']),
       ),
       GoRoute(
         path: AppRoutes.home,

@@ -23,9 +23,12 @@ class StorageDataSourceImpl implements StorageDataSource {
     required String path,
     required Uint8List bytes,
     required String contentType,
+    String? bucket,
   }) async {
+    final target = bucket ?? this.bucket;
+
     await _dio.post<dynamic>(
-      '/storage/v1/object/$bucket/$path',
+      '/storage/v1/object/$target/$path',
       data: Stream<List<int>>.fromIterable([bytes]),
       options: Options(
         headers: {
@@ -41,6 +44,6 @@ class StorageDataSourceImpl implements StorageDataSource {
     // API_URL is configured with a trailing slash, and this URL is stored on
     // the row — a doubled slash would be persisted, not just requested.
     final base = _dio.options.baseUrl.replaceAll(RegExp(r'/+$'), '');
-    return '$base/storage/v1/object/public/$bucket/$path';
+    return '$base/storage/v1/object/public/$target/$path';
   }
 }

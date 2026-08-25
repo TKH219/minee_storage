@@ -7,6 +7,8 @@ import 'package:mine_storage/domain/repositories/media_repository.dart';
 class MediaRepositoryImpl implements MediaRepository {
   MediaRepositoryImpl(this._dataSource);
 
+  static const String productBucket = 'product-images';
+
   static const Map<String, String> _contentTypes = {
     'jpg': 'image/jpeg',
     'jpeg': 'image/jpeg',
@@ -28,9 +30,20 @@ class MediaRepositoryImpl implements MediaRepository {
     required String fileExtension,
   }) => _upload('stores', bytes, fileExtension);
 
+  @override
+  Future<String> uploadProductPhoto({
+    required Uint8List bytes,
+    required String fileExtension,
+  }) => _upload('products', bytes, fileExtension, bucket: productBucket);
+
   /// The uid is the *second* path segment because that is the segment the
   /// storage policy compares against `auth.uid()`.
-  Future<String> _upload(String prefix, Uint8List bytes, String fileExtension) {
+  Future<String> _upload(
+    String prefix,
+    Uint8List bytes,
+    String fileExtension, {
+    String? bucket,
+  }) {
     final extension = fileExtension.toLowerCase().replaceFirst('.', '');
     final contentType = _contentTypes[extension];
     if (contentType == null) {
@@ -50,6 +63,7 @@ class MediaRepositoryImpl implements MediaRepository {
         path: '$prefix/$ownerId/$stamp.$extension',
         bytes: bytes,
         contentType: contentType,
+        bucket: bucket,
       );
     });
   }

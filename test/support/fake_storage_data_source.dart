@@ -16,6 +16,7 @@ class FakeStorageDataSource implements StorageDataSource {
   final List<String> calls = [];
   String? lastPath;
   String? lastContentType;
+  String? lastBucket;
 
   @override
   String? get currentUserId => currentId;
@@ -25,11 +26,13 @@ class FakeStorageDataSource implements StorageDataSource {
     required String path,
     required Uint8List bytes,
     required String contentType,
+    String? bucket,
   }) async {
     calls.add('upload:$path');
     if (error != null) throw error!;
     lastPath = path;
     lastContentType = contentType;
+    lastBucket = bucket;
     return returnedUrl;
   }
 }

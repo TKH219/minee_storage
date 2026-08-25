@@ -38,6 +38,31 @@ void main() {
     expect(source.lastContentType, 'image/png');
   });
 
+  test('a product photo lands under products/<uid>/ in its own bucket', () async {
+    final source = FakeStorageDataSource();
+
+    await MediaRepositoryImpl(source).uploadProductPhoto(
+      bytes: Uint8List(3),
+      fileExtension: 'png',
+    );
+
+    expect(source.lastPath, startsWith('products/uid-1/'));
+    expect(source.lastContentType, 'image/png');
+    // Avatars and product images are separate buckets with separate policies.
+    expect(source.lastBucket, 'product-images');
+  });
+
+  test('avatars and logos stay in the default bucket', () async {
+    final source = FakeStorageDataSource();
+
+    await MediaRepositoryImpl(source).uploadUserAvatar(
+      bytes: Uint8List(3),
+      fileExtension: 'png',
+    );
+
+    expect(source.lastBucket, isNull);
+  });
+
   test('the uid is the second path segment, which is what storage RLS checks', () async {
     final source = FakeStorageDataSource(currentId: 'abc-123');
 

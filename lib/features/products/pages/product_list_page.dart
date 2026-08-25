@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/products/states/product_list_state.dart';
@@ -80,6 +82,19 @@ class _ProductListPageState
       ..loadCategories();
   }
 
+  Future<void> _createProduct() async {
+    final created = await context.pushNamed<String>(AppRoutes.productNewName);
+    if (created != null && mounted) await notifier.refresh();
+  }
+
+  Future<void> _editProduct(String id) async {
+    final changed = await context.pushNamed<String>(
+      AppRoutes.productEditName,
+      pathParameters: {'id': id},
+    );
+    if (changed != null && mounted) await notifier.refresh();
+  }
+
   Future<void> _openFilters() async {
     final result = await ProductFilterSheet.show(
       context,
@@ -94,6 +109,12 @@ class _ProductListPageState
     return Scaffold(
       backgroundColor: context.colors.neutral1,
       appBar: AppBar(title: Text(LocaleKeys.products_title.tr())),
+      floatingActionButton: FloatingActionButton.extended(
+        key: const Key('product-add-fab'),
+        onPressed: _createProduct,
+        icon: const Icon(Icons.add_rounded),
+        label: Text(LocaleKeys.products_addTitle.tr()),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -194,7 +215,12 @@ class _ProductListPageState
         itemCount: currentState.products.length + (currentState.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= currentState.products.length) return const SkeletonRow();
-          return ProductRow(product: currentState.products[index], today: today);
+          final product = currentState.products[index];
+          return ProductRow(
+            product: product,
+            today: today,
+            onTap: () => _editProduct(product.id),
+          );
         },
       ),
     );
