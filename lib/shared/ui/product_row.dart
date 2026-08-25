@@ -103,11 +103,13 @@ class ProductRow extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      ExpiryBadge(
-                        status: product.statusOn(today),
-                        expiry: product.nearestExpiry,
-                        today: today,
-                        archived: product.archived,
+                      Flexible(
+                        child: ExpiryBadge(
+                          status: product.statusOn(today),
+                          expiry: product.nearestExpiry,
+                          today: today,
+                          archived: product.archived,
+                        ),
                       ),
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mine_storage/app/clock.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
@@ -13,7 +14,6 @@ import 'package:mine_storage/features/settings/states/settings_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/app_snack.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
-import 'package:mine_storage/shared/ui/expiry_badge.dart';
 import 'package:mine_storage/shared/ui/loaders/loaders.dart';
 import 'package:mine_storage/shared/ui/lot_card.dart';
 import 'package:mine_storage/shared/ui/quantity_format.dart';
@@ -129,7 +129,7 @@ class _ProductDetailPageState
 
   Widget _buildLoaded(BuildContext context, ProductEntity product) {
     final colors = context.colors;
-    final today = DateTime.now();
+    final today = ref.watch(nowProvider)();
     final lots = currentState.orderedBatches;
     final nextOut = currentState.nextOut;
 
@@ -248,6 +248,8 @@ class _ProductDetailPageState
 
 /// The three derived figures. None is stored; each is computed from the batches
 /// held in the store being viewed.
+final _shortDate = DateFormat('d MMM y');
+
 class _Header extends ConsumerWidget {
   const _Header({required this.product, required this.today});
 
@@ -271,27 +273,17 @@ class _Header extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.products_nearestExpiry.tr(),
-                  style: context.textStyles.sansCaption.copyWith(
-                    color: context.colors.neutral6,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // A depleted product reads "—": there is no expiry to speak of
-                // when nothing is left to expire.
-                product.hasStock
-                    ? ExpiryBadge(
-                        status: product.statusOn(today),
-                        expiry: product.nearestExpiry,
-                        today: today,
-                        archived: product.archived,
-                      )
-                    : Text('—', style: context.textStyles.monoBody),
-              ],
+            child: _Figure(
+              label: LocaleKeys.products_nearestExpiry.tr(),
+              // The design shows this as a figure, not a pill — the pill is the
+              // list row's job. A depleted product reads "—", and one whose
+              // lots carry no date reads "Not tracked".
+              value: switch (product) {
+                final p when !p.hasStock => '—',
+                final p when p.nearestExpiry == null =>
+                  LocaleKeys.stock_notTracked.tr(),
+                final p => _shortDate.format(p.nearestExpiry!),
+              },
             ),
           ),
           Expanded(

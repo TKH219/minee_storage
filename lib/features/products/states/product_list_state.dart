@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mine_storage/app/clock.dart';
 import 'package:mine_storage/core/base/base_state.dart';
 import 'package:mine_storage/core/constants.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
@@ -200,7 +201,7 @@ class ProductListStateNotifier extends BaseStateNotifier<ProductListState> {
   }
 
   int _countExpiringSoon(List<ProductEntity> products) {
-    final now = DateTime.now();
+    final now = ref.read(nowProvider)();
     return products.where((product) => product.statusOn(now).isExpiringSoon).length;
   }
 }
