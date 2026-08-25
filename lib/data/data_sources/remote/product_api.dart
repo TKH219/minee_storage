@@ -29,6 +29,9 @@ abstract class ProductApi {
     @Query('storeId') required String storeId,
   });
 
+  @GET('/products/{id}/holdings')
+  Future<BaseResponse<List<StoreHoldingModel>>> getHoldings(@Path('id') String id);
+
   @GET('/products/categories')
   Future<BaseResponse<List<String>>> getCategories();
 

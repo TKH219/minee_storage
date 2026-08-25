@@ -51,6 +51,12 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
+  Future<List<StoreHolding>> getHoldings(String productId) async {
+    final response = await productApi.getHoldings(productId);
+    return (response.data ?? const []).map((row) => row.toEntity()).toList();
+  }
+
+  @override
   Future<ProductEntity> createProduct(
     ProductDraft draft, {
     required String storeId,

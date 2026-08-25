@@ -186,6 +186,33 @@ class FakeProductRepository implements ProductRepository {
     return index == -1 ? null : _scopedTo(storeId, _products[index]);
   }
 
+  /// The seed files everything into [seedStoreId], so a product holds stock in
+  /// exactly one store unless a test adds a batch elsewhere.
+  @override
+  Future<List<StoreHolding>> getHoldings(String productId) async {
+    await Future<void>.delayed(latency);
+    final product = _require(productId);
+    final byStore = <String, List<ProductBatchEntity>>{};
+    for (final batch in product.batches.where((b) => !b.archived && b.hasStock)) {
+      byStore.putIfAbsent(batch.storeId, () => []).add(batch);
+    }
+
+    return byStore.entries.map((entry) {
+      final batches = [...entry.value]
+        ..sort((a, b) => b.purchasedAt.compareTo(a.purchasedAt));
+      return StoreHolding(
+        storeId: entry.key,
+        storeName: entry.key,
+        remaining: batches.fold(
+          Decimal.zero,
+          (sum, batch) => sum + batch.remainingQuantity,
+        ),
+        latestUnitPrice: batches.first.unitPrice,
+      );
+    }).toList()
+      ..sort((a, b) => a.storeName.compareTo(b.storeName));
+  }
+
   @override
   Future<List<String>> getCategories() async {
     await Future<void>.delayed(latency);

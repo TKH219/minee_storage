@@ -6,6 +6,7 @@ export 'response/post/post_model.dart';
 export 'response/product/paged_products_model.dart';
 export 'response/product/product_batch_model.dart';
 export 'response/product/product_model.dart';
+export 'response/product/store_holding_model.dart';
 export 'request/store/create_store_request.dart';
 export 'response/store/currency_model.dart';
 export 'response/store/store_category_model.dart';
