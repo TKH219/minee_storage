@@ -185,6 +185,10 @@ class _FakeProductApi implements ProductApi {
   Future<BaseResponse<List<String>>> getCategories() => throw UnimplementedError();
 
   @override
+  Future<BaseResponse<List<StoreHoldingModel>>> getHoldings(String id) =>
+      throw UnimplementedError();
+
+  @override
   Future<BaseResponse<ProductModel>> createProduct(ProductRequest body) =>
       throw UnimplementedError();
 

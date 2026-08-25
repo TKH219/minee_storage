@@ -18,6 +18,10 @@ abstract class ProductRepository {
   /// Distinct values the caller has already used, for the form's autocomplete.
   Future<List<String>> getCategories();
 
+  /// Every store of the caller's that still holds stock of this product. The
+  /// only cross-store read — everything else is scoped to one store.
+  Future<List<StoreHolding>> getHoldings(String productId);
+
   Future<ProductEntity> createProduct(ProductDraft draft, {required String storeId});
 
   Future<ProductEntity> updateProduct(

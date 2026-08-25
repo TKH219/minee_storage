@@ -49,6 +49,9 @@ Deno.serve(async (request: Request) => {
     if (after.length === 2 && after[1] === 'consumptions' && method === 'POST') {
       return await consume(supabase, id, request);
     }
+    if (after.length === 2 && after[1] === 'holdings' && method === 'GET') {
+      return await holdings(supabase, id);
+    }
 
     return fail('NOT_FOUND', 'No such route.', 404);
   } catch (error) {
@@ -237,6 +240,17 @@ async function consume(supabase: SupabaseClient, productId: string, request: Req
     p_product_id: productId,
     p_store_id: storeId,
     p_allocations: body.allocations,
+  });
+  if (error) throw error;
+  return ok(data);
+}
+
+/// What the same product holds in the caller's other shops. Deliberately a
+/// separate call: every other route is scoped to one store, and folding
+/// cross-store totals into them would make that scoping ambiguous.
+async function holdings(supabase: SupabaseClient, productId: string) {
+  const { data, error } = await supabase.rpc('product_store_holdings', {
+    p_product_id: productId,
   });
   if (error) throw error;
   return ok(data);
