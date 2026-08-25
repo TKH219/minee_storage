@@ -37,6 +37,9 @@ class AppRoutes {
   static const String productNew = '/products/new';
   static const String productNewName = 'productNew';
 
+  static const String productScan = '/products/scan';
+  static const String productScanName = 'productScan';
+
   static const String productEdit = '/products/:id/edit';
   static const String productEditName = 'productEdit';
 

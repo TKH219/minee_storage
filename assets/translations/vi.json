@@ -208,7 +208,20 @@
     "archiveDialogTitle": "Lưu trữ {name}?",
     "archiveDialogBody": "Còn {qty} trong kho. Sản phẩm rời danh sách nhưng giữ mọi lô và giá vốn.",
     "undo": "Hoàn tác",
-    "archivedSnack": "Đã lưu trữ sản phẩm"
+    "archivedSnack": "Đã lưu trữ sản phẩm",
+    "scanTitle": "Quét mã vạch",
+    "scanHint": "Hướng máy ảnh vào mã vạch.",
+    "enterManually": "Nhập mã vạch thủ công",
+    "manualBarcode": "Mã vạch",
+    "cameraDenied": "Mine Storage không dùng được máy ảnh. Hãy bật trong Cài đặt để quét mã — bạn vẫn có thể nhập tay.",
+    "openSettings": "Mở Cài đặt",
+    "simulateScan": "Giả lập quét",
+    "scanHitTitle": "Đã có trong danh mục",
+    "scanHitBody": "{name} đang dùng mã vạch này. Thêm lô để nhập thêm hàng.",
+    "scanMissTitle": "Sản phẩm mới",
+    "scanMissBody": "Chưa có sản phẩm nào dùng mã này. Tạo mới với mã đã điền sẵn.",
+    "createProduct": "Tạo sản phẩm",
+    "openProduct": "Mở sản phẩm"
   },
   "sales": {
     "title": "Bán hàng",
