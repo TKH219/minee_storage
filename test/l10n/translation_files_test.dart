@@ -32,9 +32,28 @@ void main() {
   });
 
   test('no translation value is left empty', () {
+    // Inspects the parsed values rather than searching the raw text for `""`:
+    // a legitimate value carrying a quoted word — `No matches for "milk"` —
+    // contains that sequence once escaped, and blank-but-not-empty values slip
+    // past a substring check entirely.
     for (final locale in ['en', 'vi']) {
       final raw = File('assets/translations/$locale.json').readAsStringSync();
-      expect(raw.contains('""'), isFalse, reason: '$locale.json has an empty value');
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+
+      final blank = <String>[];
+      void walk(Map<String, dynamic> node, String path) {
+        node.forEach((key, value) {
+          final here = path.isEmpty ? key : '$path.$key';
+          if (value is Map<String, dynamic>) {
+            walk(value, here);
+          } else if (value is String && value.trim().isEmpty) {
+            blank.add(here);
+          }
+        });
+      }
+
+      walk(decoded, '');
+      expect(blank, isEmpty, reason: '$locale.json leaves these empty: $blank');
     }
   });
 }

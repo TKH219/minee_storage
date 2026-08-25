@@ -140,7 +140,7 @@
     "clearAll": "Xoá tất cả",
     "apply": "Áp dụng",
     "noActiveStore": "Hãy chọn một cửa hàng trước khi thêm hàng.",
-    "expiringSoonCount": "{count} sắp hết hạn",
+    "expiringSoonCount": "{count} sản phẩm hết hạn trong 30 ngày",
     "barcodeTaken": "Một sản phẩm khác đã dùng mã vạch này.",
     "newTitle": "Sản phẩm mới",
     "editTitle": "Sửa sản phẩm",
@@ -223,7 +223,16 @@
     "createProduct": "Tạo sản phẩm",
     "openProduct": "Mở sản phẩm",
     "applyCount": "Hiện {count}",
-    "applyNone": "Không có kết quả"
+    "applyNone": "Không có kết quả",
+    "emptyExpiredTitle": "Chưa có gì hết hạn",
+    "emptyExpiredSubtitle": "Mọi lô bạn đang giữ vẫn còn hạn. Hãy kiểm tra lại sau lần nhập tới.",
+    "emptyExpiringTitle": "Không có gì sắp hết hạn",
+    "emptyExpiringSubtitle": "Không lô nào đến hạn trong 30 ngày tới.",
+    "emptyArchivedTitle": "Chưa lưu trữ gì",
+    "emptyArchivedSubtitle": "Sản phẩm bạn lưu trữ vẫn giữ lô và lịch sử giá, và hiện ở đây.",
+    "emptySearchTitle": "Không có kết quả cho \"{query}\"",
+    "emptySearchSubtitle": "Tìm kiếm chỉ theo tên. Mã vạch được đối chiếu bằng cách quét.",
+    "matchesFor": "{count} kết quả cho \"{query}\""
   },
   "sales": {
     "title": "Bán hàng",

@@ -140,7 +140,7 @@
     "clearAll": "Clear all",
     "apply": "Apply",
     "noActiveStore": "Choose a shop before adding stock.",
-    "expiringSoonCount": "{count} expiring soon",
+    "expiringSoonCount": "{count} products expiring within 30 days",
     "barcodeTaken": "Another product already uses this barcode.",
     "newTitle": "New product",
     "editTitle": "Edit product",
@@ -223,7 +223,16 @@
     "createProduct": "Create product",
     "openProduct": "Open product",
     "applyCount": "Show {count}",
-    "applyNone": "No matches"
+    "applyNone": "No matches",
+    "emptyExpiredTitle": "Nothing has expired",
+    "emptyExpiredSubtitle": "Every lot you're holding is still within date. Check back after your next delivery.",
+    "emptyExpiringTitle": "Nothing expiring soon",
+    "emptyExpiringSubtitle": "No lot comes due in the next 30 days.",
+    "emptyArchivedTitle": "Nothing archived",
+    "emptyArchivedSubtitle": "Products you archive keep their lots and cost history, and show up here.",
+    "emptySearchTitle": "No matches for \"{query}\"",
+    "emptySearchSubtitle": "Search covers names only. Barcodes are matched by scanning.",
+    "matchesFor": "{count} matches for \"{query}\""
   },
   "sales": {
     "title": "Sales",
