@@ -10,6 +10,7 @@ import 'package:mine_storage/features/dashboard/pages/dashboard_page.dart';
 import 'package:mine_storage/features/home/pages/home_page.dart';
 import 'package:mine_storage/features/onboarding/create_store/pages/create_store_page.dart';
 import 'package:mine_storage/features/onboarding/profile/pages/profile_page.dart';
+import 'package:mine_storage/features/products/detail/pages/product_detail_page.dart';
 import 'package:mine_storage/features/products/form/pages/product_form_page.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
@@ -86,6 +87,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: AppRoutes.productEditName,
         builder: (context, state) =>
             ProductFormPage(productId: state.pathParameters['id']),
+      ),
+      // Last of the /products/* group: `:id` would otherwise swallow `new`.
+      GoRoute(
+        path: AppRoutes.productDetail,
+        name: AppRoutes.productDetailName,
+        builder: (context, state) =>
+            ProductDetailPage(productId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: AppRoutes.home,
