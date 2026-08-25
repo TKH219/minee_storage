@@ -214,6 +214,15 @@ abstract class  LocaleKeys {
   static const products_openProduct = 'products.openProduct';
   static const products_applyCount = 'products.applyCount';
   static const products_applyNone = 'products.applyNone';
+  static const products_emptyExpiredTitle = 'products.emptyExpiredTitle';
+  static const products_emptyExpiredSubtitle = 'products.emptyExpiredSubtitle';
+  static const products_emptyExpiringTitle = 'products.emptyExpiringTitle';
+  static const products_emptyExpiringSubtitle = 'products.emptyExpiringSubtitle';
+  static const products_emptyArchivedTitle = 'products.emptyArchivedTitle';
+  static const products_emptyArchivedSubtitle = 'products.emptyArchivedSubtitle';
+  static const products_emptySearchTitle = 'products.emptySearchTitle';
+  static const products_emptySearchSubtitle = 'products.emptySearchSubtitle';
+  static const products_matchesFor = 'products.matchesFor';
   static const products = 'products';
   static const sales_title = 'sales.title';
   static const sales_emptyTitle = 'sales.emptyTitle';

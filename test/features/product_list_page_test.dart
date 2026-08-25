@@ -119,6 +119,34 @@ void main() {
     expect(repository.callCount, before + 1);
     expect(repository.lastFilter?.query, 'oli');
   });
+
+  testWidgets('an empty Expired list reads as good news, not as nothing here', (tester) async {
+    await pump(tester, _EmptyRepository());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(AppFilterChip, 'Expired'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nothing has expired'), findsOneWidget);
+  });
+
+  testWidgets('an empty Archived list explains what would land there', (tester) async {
+    await pump(tester, _EmptyRepository());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(AppFilterChip, 'Archived'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nothing archived'), findsOneWidget);
+  });
+
+  testWidgets('an empty catalogue still offers the retry the others do not', (tester) async {
+    await pump(tester, _EmptyRepository());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your shelves are empty'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+  });
 }
 
 class _EmptyRepository extends FakeProductRepository {

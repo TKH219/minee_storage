@@ -194,6 +194,27 @@ class _ProductListPageState
   /// regardless of which chip is selected, so putting it inside the chip would
   /// read as that chip's own count.
   Widget _buildExpiringSoonCount(BuildContext context) {
+    final query = currentState.filter.query.trim();
+    if (query.isNotEmpty && currentState.products.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            LocaleKeys.products_matchesFor.tr(
+              namedArgs: {
+                'count': '${currentState.products.length}',
+                'query': query,
+              },
+            ),
+            style: context.textStyles.sansCaption.copyWith(
+              color: context.colors.neutral6,
+            ),
+          ),
+        ),
+      );
+    }
+
     if (currentState.expiringSoonCount == 0) return const SizedBox.shrink();
 
     return Padding(
@@ -213,6 +234,45 @@ class _ProductListPageState
     );
   }
 
+  /// Empty means something different per chip, and a generic "nothing here"
+  /// hides that difference. An empty Expired list is good news; an empty
+  /// catalogue is a prompt to add something.
+  Widget _buildEmpty(BuildContext context) {
+    final query = currentState.filter.query.trim();
+    if (query.isNotEmpty) {
+      return EmptyView(
+        icon: Icons.search_off_rounded,
+        title: LocaleKeys.products_emptySearchTitle.tr(namedArgs: {'query': query}),
+        subtitle: LocaleKeys.products_emptySearchSubtitle.tr(),
+      );
+    }
+
+    return switch (currentState.filter.quickFilter) {
+      ProductQuickFilter.expired => EmptyView(
+        icon: Icons.check_circle_outline_rounded,
+        title: LocaleKeys.products_emptyExpiredTitle.tr(),
+        subtitle: LocaleKeys.products_emptyExpiredSubtitle.tr(),
+      ),
+      ProductQuickFilter.expiringSoon => EmptyView(
+        icon: Icons.check_circle_outline_rounded,
+        title: LocaleKeys.products_emptyExpiringTitle.tr(),
+        subtitle: LocaleKeys.products_emptyExpiringSubtitle.tr(),
+      ),
+      ProductQuickFilter.archived => EmptyView(
+        icon: Icons.inventory_2_outlined,
+        title: LocaleKeys.products_emptyArchivedTitle.tr(),
+        subtitle: LocaleKeys.products_emptyArchivedSubtitle.tr(),
+      ),
+      ProductQuickFilter.all => EmptyView(
+        icon: Icons.inventory_2_outlined,
+        title: LocaleKeys.products_emptyTitle.tr(),
+        subtitle: LocaleKeys.products_emptySubtitle.tr(),
+        actionLabel: LocaleKeys.common_tryAgain.tr(),
+        onAction: notifier.loadInitial,
+      ),
+    };
+  }
+
   Widget _buildBody(BuildContext context) {
     if (currentState.isLoading && currentState.products.isEmpty) {
       return ListView.builder(
@@ -229,15 +289,7 @@ class _ProductListPageState
       );
     }
 
-    if (currentState.isEmpty) {
-      return EmptyView(
-        icon: Icons.inventory_2_outlined,
-        title: LocaleKeys.products_emptyTitle.tr(),
-        subtitle: LocaleKeys.products_emptySubtitle.tr(),
-        actionLabel: LocaleKeys.common_tryAgain.tr(),
-        onAction: notifier.loadInitial,
-      );
-    }
+    if (currentState.isEmpty) return _buildEmpty(context);
 
     final today = ref.watch(nowProvider)();
 
