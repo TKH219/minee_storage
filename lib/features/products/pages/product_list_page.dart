@@ -87,12 +87,13 @@ class _ProductListPageState
     if (created != null && mounted) await notifier.refresh();
   }
 
-  Future<void> _editProduct(String id) async {
-    final changed = await context.pushNamed<String>(
-      AppRoutes.productEditName,
+  Future<void> _openProduct(String id) async {
+    await context.pushNamed<void>(
+      AppRoutes.productDetailName,
       pathParameters: {'id': id},
     );
-    if (changed != null && mounted) await notifier.refresh();
+    // Detail can archive, receive or consume, so the list is always restated.
+    if (mounted) await notifier.refresh();
   }
 
   Future<void> _openFilters() async {
@@ -219,7 +220,7 @@ class _ProductListPageState
           return ProductRow(
             product: product,
             today: today,
-            onTap: () => _editProduct(product.id),
+            onTap: () => _openProduct(product.id),
           );
         },
       ),

@@ -40,6 +40,9 @@ class AppRoutes {
   static const String productEdit = '/products/:id/edit';
   static const String productEditName = 'productEdit';
 
+  static const String productDetail = '/products/:id';
+  static const String productDetailName = 'productDetail';
+
   static const String sales = '/sales';
   static const String salesName = 'sales';
 
