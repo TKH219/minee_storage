@@ -86,13 +86,17 @@ class ExpiryBadge extends StatelessWidget {
                   Icon(icon, size: 12, color: foreground),
                   const SizedBox(width: 5),
                 ],
-                Text(
-                  label,
-                  style: context.textStyles.sansCaption.copyWith(
-                    color: foreground,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.11,
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.sansCaption.copyWith(
+                      color: foreground,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.11,
+                    ),
                   ),
                 ),
               ],

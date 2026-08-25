@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:mine_storage/app/theme/theme.dart';
+import 'package:mine_storage/app/clock.dart';
 import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
@@ -205,7 +206,7 @@ class _ProductListPageState
       );
     }
 
-    final today = DateTime.now();
+    final today = ref.watch(nowProvider)();
 
     return RefreshIndicator(
       onRefresh: notifier.refresh,
