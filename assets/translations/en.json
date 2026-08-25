@@ -208,7 +208,20 @@
     "archiveDialogTitle": "Archive {name}?",
     "archiveDialogBody": "{qty} still in stock. It leaves your list but keeps every lot and its cost.",
     "undo": "Undo",
-    "archivedSnack": "Product archived"
+    "archivedSnack": "Product archived",
+    "scanTitle": "Scan a barcode",
+    "scanHint": "Point the camera at the barcode.",
+    "enterManually": "Enter barcode manually",
+    "manualBarcode": "Barcode",
+    "cameraDenied": "Mine Storage can't use your camera. Turn it on in Settings to scan barcodes — you can still type the barcode by hand.",
+    "openSettings": "Open Settings",
+    "simulateScan": "Simulate a scan",
+    "scanHitTitle": "Already in your catalogue",
+    "scanHitBody": "{name} carries this barcode. Add a lot to receive more of it.",
+    "scanMissTitle": "New to you",
+    "scanMissBody": "Nothing carries this barcode yet. Create it with the barcode already filled in.",
+    "createProduct": "Create product",
+    "openProduct": "Open product"
   },
   "sales": {
     "title": "Sales",

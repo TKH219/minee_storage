@@ -13,6 +13,7 @@ import 'package:mine_storage/features/onboarding/profile/pages/profile_page.dart
 import 'package:mine_storage/features/products/detail/pages/product_detail_page.dart';
 import 'package:mine_storage/features/products/form/pages/product_form_page.dart';
 import 'package:mine_storage/features/products/pages/product_list_page.dart';
+import 'package:mine_storage/features/products/scan/pages/scan_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
 import 'package:mine_storage/features/shell/pages/main_shell_page.dart';
@@ -81,6 +82,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ProductFormPage(
           initialBarcode: state.uri.queryParameters['barcode'],
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.productScan,
+        name: AppRoutes.productScanName,
+        builder: (context, state) => const ScanPage(),
       ),
       GoRoute(
         path: AppRoutes.productEdit,
