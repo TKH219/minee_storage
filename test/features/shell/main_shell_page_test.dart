@@ -5,6 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/app/router/app_router.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/features/shell/widgets/app_nav_bar.dart';
+import 'package:mine_storage/data/repositories/fake_product_repository.dart';
+import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +19,7 @@ import '../../support/localization_test_harness.dart';
 Widget shellApp({
   required String initialLocation,
   required SharedPreferences prefs,
+  ProductRepository? products,
 }) {
   final container = ProviderContainer(
     overrides: [
@@ -23,6 +28,7 @@ Widget shellApp({
         FakeStoreRepository(stores: [storeFixture()]),
       ),
       sharedPreferencesProvider.overrideWithValue(prefs),
+      if (products != null) productRepositoryProvider.overrideWithValue(products),
     ],
   );
   final router = container.read(routerProvider);
@@ -74,15 +80,79 @@ void main() {
     expect(find.byType(AppNavBar), findsNothing);
   });
 
-  testWidgets('the centre action shows a snack rather than navigating', (tester) async {
+  testWidgets('the centre action opens the add sheet without leaving the tab', (tester) async {
     await tester.pumpWidget(shellApp(initialLocation: '/reports', prefs: prefs));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('new-sale-circle')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
 
+    // The design's only route into adding stock. It cannot be a floating button
+    // on the list: the shell sets extendBody, which puts anything the list
+    // floats behind the nav bar.
+    expect(find.byKey(const Key('add-scan-tile')), findsOneWidget);
+    expect(find.byKey(const Key('add-manual-tile')), findsOneWidget);
     expect(find.text('Nothing to report yet'), findsOneWidget);
-    expect(find.byType(SnackBar), findsOneWidget);
   });
+
+  testWidgets('the list reloads after the add flow, so a new product is not hidden', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      OnboardingResolver.activeStoreKey: 'store-a',
+    });
+    final withStore = await SharedPreferences.getInstance();
+    final repository = _GrowingRepository();
+
+    await tester.pumpWidget(
+      shellApp(initialLocation: '/products', prefs: withStore, products: repository),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your shelves are empty'), findsOneWidget);
+
+    // Something else creates a product while the sheet is open — exactly what
+    // the real form does over the network.
+    repository.hasProduct = true;
+
+    await tester.tap(find.byKey(const Key('new-sale-circle')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('add-manual-tile')));
+    await tester.pumpAndSettle();
+
+    // Back out of the form the way the user does.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your shelves are empty'), findsNothing);
+    expect(find.text('Bench Oil'), findsOneWidget);
+  });
+}
+
+/// Empty until something creates a product, which is the state the list is left
+/// in while the add sheet and the form are on top of it.
+class _GrowingRepository extends FakeProductRepository {
+  _GrowingRepository() : super(latency: Duration.zero);
+
+  bool hasProduct = false;
+
+  @override
+  Future<PagedProducts> getProducts({
+    required String storeId,
+    required ProductFilter filter,
+    required int page,
+    int limit = 20,
+  }) async {
+    if (!hasProduct) return const PagedProducts(items: [], hasMore: false);
+    return PagedProducts(
+      items: [
+        ProductEntity(
+          id: 'new',
+          name: 'Bench Oil',
+          unit: ProductUnit.litre,
+          createdAt: DateTime(2026, 8, 25),
+          updatedAt: DateTime(2026, 8, 25),
+        ),
+      ],
+      hasMore: false,
+    );
+  }
 }

@@ -11,7 +11,6 @@ import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/products/states/product_list_state.dart';
-import 'package:mine_storage/features/products/widgets/add_product_sheet.dart';
 import 'package:mine_storage/features/products/widgets/product_filter_sheet.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/app_filter_chip.dart';
@@ -84,19 +83,6 @@ class _ProductListPageState
       ..loadCategories();
   }
 
-  Future<void> _addProduct() async {
-    final choice = await showAddProductSheet(context);
-    if (choice == null || !mounted) return;
-
-    switch (choice) {
-      case AddProductRoute.scan:
-        await context.pushNamed<void>(AppRoutes.productScanName);
-      case AddProductRoute.manual:
-        await context.pushNamed<String>(AppRoutes.productNewName);
-    }
-    if (mounted) await notifier.refresh();
-  }
-
   Future<void> _openProduct(String id) async {
     await context.pushNamed<void>(
       AppRoutes.productDetailName,
@@ -120,12 +106,6 @@ class _ProductListPageState
     return Scaffold(
       backgroundColor: context.colors.neutral1,
       appBar: AppBar(title: Text(LocaleKeys.products_title.tr())),
-      floatingActionButton: FloatingActionButton.extended(
-        key: const Key('product-add-fab'),
-        onPressed: _addProduct,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(LocaleKeys.products_addTitle.tr()),
-      ),
       body: SafeArea(
         child: Column(
           children: [
