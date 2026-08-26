@@ -122,7 +122,12 @@
   },
   "dashboard": {
     "emptyTitle": "Chưa có hàng",
-    "emptySubtitle": "Thêm sản phẩm đầu tiên, rồi ghi lại bạn đã mua gì và giá bao nhiêu. Số liệu bắt đầu chạy ngay khi bạn bán đơn đầu tiên."
+    "emptySubtitle": "Thêm sản phẩm đầu tiên, rồi ghi lại bạn đã mua gì và giá bao nhiêu. Số liệu bắt đầu chạy ngay khi bạn bán đơn đầu tiên.",
+    "today": "Hôm nay · {date}",
+    "addProduct": "Thêm sản phẩm",
+    "scanBarcode": "Quét mã vạch",
+    "settings": "Cài đặt",
+    "switchStore": "Đổi cửa hàng"
   },
   "products": {
     "title": "Sản phẩm",

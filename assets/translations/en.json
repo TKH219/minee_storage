@@ -122,7 +122,12 @@
   },
   "dashboard": {
     "emptyTitle": "No stock yet",
-    "emptySubtitle": "Add your first product, then record what you bought and what it cost. Your numbers start the moment you make a sale."
+    "emptySubtitle": "Add your first product, then record what you bought and what it cost. Your numbers start the moment you make a sale.",
+    "today": "Today · {date}",
+    "addProduct": "Add a product",
+    "scanBarcode": "Scan a barcode",
+    "settings": "Settings",
+    "switchStore": "Switch store"
   },
   "products": {
     "title": "Products",
