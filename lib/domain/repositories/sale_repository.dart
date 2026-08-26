@@ -31,4 +31,11 @@ abstract class SaleRepository {
     required String storeId,
     int limit = 5,
   });
+
+  /// Every figure the dashboard shows, derived from the sales actually
+  /// recorded — so an empty shop and a busy one fall out of the same data.
+  Future<SalesDashboardSummary> dashboardSummary({
+    required String storeId,
+    required DateTime today,
+  });
 }
