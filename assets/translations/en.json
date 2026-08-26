@@ -374,7 +374,12 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "language": "Language",
-    "currency": "Currency"
+    "currency": "Currency",
+    "account": "Account",
+    "myProfile": "My profile",
+    "changePassword": "Change password",
+    "allowProfileUpdates": "Allow profile updates",
+    "logOut": "Log out"
   },
   "onboarding": {
     "profile": {

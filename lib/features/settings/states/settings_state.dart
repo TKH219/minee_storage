@@ -59,3 +59,33 @@ class CurrencyNotifier extends Notifier<Currency> {
     }
   }
 }
+
+/// Whether this device may push profile edits. A local preference, on by
+/// default, and the only thing the account group's switch touches.
+final allowProfileUpdatesProvider =
+    NotifierProvider<AllowProfileUpdatesNotifier, bool>(
+      AllowProfileUpdatesNotifier.new,
+    );
+
+class AllowProfileUpdatesNotifier extends Notifier<bool> {
+  static const String storageKey = 'settings_allow_profile_updates';
+
+  @override
+  bool build() =>
+      ref.watch(sharedPreferencesProvider).getBool(storageKey) ?? true;
+
+  Future<void> set(bool value) async {
+    state = value;
+    try {
+      await ref.read(sharedPreferencesProvider).setBool(storageKey, value);
+    } on Exception catch (e) {
+      logger.e('Failed to persist the profile-updates preference', error: e);
+    }
+  }
+}
+
+/// The signed-in account, for the settings header. Read once rather than
+/// watched: it changes on sign-in, and this screen is opened after that.
+final currentUserProvider = FutureProvider<UserEntity?>(
+  (ref) => ref.watch(authRepositoryProvider).currentUser(),
+);
