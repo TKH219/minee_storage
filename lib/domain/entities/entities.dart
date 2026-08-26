@@ -1,6 +1,7 @@
 export 'post_entity.dart';
 export 'user_entity.dart';
 export 'expiry_status.dart';
+export 'attention_alert.dart';
 export 'audit_times.dart';
 export 'batch_allocation.dart';
 export 'paged_products.dart';
