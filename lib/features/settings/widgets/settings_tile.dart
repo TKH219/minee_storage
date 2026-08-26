@@ -10,14 +10,24 @@ class SettingsTile extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    required this.value,
     required this.onTap,
+    this.value,
+    this.trailing,
+    this.destructive = false,
   });
 
   final IconData icon;
   final String label;
-  final String value;
   final VoidCallback onTap;
+
+  /// The mono figure on the right. Absent on rows that only lead somewhere.
+  final String? value;
+
+  /// Replaces the value and the chevron — the switch row uses this.
+  final Widget? trailing;
+
+  /// The way out is drawn apart from everything else.
+  final bool destructive;
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +41,16 @@ class SettingsTile extends StatelessWidget {
           padding: SettingsMetrics.tilePadding,
           child: Row(
             children: [
-              Icon(icon, size: SettingsMetrics.iconSize, color: colors.neutral7),
+              Icon(
+                icon,
+                size: SettingsMetrics.iconSize,
+                color: destructive ? colors.red5 : colors.neutral7,
+              ),
               const SizedBox(width: SettingsMetrics.tileGap),
               Expanded(
                 child: Text(
                   label,
+                  key: Key('settings-label-$label'),
                   // The design's `.lbl { flex:1; min-width:0 }` — the label
                   // shrinks and clips rather than wrapping, which would
                   // otherwise push the row past its 56px height in Vietnamese.
@@ -43,24 +58,34 @@ class SettingsTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: context.textStyles.sansBody.copyWith(
                     fontSize: SettingsMetrics.labelSize,
+                    fontWeight: destructive ? FontWeight.w500 : null,
+                    color: destructive ? colors.red5 : null,
                   ),
                 ),
               ),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textStyles.monoBody.copyWith(
-                  fontSize: SettingsMetrics.valueSize,
-                  color: colors.neutral6,
-                ),
-              ),
-              const SizedBox(width: SettingsMetrics.tileGap),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: SettingsMetrics.chevronSize,
-                color: colors.neutral4,
-              ),
+              if (trailing != null)
+                trailing!
+              else ...[
+                if (value != null)
+                  Text(
+                    value!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.monoBody.copyWith(
+                      fontSize: SettingsMetrics.valueSize,
+                      color: colors.neutral6,
+                    ),
+                  ),
+                // The destructive row leads nowhere further — it acts here.
+                if (!destructive) ...[
+                  const SizedBox(width: SettingsMetrics.tileGap),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: SettingsMetrics.chevronSize,
+                    color: colors.neutral4,
+                  ),
+                ],
+              ],
             ],
           ),
         ),

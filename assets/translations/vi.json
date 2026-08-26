@@ -374,7 +374,12 @@
     "themeLight": "Sáng",
     "themeDark": "Tối",
     "language": "Ngôn ngữ",
-    "currency": "Tiền tệ"
+    "currency": "Tiền tệ",
+    "account": "Tài khoản",
+    "myProfile": "Hồ sơ của tôi",
+    "changePassword": "Đổi mật khẩu",
+    "allowProfileUpdates": "Cho phép cập nhật hồ sơ",
+    "logOut": "Đăng xuất"
   },
   "onboarding": {
     "profile": {

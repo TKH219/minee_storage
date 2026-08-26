@@ -5,6 +5,10 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/features/settings/pages/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/providers.dart';
+
+import '../../support/fake_auth_repository.dart';
 import '../../support/localization_test_harness.dart';
 
 void main() {
@@ -21,15 +25,29 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
+  /// The header names the signed-in account, so the golden needs one.
+  Widget settingsHost() => ProviderScope(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      authRepositoryProvider.overrideWithValue(
+        FakeAuthRepository(
+          user: const UserEntity(
+            id: 'uid-1',
+            email: 'maya@northsidegrocers.com',
+            fullName: 'Northside Grocers',
+          ),
+        ),
+      ),
+    ],
+    child: Theme(data: AppTheme.light(), child: const SettingsPage()),
+  );
+
   for (final (locale, tag) in [(enLocale, 'en'), (viLocale, 'vi')]) {
     testWidgets('settings golden · $tag', (tester) async {
       sizeToPhone(tester);
       await pumpLocalizedApp(
         tester,
-        ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-          child: Theme(data: AppTheme.light(), child: const SettingsPage()),
-        ),
+        settingsHost(),
         locale: locale,
       );
       await expectLater(

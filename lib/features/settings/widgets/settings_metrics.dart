@@ -14,4 +14,13 @@ abstract class SettingsMetrics {
   static const double sectionLabelSize = 13;
   static const double dividerThickness = 1;
   static const EdgeInsets sectionPadding = EdgeInsets.fromLTRB(16, 24, 16, 8);
+
+  /// The gap the design leaves above the log-out group.
+  static const double groupGap = 24;
+
+  /// The design's switch. Material 3 draws its own larger, so it is fitted
+  /// into this box — scaling alone would leave the row 68px tall, because a
+  /// Transform changes paint and not layout.
+  static const double switchWidth = 44;
+  static const double switchHeight = 26;
 }
