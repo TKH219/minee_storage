@@ -41,7 +41,7 @@ void main() {
     expect(json.containsKey('remainingQuantity'), isFalse);
   });
 
-  test('includes remaining quantity when the draft carries one', () {
+  test('carries no remaining quantity, however the draft was built', () {
     final json = BatchRequest.fromDraft(
       BatchDraft(
         storeId: 'store-a',
@@ -49,11 +49,10 @@ void main() {
         unitPrice: Decimal.parse('1.00'),
         expiryDate: DateTime.utc(2026, 9, 1),
         initialQuantity: Decimal.parse('5'),
-        remainingQuantity: Decimal.parse('3'),
       ),
     ).toJson();
 
-    expect(json['remainingQuantity'], '3');
+    expect(json.containsKey('remainingQuantity'), isFalse);
   });
 
   test('serialises allocations in the order given', () {

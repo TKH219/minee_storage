@@ -34,7 +34,6 @@ class BatchDraft extends Equatable {
     required this.unitPrice,
     required this.initialQuantity,
     this.expiryDate,
-    this.remainingQuantity,
     this.supplier,
     this.storageLocation,
     this.note,
@@ -48,10 +47,9 @@ class BatchDraft extends Equatable {
 
   /// Null for goods the shop does not date.
   final DateTime? expiryDate;
+  /// What the delivery brought in. Never a statement about what is left: the
+  /// remainder moves only through a stock transaction.
   final Decimal initialQuantity;
-
-  /// Null on create — the server seeds it from [initialQuantity].
-  final Decimal? remainingQuantity;
   final String? supplier;
   final String? storageLocation;
   final String? note;
@@ -63,7 +61,6 @@ class BatchDraft extends Equatable {
     unitPrice,
     expiryDate,
     initialQuantity,
-    remainingQuantity,
     supplier,
     storageLocation,
     note,

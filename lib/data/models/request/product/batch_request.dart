@@ -12,7 +12,6 @@ class BatchRequest {
     required this.unitPrice,
     required this.initialQuantity,
     this.expiryDate,
-    this.remainingQuantity,
     this.supplier,
     this.storageLocation,
     this.note,
@@ -24,7 +23,6 @@ class BatchRequest {
     unitPrice: draft.unitPrice.toString(),
     expiryDate: _dateOnly(draft.expiryDate),
     initialQuantity: draft.initialQuantity.toString(),
-    remainingQuantity: draft.remainingQuantity?.toString(),
     supplier: draft.supplier,
     storageLocation: draft.storageLocation,
     note: draft.note,
@@ -44,7 +42,6 @@ class BatchRequest {
   final String unitPrice;
   final String? expiryDate;
   final String initialQuantity;
-  final String? remainingQuantity;
   final String? supplier;
   final String? storageLocation;
   final String? note;
