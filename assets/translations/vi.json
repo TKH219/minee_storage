@@ -279,7 +279,21 @@
     "pickerEmptyTitle": "Chưa có sản phẩm",
     "pickerEmptyBody": "Hãy thêm sản phẩm trước khi ghi nhận đơn hàng.",
     "pickerNoMatches": "Không có kết quả cho \"{query}\"",
-    "pickerScan": "Quét mã vạch"
+    "pickerScan": "Quét mã vạch",
+    "allocQuantity": "Số lượng",
+    "allocSellPrice": "Giá bán mỗi đơn vị",
+    "allocComesFrom": "Lấy từ — hết hạn sớm nhất trước",
+    "allocEdit": "Sửa",
+    "allocAuto": "Quay lại tự động",
+    "allocLotExpiring": "Lô hết hạn {date}",
+    "allocLotNoExpiry": "Lô nhập {date}",
+    "allocCostEmpties": "giá vốn {cost}/đơn vị · dùng hết lô này",
+    "allocCostRemains": "giá vốn {cost}/đơn vị · còn lại {remaining}",
+    "allocLineTotal": "Thành tiền · {quantity} × {price}",
+    "allocAddToSale": "Thêm vào đơn",
+    "allocNotEnough": "Chỉ còn {available}.",
+    "allocPriceNeeded": "Hãy nhập giá bán để tiếp tục.",
+    "allocWholeUnits": "Sản phẩm này chỉ tính theo đơn vị nguyên."
   },
   "reports": {
     "title": "Báo cáo",

@@ -8,6 +8,8 @@ import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
 
+import '../widgets/allocation_sheet.dart';
+import '../widgets/product_picker_sheet.dart';
 import '../widgets/sale_buttons.dart';
 import '../widgets/sale_metrics.dart';
 
@@ -161,7 +163,17 @@ class _SaleCartPageState
     );
   }
 
-  void _chooseProduct() {}
+  /// Product, then quantity — never a lot. The split falls out of the
+  /// allocation sheet, which resolves it through the repository.
+  Future<void> _chooseProduct() async {
+    final product = await showProductPicker(context);
+    if (product == null || !mounted) return;
+
+    final line = await showAllocationSheet(context, product: product);
+    if (line == null || !mounted) return;
+
+    notifier.addLine(line);
+  }
 
   void _scanBarcode() {}
 }
