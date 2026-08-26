@@ -203,6 +203,18 @@ void main() {
       expect(first.id, isNot(second.id));
     });
 
+    test('the id is safe to carry in a route, the code is for display', () async {
+      final sale = await sales.confirm(await draftForOliveOil('1'), storeId: 'store-a');
+
+      expect(sale.id, 'sale-1042');
+      expect(sale.code, '#1042');
+      expect(
+        Uri.tryParse('/sales/${sale.id}/success')?.fragment,
+        isEmpty,
+        reason: 'a # in the id would start a URL fragment',
+      );
+    });
+
     test('the chosen payment method reaches the sale and moves no figure', () async {
       final draft = (await draftForOliveOil('2')).copyWith(
         paymentMethod: PaymentMethod.card,

@@ -5,7 +5,8 @@
     "nothingHereYet": "Nothing here yet",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "comingSoon": "Coming soon"
   },
   "shell": {
     "dashboard": "Dashboard",
@@ -341,7 +342,16 @@
     "payBankTransfer": "Bank transfer",
     "payCard": "Card",
     "payEWallet": "E-wallet",
-    "confirmPayment": "Confirm payment"
+    "confirmPayment": "Confirm payment",
+    "received": "{amount} received",
+    "saleCode": "{method} · sale",
+    "netProfit": "Net profit",
+    "stockDeducted": "Stock deducted",
+    "lotsCount": "{count} lots",
+    "oneLot": "1 lot",
+    "createInvoice": "Create invoice",
+    "newSale": "New sale",
+    "backToDashboard": "Back to dashboard"
   },
   "reports": {
     "title": "Reports",
