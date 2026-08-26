@@ -259,6 +259,16 @@ abstract class  LocaleKeys {
   static const sales_scanBarcode = 'sales.scanBarcode';
   static const sales_lineCount = 'sales.lineCount';
   static const sales_oneLine = 'sales.oneLine';
+  static const sales_pickerSearchHint = 'sales.pickerSearchHint';
+  static const sales_pickerRecentlySold = 'sales.pickerRecentlySold';
+  static const sales_pickerAllProducts = 'sales.pickerAllProducts';
+  static const sales_pickerOutOfStock = 'sales.pickerOutOfStock';
+  static const sales_pickerNoNegative = 'sales.pickerNoNegative';
+  static const sales_pickerLeft = 'sales.pickerLeft';
+  static const sales_pickerEmptyTitle = 'sales.pickerEmptyTitle';
+  static const sales_pickerEmptyBody = 'sales.pickerEmptyBody';
+  static const sales_pickerNoMatches = 'sales.pickerNoMatches';
+  static const sales_pickerScan = 'sales.pickerScan';
   static const sales = 'sales';
   static const reports_title = 'reports.title';
   static const reports_emptyTitle = 'reports.emptyTitle';

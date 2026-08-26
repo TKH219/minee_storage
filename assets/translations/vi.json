@@ -269,7 +269,17 @@
     "chooseFromProducts": "Chọn từ sản phẩm của bạn",
     "scanBarcode": "Quét mã vạch",
     "lineCount": "{count} dòng",
-    "oneLine": "1 dòng"
+    "oneLine": "1 dòng",
+    "pickerSearchHint": "Tìm sản phẩm của bạn",
+    "pickerRecentlySold": "Bán gần đây",
+    "pickerAllProducts": "Tất cả sản phẩm · {count}",
+    "pickerOutOfStock": "Hết hàng",
+    "pickerNoNegative": "Không thể thêm sản phẩm đã hết hàng — không có tồn kho âm.",
+    "pickerLeft": "còn {quantity}",
+    "pickerEmptyTitle": "Chưa có sản phẩm",
+    "pickerEmptyBody": "Hãy thêm sản phẩm trước khi ghi nhận đơn hàng.",
+    "pickerNoMatches": "Không có kết quả cho \"{query}\"",
+    "pickerScan": "Quét mã vạch"
   },
   "reports": {
     "title": "Báo cáo",

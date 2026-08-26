@@ -269,7 +269,17 @@
     "chooseFromProducts": "Choose from your products",
     "scanBarcode": "Scan a barcode",
     "lineCount": "{count} lines",
-    "oneLine": "1 line"
+    "oneLine": "1 line",
+    "pickerSearchHint": "Search your products",
+    "pickerRecentlySold": "Recently sold",
+    "pickerAllProducts": "All products · {count}",
+    "pickerOutOfStock": "Out of stock",
+    "pickerNoNegative": "Out-of-stock products can't be added — there is no negative stock.",
+    "pickerLeft": "{quantity} left",
+    "pickerEmptyTitle": "No products yet",
+    "pickerEmptyBody": "Add a product before you record a sale.",
+    "pickerNoMatches": "No matches for \"{query}\"",
+    "pickerScan": "Scan a barcode"
   },
   "reports": {
     "title": "Reports",
