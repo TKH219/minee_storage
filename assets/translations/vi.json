@@ -379,7 +379,13 @@
     "myProfile": "Hồ sơ của tôi",
     "changePassword": "Đổi mật khẩu",
     "allowProfileUpdates": "Cho phép cập nhật hồ sơ",
-    "logOut": "Đăng xuất"
+    "logOut": "Đăng xuất",
+    "currencyNotice": "Thao tác này chỉ đổi ký hiệu trên giá. Nó không quy đổi giá trị.",
+    "currencyUSD": "Đô la Mỹ",
+    "currencyEUR": "Euro",
+    "currencyGBP": "Bảng Anh",
+    "currencySGD": "Đô la Singapore",
+    "currencyVND": "Đồng Việt Nam"
   },
   "onboarding": {
     "profile": {
