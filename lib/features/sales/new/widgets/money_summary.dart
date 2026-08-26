@@ -28,6 +28,7 @@ class MoneyRow {
     this.style = MoneyRowStyle.plain,
     this.note,
     this.key,
+    this.onTap,
   });
 
   final String label;
@@ -38,6 +39,10 @@ class MoneyRow {
   final String? note;
 
   final Key? key;
+
+  /// Set when the row leads somewhere — the basket's fees line opens the
+  /// editor rather than being a dead figure.
+  final VoidCallback? onTap;
 }
 
 /// Measured from the design's `.money` block.
@@ -146,6 +151,10 @@ class MoneySummary extends StatelessWidget {
       ],
     );
 
+    final wrapped = row.onTap == null
+        ? content
+        : InkWell(onTap: row.onTap, child: content);
+
     return switch (row.style) {
       MoneyRowStyle.profit => Container(
         margin: const EdgeInsets.only(top: MoneySummaryMetrics.profitTopMargin),
@@ -154,7 +163,7 @@ class MoneySummary extends StatelessWidget {
           color: profitIsPositive ? colors.green0 : colors.red0,
           borderRadius: BorderRadius.circular(MoneySummaryMetrics.profitRadius),
         ),
-        child: content,
+        child: wrapped,
       ),
       MoneyRowStyle.total => Container(
         margin: const EdgeInsets.only(top: MoneySummaryMetrics.totalTopMargin),
@@ -170,7 +179,7 @@ class MoneySummary extends StatelessWidget {
             ),
           ),
         ),
-        child: content,
+        child: wrapped,
       ),
       MoneyRowStyle.subtotalRule => Container(
         margin: const EdgeInsets.only(top: MoneySummaryMetrics.subtotalTopMargin),
@@ -181,9 +190,9 @@ class MoneySummary extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: colors.neutral2)),
         ),
-        child: content,
+        child: wrapped,
       ),
-      _ => Padding(padding: MoneySummaryMetrics.rowPadding, child: content),
+      _ => Padding(padding: MoneySummaryMetrics.rowPadding, child: wrapped),
     };
   }
 }
