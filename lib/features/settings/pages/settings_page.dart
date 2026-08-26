@@ -8,11 +8,11 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
-import 'package:mine_storage/shared/ui/app_option_sheet.dart';
 import 'package:mine_storage/shared/ui/app_snack.dart';
 import 'package:mine_storage/shared/ui/coming_soon.dart';
 
 import '../states/settings_state.dart';
+import '../widgets/currency_picker_sheet.dart';
 import '../widgets/language_picker_sheet.dart';
 import '../widgets/settings_metrics.dart';
 import '../widgets/profile_header.dart';
@@ -171,17 +171,10 @@ class SettingsPage extends ConsumerWidget {
     }
     if (!context.mounted) return;
 
-    final picked = await showAppOptionSheet<Currency>(
-      context: context,
-      title: LocaleKeys.settings_currency.tr(),
-      options: [
-        for (final currency in currencies)
-          AppOption(value: currency, label: '${currency.code}  ${currency.symbol}'),
-      ],
-      selected: currencies.firstWhere(
-        (currency) => currency.code == selected.code,
-        orElse: () => selected,
-      ),
+    final picked = await showCurrencyPicker(
+      context,
+      currencies: currencies,
+      selected: selected,
     );
     if (picked == null) return;
     await ref.read(currencyProvider.notifier).setCurrency(picked);

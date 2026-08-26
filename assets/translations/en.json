@@ -379,7 +379,13 @@
     "myProfile": "My profile",
     "changePassword": "Change password",
     "allowProfileUpdates": "Allow profile updates",
-    "logOut": "Log out"
+    "logOut": "Log out",
+    "currencyNotice": "This changes the symbol on your prices. It does not convert them.",
+    "currencyUSD": "US dollar",
+    "currencyEUR": "Euro",
+    "currencyGBP": "Pound sterling",
+    "currencySGD": "Singapore dollar",
+    "currencyVND": "Vietnamese dong"
   },
   "onboarding": {
     "profile": {
