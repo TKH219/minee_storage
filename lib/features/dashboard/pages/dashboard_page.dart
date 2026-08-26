@@ -22,6 +22,7 @@ import '../widgets/dashboard_app_bar.dart';
 import '../widgets/dashboard_empty_view.dart';
 import '../widgets/dashboard_metrics.dart';
 import '../widgets/kpi_tile.dart';
+import '../widgets/store_switcher_sheet.dart';
 import '../widgets/sparkline.dart';
 
 /// S08 — the app's true home. It answers "how did today go?" before anything
@@ -262,7 +263,14 @@ class _DashboardPageState
     context.goNamed(AppRoutes.productsName);
   }
 
-  void _switchStore() {}
+  /// Switching re-scopes everything downstream, so both the dashboard and the
+  /// product list are dropped rather than left showing the previous shop.
+  Future<void> _switchStore() async {
+    await showStoreSwitcher(context);
+    if (!mounted) return;
+    ref.invalidate(productListStateProvider);
+    await notifier.load();
+  }
 }
 
 /// Matches the rest of the app: patterns carry no locale, so a date reads the

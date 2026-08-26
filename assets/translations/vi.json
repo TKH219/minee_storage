@@ -324,5 +324,15 @@
       "categoriesFailed": "Không tải được danh sách loại hình.",
       "retry": "Thử lại"
     }
+  },
+  "stores": {
+    "switchTitle": "Đổi cửa hàng",
+    "allStores": "Tất cả cửa hàng",
+    "aggregate": "tổng hợp",
+    "productCount": "{code} · {count} sản phẩm",
+    "roleOwner": "Chủ cửa hàng",
+    "roleManager": "Quản lý",
+    "roleStaff": "Nhân viên",
+    "mixedCurrency": "Tất cả cửa hàng gồm {codes}. Số liệu hiển thị theo từng loại tiền, không cộng gộp."
   }
 }

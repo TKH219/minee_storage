@@ -308,5 +308,14 @@ abstract class  LocaleKeys {
   static const onboarding_store_retry = 'onboarding.store.retry';
   static const onboarding_store = 'onboarding.store';
   static const onboarding = 'onboarding';
+  static const stores_switchTitle = 'stores.switchTitle';
+  static const stores_allStores = 'stores.allStores';
+  static const stores_aggregate = 'stores.aggregate';
+  static const stores_productCount = 'stores.productCount';
+  static const stores_roleOwner = 'stores.roleOwner';
+  static const stores_roleManager = 'stores.roleManager';
+  static const stores_roleStaff = 'stores.roleStaff';
+  static const stores_mixedCurrency = 'stores.mixedCurrency';
+  static const stores = 'stores';
 
 }

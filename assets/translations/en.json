@@ -324,5 +324,15 @@
       "categoriesFailed": "Categories could not be loaded.",
       "retry": "Try again"
     }
+  },
+  "stores": {
+    "switchTitle": "Switch store",
+    "allStores": "All stores",
+    "aggregate": "aggregate",
+    "productCount": "{code} · {count} products",
+    "roleOwner": "Owner",
+    "roleManager": "Manager",
+    "roleStaff": "Staff",
+    "mixedCurrency": "All stores mixes {codes}. Totals are shown per currency, never summed."
   }
 }
