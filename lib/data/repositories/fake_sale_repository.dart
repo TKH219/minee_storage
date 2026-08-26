@@ -99,10 +99,12 @@ class FakeSaleRepository implements SaleRepository {
       );
     }
 
-    final code = '#${_nextCode++}';
+    final number = _nextCode++;
     final sale = Sale(
-      id: 'sale-$code',
-      code: code,
+      // The id travels in a URL, so it carries no '#' — that is the display
+      // code's own decoration and would start a fragment.
+      id: 'sale-$number',
+      code: '#$number',
       storeId: storeId,
       paidAt: DateTime.now(),
       paymentMethod: draft.paymentMethod,
@@ -127,10 +129,12 @@ class FakeSaleRepository implements SaleRepository {
   /// figures a dashboard reads without seeding twenty lots to draw them from.
   @visibleForTesting
   Sale recordAt(SaleDraft draft, {required String storeId, required DateTime at}) {
-    final code = '#${_nextCode++}';
+    final number = _nextCode++;
     final sale = Sale(
-      id: 'sale-$code',
-      code: code,
+      // The id travels in a URL, so it carries no '#' — that is the display
+      // code's own decoration and would start a fragment.
+      id: 'sale-$number',
+      code: '#$number',
       storeId: storeId,
       paidAt: at,
       paymentMethod: draft.paymentMethod,

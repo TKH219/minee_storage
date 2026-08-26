@@ -5,7 +5,8 @@
     "nothingHereYet": "Chưa có gì ở đây",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
-    "cancel": "Huỷ"
+    "cancel": "Huỷ",
+    "comingSoon": "Sắp có"
   },
   "shell": {
     "dashboard": "Tổng quan",
@@ -341,7 +342,16 @@
     "payBankTransfer": "Chuyển khoản",
     "payCard": "Thẻ",
     "payEWallet": "Ví điện tử",
-    "confirmPayment": "Xác nhận thanh toán"
+    "confirmPayment": "Xác nhận thanh toán",
+    "received": "Đã nhận {amount}",
+    "saleCode": "{method} · đơn",
+    "netProfit": "Lợi nhuận ròng",
+    "stockDeducted": "Đã trừ kho",
+    "lotsCount": "{count} lô",
+    "oneLot": "1 lô",
+    "createInvoice": "Tạo hóa đơn",
+    "newSale": "Đơn hàng mới",
+    "backToDashboard": "Về trang tổng quan"
   },
   "reports": {
     "title": "Báo cáo",

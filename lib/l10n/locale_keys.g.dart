@@ -9,6 +9,7 @@ abstract class  LocaleKeys {
   static const common_showPassword = 'common.showPassword';
   static const common_hidePassword = 'common.hidePassword';
   static const common_cancel = 'common.cancel';
+  static const common_comingSoon = 'common.comingSoon';
   static const common = 'common';
   static const shell_dashboard = 'shell.dashboard';
   static const shell_products = 'shell.products';
@@ -331,6 +332,15 @@ abstract class  LocaleKeys {
   static const sales_payCard = 'sales.payCard';
   static const sales_payEWallet = 'sales.payEWallet';
   static const sales_confirmPayment = 'sales.confirmPayment';
+  static const sales_received = 'sales.received';
+  static const sales_saleCode = 'sales.saleCode';
+  static const sales_netProfit = 'sales.netProfit';
+  static const sales_stockDeducted = 'sales.stockDeducted';
+  static const sales_lotsCount = 'sales.lotsCount';
+  static const sales_oneLot = 'sales.oneLot';
+  static const sales_createInvoice = 'sales.createInvoice';
+  static const sales_newSale = 'sales.newSale';
+  static const sales_backToDashboard = 'sales.backToDashboard';
   static const sales = 'sales';
   static const reports_title = 'reports.title';
   static const reports_emptyTitle = 'reports.emptyTitle';

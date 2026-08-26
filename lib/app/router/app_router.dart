@@ -17,6 +17,7 @@ import 'package:mine_storage/features/products/scan/pages/scan_page.dart';
 import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_cart_page.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_review_page.dart';
+import 'package:mine_storage/features/sales/success/pages/sale_success_page.dart';
 import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
 import 'package:mine_storage/features/shell/pages/main_shell_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
@@ -94,6 +95,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.saleReview,
         name: AppRoutes.saleReviewName,
         builder: (context, state) => const SaleReviewPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.saleSuccess,
+        name: AppRoutes.saleSuccessName,
+        builder: (context, state) => const SaleSuccessPage(),
       ),
       GoRoute(
         path: AppRoutes.productScan,
