@@ -263,7 +263,7 @@
   "sales": {
     "title": "Sales",
     "emptyTitle": "No sales yet",
-    "emptySubtitle": "Sales you record will appear here, newest first.",
+    "emptySubtitle": "Every sale you record is saved. The history screen is not built yet.",
     "newTitle": "New sale",
     "cartEmptyTitle": "Nothing in the basket",
     "cartEmptyBody": "Pick from what you're holding, or scan the barcode if it's to hand.",

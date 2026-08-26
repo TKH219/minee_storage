@@ -263,7 +263,7 @@
   "sales": {
     "title": "Bán hàng",
     "emptyTitle": "Chưa có đơn nào",
-    "emptySubtitle": "Đơn bạn ghi lại sẽ hiện ở đây, mới nhất trước.",
+    "emptySubtitle": "Mọi đơn bạn ghi lại đều được lưu. Màn hình lịch sử chưa được xây dựng.",
     "newTitle": "Đơn hàng mới",
     "cartEmptyTitle": "Giỏ hàng đang trống",
     "cartEmptyBody": "Chọn từ hàng bạn đang có, hoặc quét mã vạch nếu tiện tay.",
