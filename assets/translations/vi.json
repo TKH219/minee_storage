@@ -262,7 +262,14 @@
   "sales": {
     "title": "Bán hàng",
     "emptyTitle": "Chưa có đơn nào",
-    "emptySubtitle": "Đơn bạn ghi lại sẽ hiện ở đây, mới nhất trước."
+    "emptySubtitle": "Đơn bạn ghi lại sẽ hiện ở đây, mới nhất trước.",
+    "newTitle": "Đơn hàng mới",
+    "cartEmptyTitle": "Giỏ hàng đang trống",
+    "cartEmptyBody": "Chọn từ hàng bạn đang có, hoặc quét mã vạch nếu tiện tay.",
+    "chooseFromProducts": "Chọn từ sản phẩm của bạn",
+    "scanBarcode": "Quét mã vạch",
+    "lineCount": "{count} dòng",
+    "oneLine": "1 dòng"
   },
   "reports": {
     "title": "Báo cáo",

@@ -49,6 +49,17 @@ class AppRoutes {
   static const String sales = '/sales';
   static const String salesName = 'sales';
 
+  /// Registered before `/sales/:id/success` so `new` is never read as an id,
+  /// and above the shell so the flow covers the nav bar.
+  static const String saleNew = '/sales/new';
+  static const String saleNewName = 'saleNew';
+
+  static const String saleReview = '/sales/new/review';
+  static const String saleReviewName = 'saleReview';
+
+  static const String saleSuccess = '/sales/:id/success';
+  static const String saleSuccessName = 'saleSuccess';
+
   static const String reports = '/reports';
   static const String reportsName = 'reports';
 

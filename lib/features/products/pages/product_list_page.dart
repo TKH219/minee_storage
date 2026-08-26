@@ -12,6 +12,7 @@ import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/products/states/product_list_state.dart';
 import 'package:mine_storage/features/products/widgets/product_filter_sheet.dart';
+import 'package:mine_storage/features/products/widgets/add_product_sheet.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/app_filter_chip.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
@@ -101,11 +102,37 @@ class _ProductListPageState
     if (result != null) await notifier.applyFilter(result);
   }
 
+  /// The catalogue's own entry point for adding stock. It lived on the shell's
+  /// centre action until that became New sale.
+  Future<void> _addProduct() async {
+    final choice = await showAddProductSheet(context);
+    if (choice == null || !mounted) return;
+
+    switch (choice) {
+      case AddProductRoute.scan:
+        await context.pushNamed<void>(AppRoutes.productScanName);
+      case AddProductRoute.manual:
+        await context.pushNamed<String>(AppRoutes.productNewName);
+    }
+
+    if (mounted) await notifier.refresh();
+  }
+
   @override
   Widget buildPageContent(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.neutral1,
-      appBar: AppBar(title: Text(LocaleKeys.products_title.tr())),
+      appBar: AppBar(
+        title: Text(LocaleKeys.products_title.tr()),
+        actions: [
+          IconButton(
+            key: const Key('products-add-button'),
+            icon: const Icon(Icons.add_rounded),
+            tooltip: LocaleKeys.products_addTitle.tr(),
+            onPressed: _addProduct,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
