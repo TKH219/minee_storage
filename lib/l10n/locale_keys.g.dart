@@ -372,6 +372,10 @@ abstract class  LocaleKeys {
   static const settings_currencyGBP = 'settings.currencyGBP';
   static const settings_currencySGD = 'settings.currencySGD';
   static const settings_currencyVND = 'settings.currencyVND';
+  static const settings_logOutTitle = 'settings.logOutTitle';
+  static const settings_logOutBody = 'settings.logOutBody';
+  static const settings_logOutAccount = 'settings.logOutAccount';
+  static const settings_stay = 'settings.stay';
   static const settings = 'settings';
   static const onboarding_profile_title = 'onboarding.profile.title';
   static const onboarding_profile_subtitle = 'onboarding.profile.subtitle';

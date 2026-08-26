@@ -12,11 +12,17 @@ import 'package:mine_storage/shared/ui/app_snack.dart';
 import 'package:mine_storage/shared/ui/coming_soon.dart';
 
 import '../states/settings_state.dart';
+import 'package:mine_storage/features/dashboard/states/dashboard_state.dart';
+import 'package:mine_storage/features/products/states/product_list_state.dart';
+import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
+import 'package:mine_storage/features/sales/new/states/sale_review_state.dart';
+
 import '../widgets/currency_picker_sheet.dart';
 import '../widgets/language_picker_sheet.dart';
 import '../widgets/settings_metrics.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/settings_tile.dart';
+import '../widgets/logout_dialog.dart';
 import '../widgets/theme_picker_sheet.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -95,7 +101,7 @@ class SettingsPage extends ConsumerWidget {
               icon: Icons.logout_rounded,
               label: LocaleKeys.settings_logOut.tr(),
               destructive: true,
-              onTap: () {},
+              onTap: () => _logOut(context, ref),
             ),
           ]),
           const SizedBox(height: SettingsMetrics.groupGap),
@@ -149,6 +155,26 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Signing out clears the shell as well as the session: a half-built sale
+  /// or a chosen store must not greet whoever signs in next.
+  static Future<void> _logOut(BuildContext context, WidgetRef ref) async {
+    final email = ref.read(currentUserProvider).value?.email ?? '';
+    final confirmed = await showLogoutDialog(context, email: email);
+    if (!confirmed) return;
+
+    try {
+      await ref.read(authRepositoryProvider).signOut();
+    } on Object {
+      showErrorSnack(LocaleKeys.errors_generic.tr());
+      return;
+    }
+
+    ref.read(saleCartStateProvider.notifier).reset();
+    ref.read(saleReviewStateProvider.notifier).reset();
+    ref.invalidate(dashboardStateProvider);
+    ref.invalidate(productListStateProvider);
   }
 
   static Future<void> _pickTheme(

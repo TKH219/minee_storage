@@ -385,7 +385,11 @@
     "currencyEUR": "Euro",
     "currencyGBP": "Bảng Anh",
     "currencySGD": "Đô la Singapore",
-    "currencyVND": "Đồng Việt Nam"
+    "currencyVND": "Đồng Việt Nam",
+    "logOutTitle": "Đăng xuất?",
+    "logOutBody": "Bạn sẽ cần email và mật khẩu để đăng nhập lại. Mọi dữ liệu đã ghi vẫn được giữ nguyên.",
+    "logOutAccount": "Đang đăng nhập bằng {email}",
+    "stay": "Ở lại"
   },
   "onboarding": {
     "profile": {
