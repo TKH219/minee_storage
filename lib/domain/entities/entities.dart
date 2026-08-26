@@ -11,6 +11,7 @@ export 'product_entity.dart';
 export 'product_filter.dart';
 export 'product_unit.dart';
 export 'store_holding.dart';
+export 'store_summary.dart';
 export 'store.dart';
 export 'store_category.dart';
 export 'currency.dart';

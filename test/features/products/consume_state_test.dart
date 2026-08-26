@@ -10,6 +10,8 @@ import 'package:mine_storage/providers.dart';
 
 import '../../support/localization_test_harness.dart';
 
+import '../../support/active_store_override.dart';
+
 ProductBatchEntity batch({
   required String id,
   required String code,
@@ -51,7 +53,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         productRepositoryProvider.overrideWithValue(repository),
-        activeStoreProvider.overrideWithValue('store-a'),
+        activeStoreProvider.overrideWith(() => FixedActiveStore('store-a')),
       ],
     );
     addTearDown(container.dispose);

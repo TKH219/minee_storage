@@ -15,6 +15,8 @@ import 'package:mine_storage/providers.dart';
 import '../../support/fake_media_repository.dart';
 import '../../support/localization_test_harness.dart';
 
+import '../../support/active_store_override.dart';
+
 void main() {
   setUp(useLocale);
 
@@ -29,7 +31,7 @@ void main() {
           repository ?? FakeProductRepository(latency: Duration.zero),
         ),
         mediaRepositoryProvider.overrideWithValue(media ?? FakeMediaRepository()),
-        activeStoreProvider.overrideWithValue(activeStore),
+        activeStoreProvider.overrideWith(() => FixedActiveStore(activeStore)),
       ],
     );
     addTearDown(container.dispose);
