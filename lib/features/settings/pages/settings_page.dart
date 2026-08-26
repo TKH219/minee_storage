@@ -17,6 +17,7 @@ import '../widgets/language_picker_sheet.dart';
 import '../widgets/settings_metrics.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/settings_tile.dart';
+import '../widgets/theme_picker_sheet.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -79,7 +80,7 @@ class SettingsPage extends ConsumerWidget {
               icon: themeMode.icon,
               label: LocaleKeys.settings_theme.tr(),
               value: themeMode.labelKey.tr(),
-              onTap: () => ref.read(themeModeProvider.notifier).toggle(),
+              onTap: () => _pickTheme(context, ref, themeMode),
             ),
             SettingsTile(
               icon: Icons.translate_rounded,
@@ -148,6 +149,16 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  static Future<void> _pickTheme(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode selected,
+  ) async {
+    final picked = await showThemePicker(context, selected: selected);
+    if (picked == null) return;
+    await ref.read(themeModeProvider.notifier).setThemeMode(picked);
   }
 
   static void _toggleProfileUpdates(WidgetRef ref) {
