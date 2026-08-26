@@ -161,6 +161,70 @@ class FakeSaleRepository implements SaleRepository {
       _sales.where((sale) => sale.storeId == storeId).toList().reversed.toList();
 
   @override
+  Future<SalesDashboardSummary> dashboardSummary({
+    required String storeId,
+    required DateTime today,
+  }) async {
+    await Future<void>.delayed(latency);
+    final recorded = _recorded(storeId);
+    final start = DateTime(today.year, today.month, today.day);
+
+    List<Sale> on(DateTime day) => recorded
+        .where((sale) => _dayOf(sale.paidAt) == day)
+        .toList();
+
+    Decimal sum(Iterable<Decimal> values) =>
+        values.fold(Decimal.zero, (total, value) => total + value);
+
+    final todaySales = on(start);
+    final yesterdaySales = on(start.subtract(const Duration(days: 1)));
+
+    Decimal revenueOf(List<Sale> group) =>
+        sum(group.map((sale) => sale.totals.netRevenue));
+    Decimal profitOf(List<Sale> group) =>
+        sum(group.map((sale) => sale.totals.netProfit));
+    Decimal basketOf(List<Sale> group) => group.isEmpty
+        ? Decimal.zero
+        : (sum(group.map((sale) => sale.totals.buyerTotal)) /
+                  Decimal.fromInt(group.length))
+              .toDecimal(scaleOnInfinitePrecision: 6)
+              .round(scale: 2);
+
+    final series = [
+      for (var back = 6; back >= 0; back--)
+        revenueOf(on(start.subtract(Duration(days: back)))),
+    ];
+
+    return SalesDashboardSummary(
+      revenue: revenueOf(todaySales),
+      netProfit: profitOf(todaySales),
+      salesCount: todaySales.length,
+      avgBasket: basketOf(todaySales),
+      revenueDelta: KpiDelta.between(
+        revenueOf(todaySales),
+        revenueOf(yesterdaySales),
+      ),
+      netProfitDelta: KpiDelta.between(
+        profitOf(todaySales),
+        profitOf(yesterdaySales),
+      ),
+      salesCountDelta: KpiDelta.between(
+        Decimal.fromInt(todaySales.length),
+        Decimal.fromInt(yesterdaySales.length),
+      ),
+      avgBasketDelta: KpiDelta.between(
+        basketOf(todaySales),
+        basketOf(yesterdaySales),
+      ),
+      lastSevenDaysRevenue: sum(series),
+      lastSevenDaysSeries: series,
+    );
+  }
+
+  static DateTime _dayOf(DateTime moment) =>
+      DateTime(moment.year, moment.month, moment.day);
+
+  @override
   Future<List<String>> recentlySoldProductIds({
     required String storeId,
     int limit = 5,

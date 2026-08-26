@@ -20,3 +20,4 @@ export 'sale_draft.dart';
 export 'sale_line.dart';
 export 'sale_totals.dart';
 export 'sale.dart';
+export 'sales_dashboard_summary.dart';
