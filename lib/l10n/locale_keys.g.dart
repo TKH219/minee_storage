@@ -283,6 +283,11 @@ abstract class  LocaleKeys {
   static const sales_allocNotEnough = 'sales.allocNotEnough';
   static const sales_allocPriceNeeded = 'sales.allocPriceNeeded';
   static const sales_allocWholeUnits = 'sales.allocWholeUnits';
+  static const sales_manualTitle = 'sales.manualTitle';
+  static const sales_manualSubtitle = 'sales.manualSubtitle';
+  static const sales_manualAvailable = 'sales.manualAvailable';
+  static const sales_manualShort = 'sales.manualShort';
+  static const sales_manualOver = 'sales.manualOver';
   static const sales = 'sales';
   static const reports_title = 'reports.title';
   static const reports_emptyTitle = 'reports.emptyTitle';
