@@ -18,7 +18,7 @@ import 'package:mine_storage/features/reports/pages/reports_page.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_cart_page.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_review_page.dart';
 import 'package:mine_storage/features/sales/success/pages/sale_success_page.dart';
-import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
+import 'package:mine_storage/features/sales/list/pages/sales_list_page.dart';
 import 'package:mine_storage/features/shell/pages/main_shell_page.dart';
 import 'package:mine_storage/features/splash/pages/splash_page.dart';
 import 'package:mine_storage/shared/utils/logger.dart';
