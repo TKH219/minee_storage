@@ -11,6 +11,8 @@ import 'package:mine_storage/providers.dart';
 
 import '../../support/localization_test_harness.dart';
 
+import '../../support/active_store_override.dart';
+
 ProductEntity product({ProductUnit unit = ProductUnit.kg}) => ProductEntity(
   id: 'p1',
   name: 'Whole Milk 1L',
@@ -40,7 +42,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         productRepositoryProvider.overrideWithValue(repository),
-        activeStoreProvider.overrideWithValue('store-a'),
+        activeStoreProvider.overrideWith(() => FixedActiveStore('store-a')),
       ],
     );
     addTearDown(container.dispose);

@@ -11,6 +11,8 @@ import 'package:mine_storage/providers.dart';
 
 import '../../support/localization_test_harness.dart';
 
+import '../../support/active_store_override.dart';
+
 void main() {
   setUp(useLocale);
 
@@ -21,7 +23,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         productRepositoryProvider.overrideWithValue(repository),
-        activeStoreProvider.overrideWithValue(activeStore),
+        activeStoreProvider.overrideWith(() => FixedActiveStore(activeStore)),
       ],
     );
     addTearDown(container.dispose);

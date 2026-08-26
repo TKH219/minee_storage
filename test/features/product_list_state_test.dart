@@ -10,6 +10,8 @@ import 'package:mine_storage/features/products/states/product_list_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
 
+import '../support/active_store_override.dart';
+
 void main() {
   ProviderContainer containerWith(
     ProductRepository repository, {
@@ -18,7 +20,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         productRepositoryProvider.overrideWithValue(repository),
-        activeStoreProvider.overrideWithValue(activeStore),
+        activeStoreProvider.overrideWith(() => FixedActiveStore(activeStore)),
       ],
     );
     addTearDown(container.dispose);

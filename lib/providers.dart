@@ -30,9 +30,11 @@ import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/product_api.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/data/repositories/fake_sale_repository.dart';
+import 'package:mine_storage/data/repositories/fake_store_overview_repository.dart';
 import 'package:mine_storage/data/repositories/product_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
 import 'package:mine_storage/domain/repositories/sale_repository.dart';
+import 'package:mine_storage/domain/repositories/store_overview_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
@@ -201,4 +203,13 @@ final storeDataSourceProvider = Provider<StoreDataSource>(
 
 final storeRepositoryProvider = Provider<StoreRepository>(
   (ref) => SupabaseStoreRepositoryImpl(ref.watch(storeDataSourceProvider)),
+);
+
+/// Spans every store the user can act in, which is what the switcher needs and
+/// what every other read deliberately refuses to do.
+final storeOverviewRepositoryProvider = Provider<StoreOverviewRepository>(
+  (ref) => FakeStoreOverviewRepository(
+    ref.watch(storeRepositoryProvider),
+    ref.watch(productRepositoryProvider),
+  ),
 );
