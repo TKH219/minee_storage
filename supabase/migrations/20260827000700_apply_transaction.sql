@@ -74,8 +74,8 @@ begin
       v_lines := v_lines || jsonb_build_object(
         'productId', v_pid, 'batchId', null,
         'productName', v_pname, 'unit', v_punit,
-        'quantityDelta', v_qty, 'unitPrice', v_price,
-        'unitCostSnapshot', v_price, 'lineGross', v_gross, 'lineCost', v_gross,
+        'quantityDelta', v_qty::text, 'unitPrice', v_price::text,
+        'unitCostSnapshot', v_price::text, 'lineGross', v_gross::text, 'lineCost', v_gross::text,
         'sortOrder', v_idx, 'batch', coalesce(v_line->'batch', '{}'::jsonb));
       v_idx := v_idx + 1;
 
@@ -98,9 +98,9 @@ begin
       v_lines := v_lines || jsonb_build_object(
         'productId', v_pid, 'batchId', v_bid,
         'productName', v_pname, 'unit', v_punit,
-        'quantityDelta', v_delta, 'unitPrice', 0,
-        'unitCostSnapshot', v_bcost, 'lineGross', 0,
-        'lineCost', round(abs(v_delta) * v_bcost, v_units),
+        'quantityDelta', v_delta::text, 'unitPrice', '0',
+        'unitCostSnapshot', v_bcost::text, 'lineGross', '0',
+        'lineCost', round(abs(v_delta) * v_bcost, v_units)::text,
         'sortOrder', v_idx, 'batch', '{}'::jsonb);
       v_idx := v_idx + 1;
 
@@ -125,9 +125,9 @@ begin
         v_lines := v_lines || jsonb_build_object(
           'productId', v_pid, 'batchId', v_bid,
           'productName', v_pname, 'unit', v_punit,
-          'quantityDelta', -v_qty, 'unitPrice', v_price,
-          'unitCostSnapshot', v_bcost, 'lineGross', v_gross,
-          'lineCost', round(v_qty * v_bcost, v_units),
+          'quantityDelta', (-v_qty)::text, 'unitPrice', v_price::text,
+          'unitCostSnapshot', v_bcost::text, 'lineGross', v_gross::text,
+          'lineCost', round(v_qty * v_bcost, v_units)::text,
           'sortOrder', v_idx, 'batch', '{}'::jsonb);
         v_idx := v_idx + 1;
       else
@@ -153,9 +153,9 @@ begin
           v_lines := v_lines || jsonb_build_object(
             'productId', v_pid, 'batchId', v_batch.id,
             'productName', v_pname, 'unit', v_punit,
-            'quantityDelta', -v_take, 'unitPrice', v_price,
-            'unitCostSnapshot', v_batch.unit_cost, 'lineGross', v_gross,
-            'lineCost', round(v_take * v_batch.unit_cost, v_units),
+            'quantityDelta', (-v_take)::text, 'unitPrice', v_price::text,
+            'unitCostSnapshot', v_batch.unit_cost::text, 'lineGross', v_gross::text,
+            'lineCost', round(v_take * v_batch.unit_cost, v_units)::text,
             'sortOrder', v_idx, 'batch', '{}'::jsonb);
           v_idx := v_idx + 1;
           v_out := v_out - v_take;
@@ -194,9 +194,9 @@ begin
         v_share := round(v_bearable * v_gross / v_grosstot, v_units);
         v_landed := round((v_gross + v_share) / v_qty, 2);
         v_new := v_new || (v_line
-          || jsonb_build_object('unitCostSnapshot', v_landed,
-                                'lineCost', round(v_qty * v_landed, v_units),
-                                'landedShare', v_share));
+          || jsonb_build_object('unitCostSnapshot', v_landed::text,
+                                'lineCost', round(v_qty * v_landed, v_units)::text,
+                                'landedShare', v_share::text));
       end loop;
       v_lines := v_new;
     end if;

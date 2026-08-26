@@ -77,6 +77,17 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260822001500` | `apply_consumption` and `product_as_json` |
 | `20260822001600` | `list_products` and `list_product_categories` |
 | `20260822001700` | `product_store_holdings` |
+| `20260827000100` | `transactions` — the ledger header, its check constraints, the partial unique index on `(store_id, code)` and `next_transaction_code` |
+| `20260827000200` | `transaction_lines` — the signed delta, the batch/store agreement trigger and the `occurred_at` arrival floor |
+| `20260827000300` | `transaction_fees` — and the trigger refusing a fee no type can carry |
+| `20260827000400` | `fee_presets` |
+| `20260827000500` | seed each store its VAT and Shipping presets |
+| `20260827000600` | `compute_transaction_money` — §5.3 in two passes |
+| `20260827000700` | `resolve_transaction_payload`, `preview_transaction`, `apply_transaction`, `write_transaction_lines`, `transaction_json` |
+| `20260827000800` | `reverse_transaction_lines` and `amend_transaction` |
+| `20260827000900` | `remove_transaction` |
+| `20260827001000` | `list_transactions` — day-grouped, with whole-day subtotals |
+| `20260827001100` | every money and quantity column leaves as a decimal string |
 
 Every migration is idempotent (`create table if not exists`,
 `create or replace function`, `drop … if exists`, `on conflict do nothing`), so
@@ -112,8 +123,9 @@ functions adapt the shape.
 
 | Function | Serves |
 | --- | --- |
-| `products` | everything under `/products/*` — list, create, read, update, archive, restore, categories, barcode lookup, holdings, batch create/update/archive, consumptions |
+| `products` | everything under `/products/*` — list, create, read, update, archive, restore, categories, barcode lookup, holdings, batch create/update/archive |
 | `media` | `POST /media` — multipart image upload into `product-images` |
+| `transactions` | the ledger — `/transactions` list and create, `/transactions/preview`, `/transactions/{id}` read, amend and delete, and `/fee-presets` |
 
 Both run on the **caller's** JWT, forwarded to PostgREST, so row-level security
 stays the enforcement point and neither function is one. **Neither reads the
@@ -166,6 +178,62 @@ curl -s -H "apikey: $ANON" -H "Authorization: Bearer $JWT" \
 
 Exercise it with **two** accounts. A route that returns the caller's own data
 correctly can still leak someone else's, and only a second token shows that.
+
+## The ledger
+
+Four tables and four RPCs replace the reasonless `apply_consumption`. **After
+this feature there is exactly one write path into `batches.quantity_remaining`,
+and it is the ledger.** Any other write is a bug.
+
+| Table | What it holds |
+| --- | --- |
+| `transactions` | the header — type, code, `occurred_at`, counterparty, payment method, and the eleven frozen money columns |
+| `transaction_lines` | **a signed `quantity_delta` against one batch**, with the product name, unit and unit cost frozen at write time |
+| `transaction_fees` | the resolved fees, each with the amount it moved |
+| `fee_presets` | per-store defaults, seeded with VAT 10% pass-through and Shipping |
+
+There is deliberately **no `status` column** and **no `stock_movements` table**.
+A transaction is edited and deleted rather than returned and voided, and
+`deleted_at` is the only lifecycle state it has.
+
+`quantity_delta` is signed and is the only truth about stock — negative on a
+`sale` and `write_off`, positive on a `receive`, either sign on an `adjust`.
+Applying is addition and reversing is its negation, computed by the same code,
+so nothing in either path branches on the type.
+
+| RPC | What it does |
+| --- | --- |
+| `compute_transaction_money` | §5.3 in two passes — discounts against `items_subtotal`, everything else against `items_subtotal − discount_total` — rounded half-up to the store currency's minor units **once** |
+| `apply_transaction` | resolves the allocation (FEFO), applies every delta, freezes the snapshots, computes the money and inserts. A `receive` creates its batches with landed cost folded in |
+| `amend_transaction` | checks the optimistic lock **first**, reverses the existing lines, re-resolves against present stock, soft-deletes the superseded rows, stamps `amended_at` and bumps `revision` |
+| `remove_transaction` | checks the lock, reverses the lines, archives a receive's untouched batches, stamps `deleted_at` |
+| `preview_transaction` | the same resolution and money, written nowhere — so the previewed total is the stored total |
+| `list_transactions` | day-grouped, with each day's subtotal computed over the **whole** day rather than the page slice |
+
+A few rules worth knowing before touching any of it:
+
+- **A `receive` amends its batch in place** and never reverses-and-recreates. It
+  is the one type whose lines *create* their batch, so reversing it would strand
+  the original lot and open a second for the same delivery. It is refused when
+  the new quantity would fall below what has already been drawn out.
+- **Landed cost.** Every fee the shop actually bears — `buyer_charge` that is
+  not pass-through, less any discount — is apportioned across a receive's lines
+  pro-rata by `line_gross` and folded into each lot's `unit_cost`. A
+  pass-through fee is excluded: the shop gets it back, so it was never part of
+  what the goods cost.
+- **Every amend and delete is optimistically locked on `updated_at`.** A stale
+  value is refused with `P0010` and **nothing changes**.
+- **Later transactions are never replayed.** An amend may therefore land on a
+  different batch set than the original, and the UI names that before commit.
+- **A code is never released**, including by delete. The unique index is partial
+  on `deleted_at is null` and `next_transaction_code` reads the highest ever
+  issued rather than counting live rows.
+
+Refusals carry distinct codes so the client can name them: `P0003` insufficient
+stock, `P0004` a receive amended below its drawn quantity, `P0005` a date before
+the stock arrived, `P0006` a fee the type may not carry, `P0007` a reversal
+below zero, `P0008` a reversal above `quantity_received`, `P0009` a lot already
+drawn from, `P0010` a stale lock.
 
 ## Schema notes
 
