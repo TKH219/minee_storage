@@ -170,10 +170,13 @@ async function byBarcode(supabase: SupabaseClient, barcode: string, url: URL) {
   return ok(await productJson(supabase, data.id, storeId));
 }
 
+// A receive is the only route that may state a remaining quantity, and it may
+// only state the whole delivery: what is left moves afterwards through stock
+// transactions, never through an edit.
 function batchColumns(body: Record<string, unknown>) {
   return {
     quantity_received: body.initialQuantity,
-    quantity_remaining: body.remainingQuantity ?? body.initialQuantity,
+    quantity_remaining: body.initialQuantity,
     unit_cost: body.unitPrice,
     expiry_date: body.expiryDate ?? null,
     received_at: body.purchasedAt,
@@ -204,14 +207,24 @@ async function updateBatch(
   const body = await request.json();
   const storeId = requireStoreFromBody(body);
 
-  const { error } = await supabase
-    .from('batches')
-    .update(batchColumns(body))
-    .eq('id', batchId)
-    .eq('product_id', productId);
+  // Through the RPC rather than a direct update: it moves the remaining
+  // quantity by the same delta as the received one under a row lock, and
+  // refuses an edit that would put the lot below what has been drawn out.
+  const { data, error } = await supabase.rpc('amend_batch', {
+    p_product_id: productId,
+    p_batch_id: batchId,
+    p_store_id: storeId,
+    p_quantity_received: body.initialQuantity,
+    p_unit_cost: body.unitPrice,
+    p_received_at: body.purchasedAt,
+    p_expiry_date: body.expiryDate ?? null,
+    p_supplier: body.supplier ?? null,
+    p_storage_location: body.storageLocation ?? null,
+    p_note: body.note ?? null,
+  });
   if (error) throw error;
 
-  return ok(await productJson(supabase, productId, storeId));
+  return ok(data);
 }
 
 async function archiveBatch(
