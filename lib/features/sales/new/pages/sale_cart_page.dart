@@ -13,6 +13,7 @@ import 'package:mine_storage/shared/utils/currency_formatter.dart';
 import '../widgets/allocation_sheet.dart';
 import '../widgets/cart_line_row.dart';
 import '../widgets/cart_metrics.dart';
+import '../widgets/fees_sheet.dart';
 import '../widgets/money_summary.dart';
 import '../widgets/product_picker_sheet.dart';
 import '../widgets/sale_buttons.dart';
@@ -144,6 +145,7 @@ class _SaleCartPageState
               label: LocaleKeys.sales_feesAndDiscounts.tr(),
               value: money.format(totals.feesAndDiscounts),
               key: const Key('cart-fees-and-discounts'),
+              onTap: _editFees,
             ),
             MoneyRow(
               label: LocaleKeys.sales_buyerPays.tr(),
@@ -182,6 +184,17 @@ class _SaleCartPageState
     );
     if (replacement == null || !mounted) return;
     notifier.replaceLine(index, replacement);
+  }
+
+  Future<void> _editFees() async {
+    final fees = await showFeesSheet(
+      context,
+      itemsSubtotal: currentState.draft.itemsSubtotal,
+      fees: currentState.draft.fees,
+      currency: currentState.currency,
+    );
+    if (fees == null || !mounted) return;
+    notifier.setFees(fees);
   }
 
   void _reviewAndPay() {}
