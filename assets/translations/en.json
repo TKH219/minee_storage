@@ -279,7 +279,21 @@
     "pickerEmptyTitle": "No products yet",
     "pickerEmptyBody": "Add a product before you record a sale.",
     "pickerNoMatches": "No matches for \"{query}\"",
-    "pickerScan": "Scan a barcode"
+    "pickerScan": "Scan a barcode",
+    "allocQuantity": "Quantity",
+    "allocSellPrice": "Sell price each",
+    "allocComesFrom": "Comes from — earliest expiry first",
+    "allocEdit": "Edit",
+    "allocAuto": "Back to automatic",
+    "allocLotExpiring": "Lot expiring {date}",
+    "allocLotNoExpiry": "Lot bought {date}",
+    "allocCostEmpties": "cost {cost} each · empties this lot",
+    "allocCostRemains": "cost {cost} each · {remaining} will remain",
+    "allocLineTotal": "Line total · {quantity} × {price}",
+    "allocAddToSale": "Add to sale",
+    "allocNotEnough": "Only {available} left.",
+    "allocPriceNeeded": "Set a sell price to continue.",
+    "allocWholeUnits": "This product is counted in whole units."
   },
   "reports": {
     "title": "Reports",
