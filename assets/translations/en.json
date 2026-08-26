@@ -298,7 +298,15 @@
     "manualSubtitle": "{product} · {quantity} needed",
     "manualAvailable": "cost {cost} · {available} available",
     "manualShort": "Allocated {allocated} of {requested}. Assign {missing} more before you can continue.",
-    "manualOver": "Allocated {allocated} of {requested}. Remove {excess} before you can continue."
+    "manualOver": "Allocated {allocated} of {requested}. Remove {excess} before you can continue.",
+    "addAnotherLine": "Add another line",
+    "splitAcross": "split across {count} lots",
+    "itemsSubtotal": "Items subtotal",
+    "feesAndDiscounts": "Fees & discounts",
+    "buyerPays": "Buyer pays",
+    "reviewAndPay": "Review & pay",
+    "lineMeta": "{quantity} × {price}",
+    "removeLine": "Remove line"
   },
   "reports": {
     "title": "Reports",
