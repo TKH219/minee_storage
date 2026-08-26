@@ -72,6 +72,7 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260822001100` | backfill the ten applied versions the history table was missing |
 | `20260822001200` | `products`, user-scoped RLS, the barcode index that spans archived rows |
 | `20260822001300` | `batches`, two-parent RLS, the owner-mismatch trigger, `#B-0001` code sequencing |
+| `20260826000100` | `amend_batch` — corrects a delivery, moving the remainder by the same delta |
 | `20260822001400` | the public `product-images` bucket, uid-scoped writes |
 | `20260822001500` | `apply_consumption` and `product_as_json` |
 | `20260822001600` | `list_products` and `list_product_categories` |
@@ -187,6 +188,15 @@ Two consequences worth knowing before touching either table:
   rejects any row whose two parents have different owners. The policies alone
   would let a caller who owns both file one user's stock against another user's
   shop.
+
+- **`quantity_remaining` is never written from a request body.** A receive
+  seeds it from the delivery; after that it moves only through a stock
+  transaction — `apply_consumption` today, the transaction ledger later. The
+  one exception is `amend_batch`, which corrects a delivery: it shifts the
+  remainder by the same delta as `quantity_received` under a row lock, and
+  raises `P0004` rather than let a lot fall below what has been drawn out of
+  it. Editing a lot is a correction of what arrived, never a statement about
+  what is on the shelf.
 
 `batch_code` runs per product **across every store**, so one store's list can
 legitimately show `#B-0001`, `#B-0003` with the gap sitting in another shop.
