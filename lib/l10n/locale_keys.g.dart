@@ -288,6 +288,14 @@ abstract class  LocaleKeys {
   static const sales_manualAvailable = 'sales.manualAvailable';
   static const sales_manualShort = 'sales.manualShort';
   static const sales_manualOver = 'sales.manualOver';
+  static const sales_addAnotherLine = 'sales.addAnotherLine';
+  static const sales_splitAcross = 'sales.splitAcross';
+  static const sales_itemsSubtotal = 'sales.itemsSubtotal';
+  static const sales_feesAndDiscounts = 'sales.feesAndDiscounts';
+  static const sales_buyerPays = 'sales.buyerPays';
+  static const sales_reviewAndPay = 'sales.reviewAndPay';
+  static const sales_lineMeta = 'sales.lineMeta';
+  static const sales_removeLine = 'sales.removeLine';
   static const sales = 'sales';
   static const reports_title = 'reports.title';
   static const reports_emptyTitle = 'reports.emptyTitle';

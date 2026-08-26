@@ -7,7 +7,7 @@ import 'package:mine_storage/app/clock.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/sales/new/states/allocation_state.dart';
-import 'package:mine_storage/features/settings/states/settings_state.dart';
+import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/quantity_format.dart';
 import 'package:mine_storage/shared/utils/currency_formatter.dart';
@@ -87,7 +87,7 @@ class _AllocationSheetState extends ConsumerState<AllocationSheet> {
   Widget build(BuildContext context) {
     final state = ref.watch(allocationStateProvider);
     final colors = context.colors;
-    final money = ref.watch(currencyFormatterProvider);
+    final money = CurrencyFormatter(ref.watch(saleCartStateProvider).currency);
     final today = ref.read(nowProvider)();
 
     return Padding(

@@ -6,9 +6,14 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
+import 'package:mine_storage/providers.dart';
 import 'package:mine_storage/shared/ui/error_aware_container.dart';
+import 'package:mine_storage/shared/utils/currency_formatter.dart';
 
 import '../widgets/allocation_sheet.dart';
+import '../widgets/cart_line_row.dart';
+import '../widgets/cart_metrics.dart';
+import '../widgets/money_summary.dart';
 import '../widgets/product_picker_sheet.dart';
 import '../widgets/sale_buttons.dart';
 import '../widgets/sale_metrics.dart';
@@ -92,8 +97,94 @@ class _SaleCartPageState
         onRetry: notifier.load,
       );
     }
-    return _buildEmptyCart(context);
+    if (currentState.isEmpty) return _buildEmptyCart(context);
+    return _buildBasket(context);
   }
+
+  Widget _buildBasket(BuildContext context) {
+    final money = CurrencyFormatter(currentState.currency);
+    final draft = currentState.draft;
+    final totals = draft.totals;
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              for (var index = 0; index < draft.lines.length; index++)
+                CartLineRow(
+                  line: draft.lines[index],
+                  money: money,
+                  onEdit: () => _editLine(index),
+                  onRemove: () => notifier.removeLine(index),
+                ),
+              Padding(
+                padding: CartMetrics.addLinePadding,
+                child: SaleSecondaryButton(
+                  key: const Key('cart-add-another-line'),
+                  label: LocaleKeys.sales_addAnotherLine.tr(),
+                  icon: Icons.add_rounded,
+                  small: true,
+                  onPressed: _chooseProduct,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: CartMetrics.moneyTopGap),
+        MoneySummary(
+          rows: [
+            MoneyRow(
+              label: LocaleKeys.sales_itemsSubtotal.tr(),
+              value: money.format(totals.itemsSubtotal),
+              key: const Key('cart-items-subtotal'),
+            ),
+            MoneyRow(
+              label: LocaleKeys.sales_feesAndDiscounts.tr(),
+              value: money.format(totals.feesAndDiscounts),
+              key: const Key('cart-fees-and-discounts'),
+            ),
+            MoneyRow(
+              label: LocaleKeys.sales_buyerPays.tr(),
+              value: money.format(totals.buyerTotal),
+              style: MoneyRowStyle.total,
+              key: const Key('cart-buyer-pays'),
+            ),
+          ],
+        ),
+        Padding(
+          padding: CartMetrics.payPadding,
+          child: SalePrimaryButton(
+            key: const Key('cart-review-and-pay'),
+            label: LocaleKeys.sales_reviewAndPay.tr(),
+            onPressed: currentState.isEmpty ? null : _reviewAndPay,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The split link leads back into the allocation that produced it, with the
+  /// line's own quantity and price already filled in.
+  Future<void> _editLine(int index) async {
+    final line = currentState.draft.lines[index];
+    final product = await ref
+        .read(productRepositoryProvider)
+        .getProduct(line.productId, storeId: currentState.storeId!);
+    if (!mounted) return;
+
+    final replacement = await showAllocationSheet(
+      context,
+      product: product,
+      quantity: line.quantity,
+      sellPrice: line.unitSellPrice,
+    );
+    if (replacement == null || !mounted) return;
+    notifier.replaceLine(index, replacement);
+  }
+
+  void _reviewAndPay() {}
 
   Widget _buildEmptyCart(BuildContext context) {
     final colors = context.colors;

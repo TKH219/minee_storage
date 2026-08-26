@@ -298,7 +298,15 @@
     "manualSubtitle": "{product} · cần {quantity}",
     "manualAvailable": "giá vốn {cost} · còn {available}",
     "manualShort": "Đã phân bổ {allocated}/{requested}. Cần phân bổ thêm {missing} để tiếp tục.",
-    "manualOver": "Đã phân bổ {allocated}/{requested}. Cần bớt {excess} để tiếp tục."
+    "manualOver": "Đã phân bổ {allocated}/{requested}. Cần bớt {excess} để tiếp tục.",
+    "addAnotherLine": "Thêm dòng khác",
+    "splitAcross": "chia từ {count} lô",
+    "itemsSubtotal": "Tạm tính hàng hóa",
+    "feesAndDiscounts": "Phí & giảm giá",
+    "buyerPays": "Khách trả",
+    "reviewAndPay": "Xem lại & thanh toán",
+    "lineMeta": "{quantity} × {price}",
+    "removeLine": "Xóa dòng"
   },
   "reports": {
     "title": "Báo cáo",

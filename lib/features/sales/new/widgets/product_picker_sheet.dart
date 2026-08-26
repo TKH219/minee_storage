@@ -6,7 +6,8 @@ import 'package:mine_storage/app/clock.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/sales/new/states/product_picker_state.dart';
-import 'package:mine_storage/features/settings/states/settings_state.dart';
+import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
+import 'package:mine_storage/shared/utils/currency_formatter.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/shared/ui/empty_view.dart';
 import 'package:mine_storage/shared/ui/expiry_badge.dart';
@@ -249,7 +250,7 @@ class _ProductRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final texts = context.textStyles;
-    final money = ref.watch(currencyFormatterProvider);
+    final money = CurrencyFormatter(ref.watch(saleCartStateProvider).currency);
 
     final row = InkWell(
       key: Key('picker-row-${product.id}'),
