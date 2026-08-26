@@ -177,7 +177,6 @@ abstract class  LocaleKeys {
   static const products_expiresOn = 'products.expiresOn';
   static const products_unitPrice = 'products.unitPrice';
   static const products_quantity = 'products.quantity';
-  static const products_remainingLabel = 'products.remainingLabel';
   static const products_storageLocation = 'products.storageLocation';
   static const products_storageLocationHint = 'products.storageLocationHint';
   static const products_supplier = 'products.supplier';
@@ -185,7 +184,8 @@ abstract class  LocaleKeys {
   static const products_tracksExpiry = 'products.tracksExpiry';
   static const products_saveLot = 'products.saveLot';
   static const products_quantityAboveZero = 'products.quantityAboveZero';
-  static const products_remainingCantExceed = 'products.remainingCantExceed';
+  static const products_quantityBelowDrawn = 'products.quantityBelowDrawn';
+  static const products_remainingMovesWithStock = 'products.remainingMovesWithStock';
   static const products_expiryAfterPurchase = 'products.expiryAfterPurchase';
   static const products_priceNotNegative = 'products.priceNotNegative';
   static const products_consumeTitle = 'products.consumeTitle';

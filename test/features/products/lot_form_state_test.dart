@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mine_storage/data/models/request/product/batch_request.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/products/detail/states/lot_form_state.dart';
@@ -17,6 +18,20 @@ ProductEntity product({ProductUnit unit = ProductUnit.kg}) => ProductEntity(
   createdAt: DateTime.parse('2026-07-01'),
   updatedAt: DateTime.parse('2026-07-01'),
 );
+
+ProductBatchEntity batch({required String initial, required String remaining}) =>
+    ProductBatchEntity(
+      id: 'b1',
+      productId: 'p1',
+      storeId: 'store-a',
+      batchCode: '#B-0001',
+      purchasedAt: DateTime.parse('2026-07-02'),
+      unitPrice: Decimal.parse('2.00'),
+      initialQuantity: Decimal.parse(initial),
+      remainingQuantity: Decimal.parse(remaining),
+      createdAt: DateTime.parse('2026-07-02'),
+      updatedAt: DateTime.parse('2026-07-02'),
+    );
 
 void main() {
   setUp(useLocale);
@@ -54,18 +69,19 @@ void main() {
       expect(container.read(lotFormStateProvider).canSubmit, isTrue);
     });
 
-    test('remaining cannot exceed what was bought', () {
+    test('purchased quantity cannot drop below what was already drawn out', () {
       final container = containerWith(_RecordingRepository());
-      final notifier = opened(container)
+      final notifier = container.read(lotFormStateProvider.notifier)
+        ..open(product(), batch: batch(initial: '20', remaining: '15'))
         ..updateUnitPrice('1.00')
-        ..updateQuantity('12')
-        ..updateRemaining('14');
+        ..updateQuantity('3');
 
-      expect(container.read(lotFormStateProvider).remainingIsInvalid, isTrue);
+      expect(container.read(lotFormStateProvider).quantityBelowDrawn, isTrue);
       expect(container.read(lotFormStateProvider).canSubmit, isFalse);
 
-      notifier.updateRemaining('12');
-      expect(container.read(lotFormStateProvider).remainingIsInvalid, isFalse);
+      notifier.updateQuantity('5');
+      expect(container.read(lotFormStateProvider).quantityBelowDrawn, isFalse);
+      expect(container.read(lotFormStateProvider).canSubmit, isTrue);
     });
 
     test('expiry must come after the purchase date', () {
@@ -108,7 +124,7 @@ void main() {
       expect(state.quantityIsInvalid, isTrue);
       expect(state.priceIsInvalid, isFalse);
       expect(state.expiryIsInvalid, isFalse);
-      expect(state.remainingIsInvalid, isFalse);
+      expect(state.quantityBelowDrawn, isFalse);
     });
   });
 
@@ -174,6 +190,20 @@ void main() {
     expect(repository.lastDraft?.expiryDate, isNull);
   });
 
+  test('editing a lot never sends a remaining quantity', () async {
+    final repository = _RecordingRepository();
+    final container = containerWith(repository);
+    final notifier = container.read(lotFormStateProvider.notifier)
+      ..open(product(), batch: batch(initial: '20', remaining: '15'))
+      ..updateQuantity('20')
+      ..updateUnitPrice('2.00');
+
+    await notifier.submit();
+
+    final json = BatchRequest.fromDraft(repository.lastDraft!).toJson();
+    expect(json.containsKey('remainingQuantity'), isFalse);
+  });
+
   test('an invalid form sends nothing', () async {
     final repository = _RecordingRepository();
     final container = containerWith(repository);
@@ -194,6 +224,16 @@ class _RecordingRepository extends FakeProductRepository {
   @override
   Future<ProductEntity> addBatch(String productId, BatchDraft draft) async {
     addCalls++;
+    lastDraft = draft;
+    return product();
+  }
+
+  @override
+  Future<ProductEntity> updateBatch(
+    String productId,
+    String batchId,
+    BatchDraft draft,
+  ) async {
     lastDraft = draft;
     return product();
   }

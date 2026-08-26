@@ -46,7 +46,6 @@ class LotSheet extends ConsumerStatefulWidget {
 
 class _LotSheetState extends ConsumerState<LotSheet> {
   final _quantity = TextEditingController();
-  final _remaining = TextEditingController();
   final _price = TextEditingController();
   final _location = TextEditingController();
   final _supplier = TextEditingController();
@@ -61,7 +60,6 @@ class _LotSheetState extends ConsumerState<LotSheet> {
       final batch = widget.batch;
       if (batch != null) {
         _quantity.text = batch.initialQuantity.toString();
-        _remaining.text = batch.remainingQuantity.toString();
         _price.text = batch.unitPrice.toString();
         _location.text = batch.storageLocation ?? '';
         _supplier.text = batch.supplier ?? '';
@@ -81,7 +79,7 @@ class _LotSheetState extends ConsumerState<LotSheet> {
 
   @override
   void dispose() {
-    for (final c in [_quantity, _remaining, _price, _location, _supplier]) {
+    for (final c in [_quantity, _price, _location, _supplier]) {
       c.dispose();
     }
     super.dispose();
@@ -212,25 +210,17 @@ class _LotSheetState extends ConsumerState<LotSheet> {
                       controller: _quantity,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: notifier.updateQuantity,
-                      errorText: state.quantityIsInvalid
-                          ? LocaleKeys.products_quantityAboveZero.tr()
-                          : null,
+                      errorText: _quantityError(state),
                     ),
                   ),
                 ],
               ),
-              if (widget.batch != null) ...[
-                const SizedBox(height: 16),
-                AppTextField(
-                  label: LocaleKeys.products_remainingLabel.tr(),
-                  controller: _remaining,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: notifier.updateRemaining,
-                  errorText: state.remainingIsInvalid
-                      ? LocaleKeys.products_remainingCantExceed.tr(
-                          namedArgs: {'bought': state.quantity},
-                        )
-                      : null,
+              if (state.drawnQuantity != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  LocaleKeys.products_remainingMovesWithStock.tr(),
+                  key: const Key('lot-remaining-note'),
+                  style: context.textStyles.sansCaption.copyWith(color: colors.neutral6),
                 ),
               ],
               const SizedBox(height: 16),
@@ -304,6 +294,16 @@ class _LotSheetState extends ConsumerState<LotSheet> {
       ),
     );
   }
+}
+
+String? _quantityError(LotFormState state) {
+  if (state.quantityIsInvalid) return LocaleKeys.products_quantityAboveZero.tr();
+  if (state.quantityBelowDrawn) {
+    return LocaleKeys.products_quantityBelowDrawn.tr(
+      namedArgs: {'drawn': state.drawnQuantity.toString()},
+    );
+  }
+  return null;
 }
 
 /// A field the design draws as an input but which opens a picker.

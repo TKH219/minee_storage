@@ -19,7 +19,7 @@ class LotFormState extends BaseState with Equatable {
     this.batchId,
     this.storeId,
     this.quantity = '',
-    this.remaining = '',
+    this.drawnQuantity,
     this.unitPrice = '',
     this.purchasedAt,
     this.expiryDate,
@@ -42,7 +42,10 @@ class LotFormState extends BaseState with Equatable {
   final String? storeId;
 
   final String quantity;
-  final String remaining;
+
+  /// How much of the lot being edited has already left through a transaction.
+  /// Null while receiving new stock, where nothing has been drawn yet.
+  final Decimal? drawnQuantity;
   final String unitPrice;
   final DateTime? purchasedAt;
   final DateTime? expiryDate;
@@ -55,7 +58,6 @@ class LotFormState extends BaseState with Equatable {
   final bool didSave;
 
   Decimal? get _quantity => Decimal.tryParse(quantity.trim());
-  Decimal? get _remaining => Decimal.tryParse(remaining.trim());
   Decimal? get _price => Decimal.tryParse(unitPrice.trim());
 
   bool get quantityIsInvalid {
@@ -66,11 +68,13 @@ class LotFormState extends BaseState with Equatable {
     return unit != null && !unit.acceptsQuantity(value);
   }
 
-  bool get remainingIsInvalid {
-    final entered = _remaining;
-    final bought = _quantity;
-    if (entered == null || bought == null) return false;
-    return entered > bought || entered < Decimal.zero;
+  /// Lowering a lot below what has already left it would have to invent a
+  /// stock movement to balance, so the form refuses before anything is sent.
+  bool get quantityBelowDrawn {
+    final entered = _quantity;
+    final alreadyDrawn = drawnQuantity;
+    if (entered == null || alreadyDrawn == null) return false;
+    return entered < alreadyDrawn;
   }
 
   bool get priceIsInvalid {
@@ -98,7 +102,7 @@ class LotFormState extends BaseState with Equatable {
       _quantity != null &&
       _price != null &&
       !quantityIsInvalid &&
-      !remainingIsInvalid &&
+      !quantityBelowDrawn &&
       !priceIsInvalid &&
       !expiryIsInvalid &&
       storeId != null &&
@@ -113,7 +117,7 @@ class LotFormState extends BaseState with Equatable {
     String? batchId,
     String? storeId,
     String? quantity,
-    String? remaining,
+    Decimal? drawnQuantity,
     String? unitPrice,
     DateTime? purchasedAt,
     DateTime? expiryDate,
@@ -128,7 +132,7 @@ class LotFormState extends BaseState with Equatable {
       batchId: batchId ?? this.batchId,
       storeId: storeId ?? this.storeId,
       quantity: quantity ?? this.quantity,
-      remaining: remaining ?? this.remaining,
+      drawnQuantity: drawnQuantity ?? this.drawnQuantity,
       unitPrice: unitPrice ?? this.unitPrice,
       purchasedAt: purchasedAt ?? this.purchasedAt,
       expiryDate: clearExpiryDate ? null : (expiryDate ?? this.expiryDate),
@@ -148,7 +152,7 @@ class LotFormState extends BaseState with Equatable {
     batchId,
     storeId,
     quantity,
-    remaining,
+    drawnQuantity,
     unitPrice,
     purchasedAt,
     expiryDate,
@@ -180,7 +184,9 @@ class LotFormStateNotifier extends BaseStateNotifier<LotFormState> {
         batchId: batch?.id,
         storeId: batch?.storeId ?? _activeStore,
         quantity: batch?.initialQuantity.toString() ?? '',
-        remaining: batch?.remainingQuantity.toString() ?? '',
+        drawnQuantity: batch == null
+            ? null
+            : batch.initialQuantity - batch.remainingQuantity,
         unitPrice: batch?.unitPrice.toString() ?? '',
         purchasedAt: batch?.purchasedAt ?? today ?? DateTime.now(),
         expiryDate: batch?.expiryDate,
@@ -194,8 +200,6 @@ class LotFormStateNotifier extends BaseStateNotifier<LotFormState> {
   void updateStore(String value) => updateState(state.copyWith(storeId: value));
 
   void updateQuantity(String value) => updateState(state.copyWith(quantity: value));
-
-  void updateRemaining(String value) => updateState(state.copyWith(remaining: value));
 
   void updateUnitPrice(String value) => updateState(state.copyWith(unitPrice: value));
 
@@ -226,7 +230,6 @@ class LotFormStateNotifier extends BaseStateNotifier<LotFormState> {
       unitPrice: Decimal.parse(state.unitPrice.trim()),
       expiryDate: state.expiryDate,
       initialQuantity: Decimal.parse(state.quantity.trim()),
-      remainingQuantity: Decimal.tryParse(state.remaining.trim()),
       supplier: _blankToNull(state.supplier),
       storageLocation: _blankToNull(state.storageLocation),
       note: _blankToNull(state.note),
