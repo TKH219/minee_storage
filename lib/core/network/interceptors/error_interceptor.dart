@@ -115,6 +115,10 @@ class ErrorInterceptor extends Interceptor {
         message: 'Invalid token provided',
         errorCode: ServerErrorCodes.tokenInvalid,
       ),
+      ServerErrorCodes.quantityBelowDrawn => QuantityBelowDrawnException(
+        errorCode: ServerErrorCodes.quantityBelowDrawn,
+        statusCode: statusCode,
+      ),
       ServerErrorCodes.unauthorised => SessionExpiredException(
         message: 'Unauthorised',
         errorCode: ServerErrorCodes.unauthorised,
