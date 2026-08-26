@@ -187,10 +187,17 @@ class UnknownSupabaseException extends SupabaseException {
 /// nobody recorded, so the edit is refused and the correction belongs in a
 /// transaction instead.
 class QuantityBelowDrawnException extends AppException {
-  const QuantityBelowDrawnException({required this.received, required this.drawn});
+  const QuantityBelowDrawnException({
+    this.received,
+    this.drawn,
+    super.errorCode,
+    super.statusCode,
+  });
 
-  final Decimal received;
-  final Decimal drawn;
+  /// Null when the refusal came back from the server, which names the figures
+  /// in its own message rather than in a structured field.
+  final Decimal? received;
+  final Decimal? drawn;
 
   @override
   String get messageKey => LocaleKeys.errors_quantityBelowDrawn;

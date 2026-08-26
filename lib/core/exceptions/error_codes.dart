@@ -13,4 +13,5 @@ class ServerErrorCodes {
   static const String userWasLocked = 'USER_WAS_LOCKED';
   static const String emailAlreadyExists = 'EMAIL_ALREADY_EXISTS';
   static const String userNameAlreadyExists = 'USERNAME_ALREADY_EXISTS';
+  static const String quantityBelowDrawn = 'QUANTITY_BELOW_DRAWN';
 }

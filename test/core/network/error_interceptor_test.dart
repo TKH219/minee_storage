@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mine_storage/core/exceptions/error_codes.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/core/network/interceptors/error_interceptor.dart';
+import 'package:mine_storage/l10n/locale_keys.g.dart';
 
 import '../../support/localization_test_harness.dart';
 
@@ -108,6 +109,21 @@ void main() {
       expect(result, isA<ServerException>());
       expect(result.errorCode, ServerErrorCodes.wrongEmailOrPassword);
       expect(result.message, 'Invalid email or password');
+    });
+
+    test('QUANTITY_BELOW_DRAWN keeps its own message rather than a generic 409', () {
+      final result = ErrorInterceptor.mapError(
+        badResponse(
+          statusCode: 409,
+          data: {
+            'code': ServerErrorCodes.quantityBelowDrawn,
+            'message': 'quantity_below_drawn: 5.000 already drawn out',
+          },
+        ),
+      );
+
+      expect(result, isA<QuantityBelowDrawnException>());
+      expect(result.messageKey, LocaleKeys.errors_quantityBelowDrawn);
     });
 
     test('tokenExpired maps to SessionExpiredException', () {
