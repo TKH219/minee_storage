@@ -29,8 +29,10 @@ import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/product_api.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
+import 'package:mine_storage/data/repositories/fake_sale_repository.dart';
 import 'package:mine_storage/data/repositories/product_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/domain/repositories/sale_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
 import 'package:mine_storage/domain/repositories/auth_repository.dart';
 import 'package:mine_storage/domain/repositories/post_repository.dart';
@@ -151,6 +153,13 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
   if (AppFeatures.fakeProductsEnabled) return FakeProductRepository();
   return ProductRepositoryImpl(productApi: ref.watch(productApiProvider));
 });
+
+/// Sales run entirely in memory until the transaction ledger lands. It draws
+/// stock through [productRepositoryProvider] rather than a copy of its own, so
+/// the two can never disagree about what is left.
+final saleRepositoryProvider = Provider<SaleRepository>(
+  (ref) => FakeSaleRepository(ref.watch(productRepositoryProvider)),
+);
 
 final onboardingResolverProvider = Provider<OnboardingResolver>(
   (ref) => OnboardingResolver(
