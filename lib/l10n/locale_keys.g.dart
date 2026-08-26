@@ -110,6 +110,7 @@ abstract class  LocaleKeys {
   static const errors_unknownNetwork = 'errors.unknownNetwork';
   static const errors_unknown = 'errors.unknown';
   static const errors_insufficientStock = 'errors.insufficientStock';
+  static const errors_quantityBelowDrawn = 'errors.quantityBelowDrawn';
   static const errors = 'errors';
   static const dashboard_emptyTitle = 'dashboard.emptyTitle';
   static const dashboard_emptySubtitle = 'dashboard.emptySubtitle';
