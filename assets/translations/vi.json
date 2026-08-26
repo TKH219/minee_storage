@@ -328,7 +328,20 @@
     "feeRemove": "Xóa",
     "feeDone": "Xong",
     "feeNameRequired": "Hãy đặt tên cho khoản phí này.",
-    "feeNoneYet": "Chưa có phí hay giảm giá nào."
+    "feeNoneYet": "Chưa có phí hay giảm giá nào.",
+    "reviewTitle": "Xem lại & thanh toán",
+    "netRevenue": "Doanh thu thuần",
+    "costOfGoods": "Giá vốn hàng bán",
+    "netProfitMargin": "Lợi nhuận ròng · biên {margin}%",
+    "lessPassThrough": "Trừ thu hộ & chi phí của bạn",
+    "remittedYouKeepNone": "nộp lại, bạn không giữ",
+    "roleLocked": "Giá vốn và lợi nhuận được ẩn với vai trò của bạn.",
+    "paymentMethod": "Phương thức thanh toán",
+    "payCash": "Tiền mặt",
+    "payBankTransfer": "Chuyển khoản",
+    "payCard": "Thẻ",
+    "payEWallet": "Ví điện tử",
+    "confirmPayment": "Xác nhận thanh toán"
   },
   "reports": {
     "title": "Báo cáo",

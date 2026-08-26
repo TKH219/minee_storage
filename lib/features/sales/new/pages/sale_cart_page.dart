@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
@@ -197,7 +199,7 @@ class _SaleCartPageState
     notifier.setFees(fees);
   }
 
-  void _reviewAndPay() {}
+  void _reviewAndPay() => context.pushNamed(AppRoutes.saleReviewName);
 
   Widget _buildEmptyCart(BuildContext context) {
     final colors = context.colors;

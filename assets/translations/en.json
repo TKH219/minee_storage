@@ -328,7 +328,20 @@
     "feeRemove": "Remove",
     "feeDone": "Done",
     "feeNameRequired": "Name this fee to add it.",
-    "feeNoneYet": "No fees or discounts yet."
+    "feeNoneYet": "No fees or discounts yet.",
+    "reviewTitle": "Review & pay",
+    "netRevenue": "Net revenue",
+    "costOfGoods": "Cost of goods",
+    "netProfitMargin": "Net profit · {margin}% margin",
+    "lessPassThrough": "Less pass-through & your costs",
+    "remittedYouKeepNone": "remitted, you keep none",
+    "roleLocked": "Cost and profit are hidden for your role.",
+    "paymentMethod": "Payment method",
+    "payCash": "Cash",
+    "payBankTransfer": "Bank transfer",
+    "payCard": "Card",
+    "payEWallet": "E-wallet",
+    "confirmPayment": "Confirm payment"
   },
   "reports": {
     "title": "Reports",
