@@ -252,6 +252,13 @@ abstract class  LocaleKeys {
   static const sales_title = 'sales.title';
   static const sales_emptyTitle = 'sales.emptyTitle';
   static const sales_emptySubtitle = 'sales.emptySubtitle';
+  static const sales_newTitle = 'sales.newTitle';
+  static const sales_cartEmptyTitle = 'sales.cartEmptyTitle';
+  static const sales_cartEmptyBody = 'sales.cartEmptyBody';
+  static const sales_chooseFromProducts = 'sales.chooseFromProducts';
+  static const sales_scanBarcode = 'sales.scanBarcode';
+  static const sales_lineCount = 'sales.lineCount';
+  static const sales_oneLine = 'sales.oneLine';
   static const sales = 'sales';
   static const reports_title = 'reports.title';
   static const reports_emptyTitle = 'reports.emptyTitle';

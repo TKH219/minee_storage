@@ -262,7 +262,14 @@
   "sales": {
     "title": "Sales",
     "emptyTitle": "No sales yet",
-    "emptySubtitle": "Sales you record will appear here, newest first."
+    "emptySubtitle": "Sales you record will appear here, newest first.",
+    "newTitle": "New sale",
+    "cartEmptyTitle": "Nothing in the basket",
+    "cartEmptyBody": "Pick from what you're holding, or scan the barcode if it's to hand.",
+    "chooseFromProducts": "Choose from your products",
+    "scanBarcode": "Scan a barcode",
+    "lineCount": "{count} lines",
+    "oneLine": "1 line"
   },
   "reports": {
     "title": "Reports",

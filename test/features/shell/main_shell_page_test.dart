@@ -80,22 +80,29 @@ void main() {
     expect(find.byType(AppNavBar), findsNothing);
   });
 
-  testWidgets('the centre action opens the add sheet without leaving the tab', (tester) async {
-    await tester.pumpWidget(shellApp(initialLocation: '/reports', prefs: prefs));
+  testWidgets('the centre action starts a sale, covering the nav bar', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      OnboardingResolver.activeStoreKey: 'store-a',
+    });
+    final withStore = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(
+      shellApp(
+        initialLocation: '/reports',
+        prefs: withStore,
+        products: FakeProductRepository(latency: Duration.zero),
+      ),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('new-sale-circle')));
     await tester.pumpAndSettle();
 
-    // The design's only route into adding stock. It cannot be a floating button
-    // on the list: the shell sets extendBody, which puts anything the list
-    // floats behind the nav bar.
-    expect(find.byKey(const Key('add-scan-tile')), findsOneWidget);
-    expect(find.byKey(const Key('add-manual-tile')), findsOneWidget);
-    expect(find.text('Nothing to report yet'), findsOneWidget);
+    expect(find.text('Nothing in the basket'), findsOneWidget);
+    expect(find.byType(AppNavBar), findsNothing);
   });
 
-  testWidgets('the list reloads after the add flow, so a new product is not hidden', (tester) async {
+  testWidgets('the products list can still add a product, now the FAB sells', (tester) async {
     SharedPreferences.setMockInitialValues({
       OnboardingResolver.activeStoreKey: 'store-a',
     });
@@ -113,8 +120,9 @@ void main() {
     // the real form does over the network.
     repository.hasProduct = true;
 
-    await tester.tap(find.byKey(const Key('new-sale-circle')));
+    await tester.tap(find.byKey(const Key('products-add-button')));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('add-scan-tile')), findsOneWidget);
     await tester.tap(find.byKey(const Key('add-manual-tile')));
     await tester.pumpAndSettle();
 
