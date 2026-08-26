@@ -117,7 +117,8 @@
     "emailNotConfirmed": "Please confirm your email first.",
     "unknownNetwork": "An unknown network error occurred.",
     "unknown": "An unknown error occurred: {error}",
-    "insufficientStock": "There is not enough stock left."
+    "insufficientStock": "There is not enough stock left.",
+    "quantityBelowDrawn": "This lot has already had more drawn out of it than that. Record a stock transaction instead."
   },
   "dashboard": {
     "emptyTitle": "No stock yet",

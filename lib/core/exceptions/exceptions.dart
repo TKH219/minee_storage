@@ -182,6 +182,24 @@ class UnknownSupabaseException extends SupabaseException {
 /// Deliberately not an [HttpException]: nothing was sent. The quantities are
 /// carried so a feature can word the shortfall itself; [messageKey] stays
 /// generic because a translation key cannot interpolate them on its own.
+/// Raised when a lot's received quantity is edited down past what has already
+/// been drawn out of it. Balancing that would mean inventing a stock movement
+/// nobody recorded, so the edit is refused and the correction belongs in a
+/// transaction instead.
+class QuantityBelowDrawnException extends AppException {
+  const QuantityBelowDrawnException({required this.received, required this.drawn});
+
+  final Decimal received;
+  final Decimal drawn;
+
+  @override
+  String get messageKey => LocaleKeys.errors_quantityBelowDrawn;
+
+  @override
+  String toString() =>
+      'QuantityBelowDrawnException: received $received, already drawn $drawn';
+}
+
 class InsufficientStockException extends AppException {
   const InsufficientStockException({required this.requested, required this.available});
 

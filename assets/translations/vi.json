@@ -117,7 +117,8 @@
     "emailNotConfirmed": "Vui lòng xác nhận email của bạn trước.",
     "unknownNetwork": "Lỗi mạng không xác định.",
     "unknown": "Lỗi không xác định: {error}",
-    "insufficientStock": "Không còn đủ hàng trong kho."
+    "insufficientStock": "Không còn đủ hàng trong kho.",
+    "quantityBelowDrawn": "Lô này đã xuất ra nhiều hơn số đó. Hãy ghi nhận bằng giao dịch kho."
   },
   "dashboard": {
     "emptyTitle": "Chưa có hàng",

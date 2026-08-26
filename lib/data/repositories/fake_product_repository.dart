@@ -323,6 +323,12 @@ class FakeProductRepository implements ProductRepository {
   ) async {
     await Future<void>.delayed(latency);
     final product = _require(productId);
+    final existing = product.batches.firstWhere((batch) => batch.id == batchId);
+    final drawn = existing.initialQuantity - existing.remainingQuantity;
+    if (draft.initialQuantity < drawn) {
+      throw QuantityBelowDrawnException(received: draft.initialQuantity, drawn: drawn);
+    }
+
     return _scopedTo(
       draft.storeId,
       _replace(
@@ -335,7 +341,7 @@ class FakeProductRepository implements ProductRepository {
               expiryDate: draft.expiryDate,
               clearExpiryDate: draft.expiryDate == null,
               initialQuantity: draft.initialQuantity,
-              remainingQuantity: batch.remainingQuantity,
+              remainingQuantity: draft.initialQuantity - drawn,
               supplier: draft.supplier,
               storageLocation: draft.storageLocation,
               note: draft.note,

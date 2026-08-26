@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 
@@ -106,6 +107,96 @@ void main() {
     );
 
     expect(updated.totalRemaining, before + Decimal.parse('4'));
+  });
+
+  group('editing a lot moves what is left only by the received delta', () {
+    Future<(FakeProductRepository, ProductEntity, ProductBatchEntity)> stocked() async {
+      final repository = FakeProductRepository();
+      final seeded =
+          (await repository.getProducts(storeId: 'store-a', filter: const ProductFilter(), page: 1))
+              .items
+              .first;
+      final withLot = await repository.addBatch(
+        seeded.id,
+        BatchDraft(
+          storeId: 'store-a',
+          purchasedAt: DateTime.utc(2026, 8, 1),
+          unitPrice: Decimal.parse('3.00'),
+          initialQuantity: Decimal.parse('20'),
+        ),
+      );
+      final batch = withLot.batches.last;
+      final consumed = await repository.consume(
+        seeded.id,
+        [BatchAllocation(batchId: batch.id, quantity: Decimal.parse('5'))],
+        storeId: 'store-a',
+      );
+      return (repository, seeded, consumed.batches.firstWhere((b) => b.id == batch.id));
+    }
+
+    BatchDraft draftOf(String quantity) => BatchDraft(
+      storeId: 'store-a',
+      purchasedAt: DateTime.utc(2026, 8, 1),
+      unitPrice: Decimal.parse('3.00'),
+      initialQuantity: Decimal.parse(quantity),
+    );
+
+    test('raising the received quantity raises what is left by the same amount', () async {
+      final (repository, product, batch) = await stocked();
+      expect(batch.remainingQuantity, Decimal.parse('15'));
+
+      final updated = await repository.updateBatch(product.id, batch.id, draftOf('25'));
+
+      final after = updated.batches.firstWhere((b) => b.id == batch.id);
+      expect(after.initialQuantity, Decimal.parse('25'));
+      expect(after.remainingQuantity, Decimal.parse('20'));
+    });
+
+    test('lowering it lowers what is left by the same amount', () async {
+      final (repository, product, batch) = await stocked();
+
+      final updated = await repository.updateBatch(product.id, batch.id, draftOf('12'));
+
+      final after = updated.batches.firstWhere((b) => b.id == batch.id);
+      expect(after.remainingQuantity, Decimal.parse('7'));
+    });
+
+    test('lowering it below what was drawn out is refused, changing nothing', () async {
+      final (repository, product, batch) = await stocked();
+
+      await expectLater(
+        repository.updateBatch(product.id, batch.id, draftOf('3')),
+        throwsA(isA<QuantityBelowDrawnException>()
+            .having((e) => e.drawn, 'drawn', Decimal.parse('5'))
+            .having((e) => e.received, 'received', Decimal.parse('3'))),
+      );
+
+      final reread = await repository.getProduct(product.id, storeId: 'store-a');
+      final after = reread.batches.firstWhere((b) => b.id == batch.id);
+      expect(after.initialQuantity, Decimal.parse('20'));
+      expect(after.remainingQuantity, Decimal.parse('15'));
+    });
+
+    test('editing everything but the quantity leaves what is left alone', () async {
+      final (repository, product, batch) = await stocked();
+
+      final updated = await repository.updateBatch(
+        product.id,
+        batch.id,
+        BatchDraft(
+          storeId: 'store-a',
+          purchasedAt: DateTime.utc(2026, 8, 2),
+          unitPrice: Decimal.parse('4.00'),
+          initialQuantity: Decimal.parse('20'),
+          supplier: 'Dairy Co',
+        ),
+      );
+
+      final after = updated.batches.firstWhere((b) => b.id == batch.id);
+      expect(after.unitPrice, Decimal.parse('4.00'));
+      expect(after.supplier, 'Dairy Co');
+      expect(after.remainingQuantity, Decimal.parse('15'));
+    });
   });
 
   test('exposes the distinct categories in use', () async {
