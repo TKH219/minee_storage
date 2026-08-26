@@ -54,7 +54,7 @@ begin
         'value', fee->>'value',
         'isPassThrough', coalesce((fee->>'isPassThrough')::boolean, false),
         'sortOrder', coalesce((fee->>'sortOrder')::int, 0),
-        'computedAmount', amount, 'base', base);
+        'computedAmount', amount::text, 'base', base::text);
     end if;
   end loop;
 
@@ -82,7 +82,7 @@ begin
         'value', fee->>'value',
         'isPassThrough', coalesce((fee->>'isPassThrough')::boolean, false),
         'sortOrder', coalesce((fee->>'sortOrder')::int, 0),
-        'computedAmount', amount, 'base', base);
+        'computedAmount', amount::text, 'base', base::text);
     end if;
   end loop;
 
@@ -106,18 +106,20 @@ begin
     net_revenue := 0; gross_profit := 0; net_profit := 0; net_margin := 0;
   end if;
 
+  -- Money leaves as decimal strings. A JSON number would be parsed as a double
+  -- by every client, which is the drift numeric(18,2) exists to prevent.
   return jsonb_build_object(
-    'items_subtotal',     items_subtotal,
-    'discount_total',     discount_total,
-    'buyer_charge_total', buyer_charge_total,
-    'seller_cost_total',  seller_cost_total,
-    'pass_through_total', pass_through_total,
-    'buyer_total',        buyer_total,
-    'net_revenue',        net_revenue,
-    'cogs',               cogs,
-    'gross_profit',       gross_profit,
-    'net_profit',         net_profit,
-    'net_margin',         net_margin,
+    'items_subtotal',     items_subtotal::text,
+    'discount_total',     discount_total::text,
+    'buyer_charge_total', buyer_charge_total::text,
+    'seller_cost_total',  seller_cost_total::text,
+    'pass_through_total', pass_through_total::text,
+    'buyer_total',        buyer_total::text,
+    'net_revenue',        net_revenue::text,
+    'cogs',               cogs::text,
+    'gross_profit',       gross_profit::text,
+    'net_profit',         net_profit::text,
+    'net_margin',         net_margin::text,
     'fees',               resolved);
 end;
 $$;
