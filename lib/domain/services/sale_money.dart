@@ -1,5 +1,4 @@
 import 'package:decimal/decimal.dart';
-import 'package:rational/rational.dart';
 
 import 'package:mine_storage/domain/entities/fee.dart';
 import 'package:mine_storage/domain/entities/sale_totals.dart';
@@ -10,8 +9,12 @@ import 'package:mine_storage/domain/entities/sale_totals.dart';
 /// Pure by design: no clock, no repository, no Flutter — the same figures fall
 /// out unchanged when this moves behind a server transaction.
 abstract class SaleMoney {
-  static Decimal roundMoney(Rational value, int decimals) =>
-      value.toDecimal(scaleOnInfinitePrecision: decimals + 6).round(scale: decimals);
+  /// A percentage of a money amount, rounded half-up to the currency's
+  /// minor-unit precision. `shift(-2)` is the exact `/100`: dividing two
+  /// [Decimal]s yields a rational, and rounding that twice is what §5.3's
+  /// "never round twice" rule forbids.
+  static Decimal percentOf(Decimal base, Decimal percent, int decimals) =>
+      (base * percent).shift(-2).round(scale: decimals);
 
   static SaleTotals compute({
     required Decimal itemsSubtotal,
@@ -20,11 +23,8 @@ abstract class SaleMoney {
     required int decimals,
   }) {
     Decimal amountOf(Fee fee, Decimal base) => switch (fee.kind) {
-      FeeKind.fixed => roundMoney(fee.value.toRational(), decimals),
-      FeeKind.percent => roundMoney(
-        base.toRational() * fee.value.toRational() / Rational.fromInt(100),
-        decimals,
-      ),
+      FeeKind.fixed => fee.value.round(scale: decimals),
+      FeeKind.percent => percentOf(base, fee.value, decimals),
     };
 
     final resolved = <String, ComputedFee>{};
@@ -72,8 +72,7 @@ abstract class SaleMoney {
       netProfit: netProfit,
       netMargin: netRevenue == Decimal.zero
           ? Decimal.zero
-          : (netProfit.toRational() / netRevenue.toRational())
-                .toDecimal(scaleOnInfinitePrecision: 6),
+          : (netProfit / netRevenue).toDecimal(scaleOnInfinitePrecision: 6),
       fees: [for (final fee in fees) resolved[fee.id]!],
     );
   }
