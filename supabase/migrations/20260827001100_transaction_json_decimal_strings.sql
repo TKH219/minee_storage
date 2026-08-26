@@ -108,7 +108,12 @@ begin
   v_offset := (v_page - 1) * v_limit;
 
   with filtered as (
-    select t.id, t.code, t.occurred_at, t.buyer_total,
+    -- A day's subtotal is NET money: what came in from sales less what went out
+    -- to suppliers, so a delivery day reads negative and says so. A write-off
+    -- and a stock count move no money and contribute nothing.
+    select t.id, t.code, t.occurred_at,
+           case when t.type = 'receive' then -t.buyer_total else t.buyer_total end
+             as signed_total,
            (t.occurred_at at time zone 'UTC')::date as day
       from public.transactions t
      where t.store_id = p_store_id
@@ -130,7 +135,7 @@ begin
      offset v_offset limit v_limit
   ),
   whole_day as (
-    select f.day, sum(f.buyer_total) as subtotal, count(*) as day_count
+    select f.day, sum(f.signed_total) as subtotal, count(*) as day_count
       from filtered f
      where f.day in (select day from page_rows)
      group by f.day
