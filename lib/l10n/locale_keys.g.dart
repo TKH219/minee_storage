@@ -114,6 +114,11 @@ abstract class  LocaleKeys {
   static const errors = 'errors';
   static const dashboard_emptyTitle = 'dashboard.emptyTitle';
   static const dashboard_emptySubtitle = 'dashboard.emptySubtitle';
+  static const dashboard_today = 'dashboard.today';
+  static const dashboard_addProduct = 'dashboard.addProduct';
+  static const dashboard_scanBarcode = 'dashboard.scanBarcode';
+  static const dashboard_settings = 'dashboard.settings';
+  static const dashboard_switchStore = 'dashboard.switchStore';
   static const dashboard = 'dashboard';
   static const products_title = 'products.title';
   static const products_emptyTitle = 'products.emptyTitle';
