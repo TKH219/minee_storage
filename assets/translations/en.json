@@ -119,7 +119,11 @@
     "unknownNetwork": "An unknown network error occurred.",
     "unknown": "An unknown error occurred: {error}",
     "insufficientStock": "There is not enough stock left.",
-    "quantityBelowDrawn": "This lot has already had more drawn out of it than that. Record a stock transaction instead."
+    "quantityBelowDrawn": "This lot has already had more drawn out of it than that. Record a stock transaction instead.",
+    "reversalBlocked": "That stock has already left, so this cannot be undone. Correct the movements that used it first.",
+    "staleTransaction": "This transaction changed while you were editing it. Reload to see what moved.",
+    "occurredBeforeArrival": "That date falls before the stock arrived.",
+    "feeNotAllowed": "This kind of movement carries no fees."
   },
   "dashboard": {
     "emptyTitle": "No stock yet",
@@ -342,6 +346,7 @@
     "payBankTransfer": "Bank transfer",
     "payCard": "Card",
     "payEWallet": "E-wallet",
+    "payOther": "Other",
     "confirmPayment": "Confirm payment",
     "received": "{amount} received",
     "saleCode": "{method} · sale",

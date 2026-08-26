@@ -208,5 +208,6 @@ class _SaleSuccessPageState extends ConsumerState<SaleSuccessPage> {
     PaymentMethod.bankTransfer => LocaleKeys.sales_payBankTransfer.tr(),
     PaymentMethod.card => LocaleKeys.sales_payCard.tr(),
     PaymentMethod.eWallet => LocaleKeys.sales_payEWallet.tr(),
+    PaymentMethod.other => LocaleKeys.sales_payOther.tr(),
   };
 }

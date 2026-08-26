@@ -26,3 +26,8 @@ export 'sales_dashboard_summary.dart';
 export 'transaction_type.dart';
 export 'write_off_reason.dart';
 export 'transaction_money.dart';
+export 'transaction_line.dart';
+export 'transaction_fee.dart';
+export 'fee_preset.dart';
+export 'transaction.dart';
+export 'transaction_draft.dart';

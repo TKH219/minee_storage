@@ -31,7 +31,7 @@ class PaymentMethodGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const methods = PaymentMethod.values;
+    const methods = PaymentMethodX.selectable;
 
     return Padding(
       padding: PaymentGridMetrics.padding,
@@ -103,6 +103,7 @@ class PaymentMethodGrid extends StatelessWidget {
     PaymentMethod.bankTransfer => Icons.account_balance_outlined,
     PaymentMethod.card => Icons.credit_card_rounded,
     PaymentMethod.eWallet => Icons.account_balance_wallet_outlined,
+    PaymentMethod.other => Icons.more_horiz_rounded,
   };
 
   static String _labelFor(PaymentMethod method) => switch (method) {
@@ -110,5 +111,6 @@ class PaymentMethodGrid extends StatelessWidget {
     PaymentMethod.bankTransfer => LocaleKeys.sales_payBankTransfer.tr(),
     PaymentMethod.card => LocaleKeys.sales_payCard.tr(),
     PaymentMethod.eWallet => LocaleKeys.sales_payEWallet.tr(),
+    PaymentMethod.other => LocaleKeys.sales_payOther.tr(),
   };
 }
