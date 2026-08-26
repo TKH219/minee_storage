@@ -31,6 +31,7 @@ import 'package:mine_storage/data/data_sources/remote/product_api.dart';
 import 'package:mine_storage/data/data_sources/remote/transaction_api.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/data/repositories/fake_sale_repository.dart';
+import 'package:mine_storage/data/repositories/ledger_sale_repository.dart';
 import 'package:mine_storage/data/repositories/fake_store_overview_repository.dart';
 import 'package:mine_storage/data/repositories/product_repository_impl.dart';
 import 'package:mine_storage/data/repositories/transaction_repository_impl.dart';
@@ -159,12 +160,18 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
   return ProductRepositoryImpl(productApi: ref.watch(productApiProvider));
 });
 
-/// Sales run entirely in memory until the transaction ledger lands. It draws
-/// stock through [productRepositoryProvider] rather than a copy of its own, so
-/// the two can never disagree about what is left.
-final saleRepositoryProvider = Provider<SaleRepository>(
-  (ref) => FakeSaleRepository(ref.watch(productRepositoryProvider)),
-);
+/// The drawn sale flow, served by the ledger. Flip
+/// [AppFeatures.fakeLedgerEnabled] to run it against the in-memory stand-in
+/// when working offline.
+final saleRepositoryProvider = Provider<SaleRepository>((ref) {
+  if (AppFeatures.fakeLedgerEnabled) {
+    return FakeSaleRepository(ref.watch(productRepositoryProvider));
+  }
+  return LedgerSaleRepository(
+    ref.watch(transactionRepositoryProvider),
+    ref.watch(productRepositoryProvider),
+  );
+});
 
 final transactionApiProvider = Provider<TransactionApi>(
   (ref) => TransactionApi(
