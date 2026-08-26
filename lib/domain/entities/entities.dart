@@ -13,3 +13,6 @@ export 'store_holding.dart';
 export 'store.dart';
 export 'store_category.dart';
 export 'currency.dart';
+export 'fee.dart';
+export 'payment_method.dart';
+export 'sale_totals.dart';
