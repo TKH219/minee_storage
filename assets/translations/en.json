@@ -385,7 +385,11 @@
     "currencyEUR": "Euro",
     "currencyGBP": "Pound sterling",
     "currencySGD": "Singapore dollar",
-    "currencyVND": "Vietnamese dong"
+    "currencyVND": "Vietnamese dong",
+    "logOutTitle": "Log out?",
+    "logOutBody": "You'll need your email and password to get back in. Nothing you've recorded is lost.",
+    "logOutAccount": "Signed in as {email}",
+    "stay": "Stay"
   },
   "onboarding": {
     "profile": {

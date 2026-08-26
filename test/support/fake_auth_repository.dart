@@ -88,7 +88,12 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> signOut() async => calls.add('signOut');
+  Future<void> signOut() async {
+    calls.add('signOut');
+    // Signing out can fail like anything else, and the caller has to keep the
+    // user signed in when it does.
+    _maybeThrow();
+  }
 
   @override
   Future<UserEntity> updateProfile({required String fullName, String? avatarUrl}) async {
