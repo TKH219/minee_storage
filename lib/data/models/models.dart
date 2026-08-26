@@ -14,3 +14,5 @@ export 'response/store/store_model.dart';
 export 'response/user/user_model.dart';
 export 'request/user/email_status_request.dart';
 export 'request/user/update_user_request.dart';
+export 'response/transaction/transaction_model.dart';
+export 'request/transaction/transaction_request.dart';
