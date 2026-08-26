@@ -15,4 +15,8 @@ export 'store_category.dart';
 export 'currency.dart';
 export 'fee.dart';
 export 'payment_method.dart';
+export 'sale_allocation.dart';
+export 'sale_draft.dart';
+export 'sale_line.dart';
 export 'sale_totals.dart';
+export 'sale.dart';
