@@ -119,7 +119,11 @@
     "unknownNetwork": "Lỗi mạng không xác định.",
     "unknown": "Lỗi không xác định: {error}",
     "insufficientStock": "Không còn đủ hàng trong kho.",
-    "quantityBelowDrawn": "Lô này đã xuất ra nhiều hơn số đó. Hãy ghi nhận bằng giao dịch kho."
+    "quantityBelowDrawn": "Lô này đã xuất ra nhiều hơn số đó. Hãy ghi nhận bằng giao dịch kho.",
+    "reversalBlocked": "Số hàng đó đã xuất kho nên không thể hoàn tác. Hãy sửa các giao dịch đã dùng nó trước.",
+    "staleTransaction": "Giao dịch này đã thay đổi trong lúc bạn chỉnh sửa. Tải lại để xem thay đổi.",
+    "occurredBeforeArrival": "Ngày đó nằm trước khi hàng về kho.",
+    "feeNotAllowed": "Loại biến động này không có phí."
   },
   "dashboard": {
     "emptyTitle": "Chưa có hàng",
@@ -342,6 +346,7 @@
     "payBankTransfer": "Chuyển khoản",
     "payCard": "Thẻ",
     "payEWallet": "Ví điện tử",
+    "payOther": "Khác",
     "confirmPayment": "Xác nhận thanh toán",
     "received": "Đã nhận {amount}",
     "saleCode": "{method} · đơn",

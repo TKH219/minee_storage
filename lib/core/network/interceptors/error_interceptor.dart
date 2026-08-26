@@ -60,7 +60,7 @@ class ErrorInterceptor extends Interceptor {
 
     // Business codes win over HTTP status: the backend uses 400 for several
     // distinct, individually-actionable failures.
-    final byCode = _mapBusinessCode(businessCode, statusCode);
+    final byCode = _mapBusinessCode(businessCode, statusCode, message);
     if (byCode != null) return byCode;
 
     return switch (statusCode) {
@@ -85,7 +85,7 @@ class ErrorInterceptor extends Interceptor {
     };
   }
 
-  static AppException? _mapBusinessCode(String? code, int? statusCode) {
+  static AppException? _mapBusinessCode(String? code, int? statusCode, String? message) {
     return switch (code) {
       ServerErrorCodes.wrongEmailOrPassword => const ServerException(
         message: 'Invalid email or password',
@@ -117,6 +117,35 @@ class ErrorInterceptor extends Interceptor {
       ),
       ServerErrorCodes.quantityBelowDrawn => QuantityBelowDrawnException(
         errorCode: ServerErrorCodes.quantityBelowDrawn,
+        statusCode: statusCode,
+      ),
+      // The ledger's refusals. Each is typed so the UI can name what happened
+      // rather than falling back to a generic failure.
+      ServerErrorCodes.reversalBelowZero ||
+      ServerErrorCodes.reversalAboveReceived ||
+      ServerErrorCodes.batchAlreadyDrawn => ReversalBlockedException(
+        message: message,
+        errorCode: code,
+        statusCode: statusCode,
+      ),
+      ServerErrorCodes.insufficientStock => InsufficientStockException(
+        message: message,
+        errorCode: ServerErrorCodes.insufficientStock,
+        statusCode: statusCode,
+      ),
+      ServerErrorCodes.staleTransaction => StaleTransactionException(
+        message: message,
+        errorCode: ServerErrorCodes.staleTransaction,
+        statusCode: statusCode,
+      ),
+      ServerErrorCodes.occurredBeforeArrival => OccurredBeforeArrivalException(
+        message: message,
+        errorCode: ServerErrorCodes.occurredBeforeArrival,
+        statusCode: statusCode,
+      ),
+      ServerErrorCodes.feeNotAllowed => FeeNotAllowedException(
+        message: message,
+        errorCode: ServerErrorCodes.feeNotAllowed,
         statusCode: statusCode,
       ),
       ServerErrorCodes.unauthorised => SessionExpiredException(

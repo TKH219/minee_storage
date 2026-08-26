@@ -112,6 +112,10 @@ abstract class  LocaleKeys {
   static const errors_unknown = 'errors.unknown';
   static const errors_insufficientStock = 'errors.insufficientStock';
   static const errors_quantityBelowDrawn = 'errors.quantityBelowDrawn';
+  static const errors_reversalBlocked = 'errors.reversalBlocked';
+  static const errors_staleTransaction = 'errors.staleTransaction';
+  static const errors_occurredBeforeArrival = 'errors.occurredBeforeArrival';
+  static const errors_feeNotAllowed = 'errors.feeNotAllowed';
   static const errors = 'errors';
   static const dashboard_emptyTitle = 'dashboard.emptyTitle';
   static const dashboard_emptySubtitle = 'dashboard.emptySubtitle';
@@ -331,6 +335,7 @@ abstract class  LocaleKeys {
   static const sales_payBankTransfer = 'sales.payBankTransfer';
   static const sales_payCard = 'sales.payCard';
   static const sales_payEWallet = 'sales.payEWallet';
+  static const sales_payOther = 'sales.payOther';
   static const sales_confirmPayment = 'sales.confirmPayment';
   static const sales_received = 'sales.received';
   static const sales_saleCode = 'sales.saleCode';
