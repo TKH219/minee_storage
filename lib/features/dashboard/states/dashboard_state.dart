@@ -99,7 +99,6 @@ class DashboardStateNotifier extends BaseStateNotifier<DashboardState> {
   late final SaleRepository _sales;
   late final StoreOverviewRepository _stores;
   late final DateTime Function() _now;
-  String? _storeId;
 
   @override
   DashboardState createInitialState() {
@@ -107,7 +106,6 @@ class DashboardStateNotifier extends BaseStateNotifier<DashboardState> {
     _sales = ref.read(saleRepositoryProvider);
     _stores = ref.read(storeOverviewRepositoryProvider);
     _now = ref.read(nowProvider);
-    _storeId = ref.read(activeStoreProvider);
     return DashboardState();
   }
 
@@ -121,7 +119,9 @@ class DashboardStateNotifier extends BaseStateNotifier<DashboardState> {
   Future<void> refresh() => _fetch();
 
   Future<void> _fetch() async {
-    final storeId = _storeId;
+    // Read fresh rather than cached: the store switcher changes this between
+    // one load and the next, and a cached id would keep showing the old shop.
+    final storeId = ref.read(activeStoreProvider);
     if (storeId == null) {
       updateState(
         state.copyWith(

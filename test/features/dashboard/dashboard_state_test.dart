@@ -1,13 +1,16 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mine_storage/app/clock.dart';
+import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/data/repositories/fake_sale_repository.dart';
 import 'package:mine_storage/data/repositories/fake_store_overview_repository.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/dashboard/states/dashboard_state.dart';
+import 'package:mine_storage/features/onboarding/onboarding_resolver.dart';
 import 'package:mine_storage/features/products/states/active_store_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
 import 'package:mine_storage/providers.dart';
@@ -73,6 +76,39 @@ void main() {
       ),
     ],
   );
+
+  test('a store chosen after the notifier was built is the one it loads', () async {
+    SharedPreferences.setMockInitialValues({
+      OnboardingResolver.activeStoreKey: 'store-a',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        productRepositoryProvider.overrideWithValue(products),
+        saleRepositoryProvider.overrideWithValue(sales),
+        storeRepositoryProvider.overrideWithValue(stores),
+        storeOverviewRepositoryProvider.overrideWithValue(
+          FakeStoreOverviewRepository(stores, products),
+        ),
+        nowProvider.overrideWithValue(() => today),
+      ],
+    );
+    addTearDown(container.dispose);
+    container.listen(dashboardStateProvider, (_, _) {}, fireImmediately: true);
+
+    await container.read(dashboardStateProvider.notifier).load();
+    expect(container.read(dashboardStateProvider).isEmpty, isFalse);
+
+    await container.read(activeStoreProvider.notifier).select('store-empty');
+    await container.read(dashboardStateProvider.notifier).load();
+
+    expect(
+      container.read(dashboardStateProvider).isEmpty,
+      isTrue,
+      reason: 'the dashboard must re-scope to the store just chosen',
+    );
+  });
 
   test('starts out untouched', () {
     final state = containerFor().read(dashboardStateProvider);
