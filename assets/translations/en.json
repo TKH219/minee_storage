@@ -293,7 +293,12 @@
     "allocAddToSale": "Add to sale",
     "allocNotEnough": "Only {available} left.",
     "allocPriceNeeded": "Set a sell price to continue.",
-    "allocWholeUnits": "This product is counted in whole units."
+    "allocWholeUnits": "This product is counted in whole units.",
+    "manualTitle": "Choose lots yourself",
+    "manualSubtitle": "{product} · {quantity} needed",
+    "manualAvailable": "cost {cost} · {available} available",
+    "manualShort": "Allocated {allocated} of {requested}. Assign {missing} more before you can continue.",
+    "manualOver": "Allocated {allocated} of {requested}. Remove {excess} before you can continue."
   },
   "reports": {
     "title": "Reports",

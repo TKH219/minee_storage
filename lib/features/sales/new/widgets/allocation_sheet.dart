@@ -14,6 +14,7 @@ import 'package:mine_storage/shared/utils/currency_formatter.dart';
 
 import 'allocation_metrics.dart';
 import 'allocation_row.dart';
+import 'manual_allocation_row.dart';
 import 'sale_buttons.dart';
 
 /// S21. The seller picks a product and a quantity — never a lot. The split is
@@ -119,12 +120,34 @@ class _AllocationSheetState extends ConsumerState<AllocationSheet> {
                 Padding(
                   padding: AllocationMetrics.horizontalPadding,
                   child: Text(
-                    widget.product.name,
+                    state.isManual
+                        ? LocaleKeys.sales_manualTitle.tr()
+                        : widget.product.name,
                     style: context.textStyles.sansBodyBold.copyWith(
                       fontSize: AllocationMetrics.titleSize,
                     ),
                   ),
                 ),
+                if (state.isManual)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: AllocationMetrics.innerGap,
+                    ),
+                    child: Text(
+                      LocaleKeys.sales_manualSubtitle.tr(
+                        namedArgs: {
+                          'product': widget.product.name,
+                          'quantity': state.quantity,
+                        },
+                      ),
+                      style: context.textStyles.sansBody.copyWith(
+                        fontSize: AllocationMetrics.subtitleSize,
+                        color: colors.neutral6,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: AllocationMetrics.blockGap),
                 Padding(
                   padding: AllocationMetrics.horizontalPadding,
@@ -200,6 +223,8 @@ class _AllocationSheetState extends ConsumerState<AllocationSheet> {
     }
     if (state.allocations.isEmpty) return const SizedBox.shrink();
 
+    final notifier = ref.read(allocationStateProvider.notifier);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -216,15 +241,69 @@ class _AllocationSheetState extends ConsumerState<AllocationSheet> {
                 ),
               ),
             ),
+            InkWell(
+              key: const Key('allocation-toggle-manual'),
+              onTap: state.isManual ? notifier.leaveManual : notifier.enterManual,
+              child: Text(
+                state.isManual
+                    ? LocaleKeys.sales_allocAuto.tr()
+                    : LocaleKeys.sales_allocEdit.tr(),
+                style: context.textStyles.sansCaption.copyWith(
+                  fontSize: AllocationMetrics.linkSize,
+                  fontWeight: FontWeight.w600,
+                  color: colors.inkPrimary,
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: AllocationMetrics.innerGap),
-        for (final allocation in state.allocations) ...[
-          if (allocation != state.allocations.first)
+        if (state.isManual) ...[
+          for (final lot in state.manualLots) ...[
+            if (lot != state.manualLots.first)
+              const SizedBox(height: AllocationMetrics.innerGap),
+            ManualAllocationRow(
+              key: ValueKey('manual-${lot.batchId}'),
+              lot: lot,
+              money: money,
+              onChanged: (value) =>
+                  notifier.setManualQuantity(lot.batchId, value),
+            ),
+          ],
+          if (!state.manualSumsExactly) ...[
             const SizedBox(height: AllocationMetrics.innerGap),
-          AllocationRow(allocation: allocation, money: money, today: today),
-        ],
+            _Notice(message: _mismatchMessage(state)),
+          ],
+        ] else
+          for (final allocation in state.allocations) ...[
+            if (allocation != state.allocations.first)
+              const SizedBox(height: AllocationMetrics.innerGap),
+            AllocationRow(allocation: allocation, money: money, today: today),
+          ],
       ],
+    );
+  }
+
+  /// §5.2.4 — the message names the shortfall so the seller knows exactly what
+  /// to change, and Add to sale stays disabled until they do.
+  static String _mismatchMessage(AllocationState state) {
+    final requested = state.quantity;
+    final allocated = formatQuantity(state.manualAllocated);
+    if (state.manualExcess > Decimal.zero) {
+      return LocaleKeys.sales_manualOver.tr(
+        namedArgs: {
+          'allocated': allocated,
+          'requested': requested,
+          'excess': formatQuantity(state.manualExcess),
+        },
+      );
+    }
+    return LocaleKeys.sales_manualShort.tr(
+      namedArgs: {
+        'allocated': allocated,
+        'requested': requested,
+        'missing': formatQuantity(state.manualMissing),
+      },
     );
   }
 

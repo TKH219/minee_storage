@@ -195,6 +195,92 @@ void main() {
     expect(find.text('Olive oil 1L'), findsNothing, reason: 'a whole unit is fine');
   });
 
+  group('manual override', () {
+    testWidgets('Edit hands the split to the seller, seeded from FEFO',
+        (tester) async {
+      await pumpSheet(tester);
+      for (var i = 0; i < 5; i++) {
+        await tester.tap(find.byKey(const Key('allocation-increment')));
+        await tester.pumpAndSettle();
+      }
+
+      await tester.tap(find.byKey(const Key('allocation-toggle-manual')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Choose lots yourself'), findsOneWidget);
+      expect(find.textContaining('6 needed'), findsOneWidget);
+      expect(find.byKey(const Key('manual-qty-b1')), findsOneWidget);
+      expect(find.byKey(const Key('manual-qty-b2')), findsOneWidget);
+    });
+
+    testWidgets('a short split names the shortfall and disables Add to sale',
+        (tester) async {
+      await pumpSheet(tester);
+      for (var i = 0; i < 5; i++) {
+        await tester.tap(find.byKey(const Key('allocation-increment')));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.byKey(const Key('allocation-toggle-manual')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byKey(const Key('manual-qty-b1')), '1');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('manual-qty-b2')), '3');
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Assign 2.000 more before you can continue'),
+        findsOneWidget,
+      );
+
+      final button = tester.widget<FilledButton>(
+        find.descendant(
+          of: find.byKey(const Key('allocation-add-to-sale')),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(button.onPressed, isNull);
+    });
+
+    testWidgets('an over-allocation names the excess', (tester) async {
+      await pumpSheet(tester);
+      for (var i = 0; i < 5; i++) {
+        await tester.tap(find.byKey(const Key('allocation-increment')));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.byKey(const Key('allocation-toggle-manual')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byKey(const Key('manual-qty-b2')), '6');
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Remove 2.000'), findsOneWidget);
+    });
+
+    testWidgets('an exact split re-enables Add to sale', (tester) async {
+      await pumpSheet(tester);
+      for (var i = 0; i < 5; i++) {
+        await tester.tap(find.byKey(const Key('allocation-increment')));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.byKey(const Key('allocation-toggle-manual')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byKey(const Key('manual-qty-b1')), '1');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('manual-qty-b2')), '5');
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<FilledButton>(
+        find.descendant(
+          of: find.byKey(const Key('allocation-add-to-sale')),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(button.onPressed, isNotNull);
+    });
+  });
+
   testWidgets('renders in Vietnamese without leaking a key', (tester) async {
     await pumpSheet(tester, locale: viLocale);
 

@@ -293,7 +293,12 @@
     "allocAddToSale": "Thêm vào đơn",
     "allocNotEnough": "Chỉ còn {available}.",
     "allocPriceNeeded": "Hãy nhập giá bán để tiếp tục.",
-    "allocWholeUnits": "Sản phẩm này chỉ tính theo đơn vị nguyên."
+    "allocWholeUnits": "Sản phẩm này chỉ tính theo đơn vị nguyên.",
+    "manualTitle": "Tự chọn lô hàng",
+    "manualSubtitle": "{product} · cần {quantity}",
+    "manualAvailable": "giá vốn {cost} · còn {available}",
+    "manualShort": "Đã phân bổ {allocated}/{requested}. Cần phân bổ thêm {missing} để tiếp tục.",
+    "manualOver": "Đã phân bổ {allocated}/{requested}. Cần bớt {excess} để tiếp tục."
   },
   "reports": {
     "title": "Báo cáo",
