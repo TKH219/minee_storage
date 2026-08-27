@@ -375,8 +375,11 @@ class FakeProductRepository implements ProductRepository {
     );
   }
 
-  @override
-  Future<ProductEntity> consume(
+  /// The in-memory mirror of the ledger's `apply_transaction` RPC, and the
+  /// only thing in this stand-in that moves a lot's remaining quantity. It is
+  /// deliberately **not** on [ProductRepository]: the ledger is the one write
+  /// path into stock, and a repository method beside it would be a second.
+  Future<ProductEntity> applyLedgerDeltas(
     String productId,
     List<BatchAllocation> allocations, {
     required String storeId,

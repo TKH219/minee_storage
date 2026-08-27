@@ -177,7 +177,7 @@ class UnknownSupabaseException extends SupabaseException {
 }
 
 /// Raised by the FEFO allocator before any request leaves the device, so a
-/// short consume attempt changes nothing.
+/// short draw against stock changes nothing.
 ///
 /// Deliberately not an [HttpException]: nothing was sent. The quantities are
 /// carried so a feature can word the shortfall itself; [messageKey] stays

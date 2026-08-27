@@ -43,11 +43,4 @@ abstract class ProductRepository {
     String batchId, {
     required String storeId,
   });
-
-  /// Applies an allocation already resolved by `FefoAllocator`. All or nothing.
-  Future<ProductEntity> consume(
-    String productId,
-    List<BatchAllocation> allocations, {
-    required String storeId,
-  });
 }

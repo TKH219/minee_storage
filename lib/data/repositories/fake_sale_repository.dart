@@ -3,14 +3,16 @@ import 'package:flutter/foundation.dart';
 
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
-import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/domain/repositories/sale_repository.dart';
 import 'package:mine_storage/domain/services/fefo_allocator.dart';
 
 /// In-memory stand-in for the sales tables, alongside [FakeProductRepository].
 ///
-/// It draws stock through the product repository rather than holding its own
-/// copy, so a sale and the product list can never disagree about what is left.
+/// It draws stock through that stand-in rather than holding its own copy, so a
+/// sale and the product list can never disagree about what is left. It is bound
+/// to the concrete fake on purpose: moving stock is the ledger's job, so no
+/// such method exists on [ProductRepository] to reach through.
 class FakeSaleRepository implements SaleRepository {
   FakeSaleRepository(
     this._products, {
@@ -18,7 +20,7 @@ class FakeSaleRepository implements SaleRepository {
     int startingCode = 1042,
   }) : _nextCode = startingCode;
 
-  final ProductRepository _products;
+  final FakeProductRepository _products;
 
   /// Fakes network delay so loading states are visible on device. Widget tests
   /// pass [Duration.zero].
@@ -86,7 +88,7 @@ class FakeSaleRepository implements SaleRepository {
     }
 
     for (final line in draft.lines) {
-      await _products.consume(
+      await _products.applyLedgerDeltas(
         line.productId,
         [
           for (final allocation in line.allocations)

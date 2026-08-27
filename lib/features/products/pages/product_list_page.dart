@@ -89,7 +89,8 @@ class _ProductListPageState
       AppRoutes.productDetailName,
       pathParameters: {'id': id},
     );
-    // Detail can archive, receive or consume, so the list is always restated.
+    // Detail can archive, receive, write off or count, so the list is always
+    // restated.
     if (mounted) await notifier.refresh();
   }
 

@@ -75,10 +75,4 @@ abstract class ProductApi {
     @Path('batchId') String batchId, {
     @Query('storeId') required String storeId,
   });
-
-  @POST('/products/{id}/consumptions')
-  Future<BaseResponse<ProductModel>> consume(
-    @Path('id') String id,
-    @Body() ConsumeRequest body,
-  );
 }

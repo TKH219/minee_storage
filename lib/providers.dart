@@ -155,8 +155,14 @@ final productApiProvider = Provider<ProductApi>(
 /// [ProductRepositoryImpl] is complete but has no tables behind it yet, so the
 /// in-memory stand-in is what the app actually runs on — see
 /// [AppFeatures.fakeProductsEnabled].
+final fakeProductRepositoryProvider = Provider<FakeProductRepository>(
+  (ref) => FakeProductRepository(),
+);
+
 final productRepositoryProvider = Provider<ProductRepository>((ref) {
-  if (AppFeatures.fakeProductsEnabled) return FakeProductRepository();
+  if (AppFeatures.fakeProductsEnabled) {
+    return ref.watch(fakeProductRepositoryProvider);
+  }
   return ProductRepositoryImpl(productApi: ref.watch(productApiProvider));
 });
 
@@ -165,7 +171,7 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
 /// when working offline.
 final saleRepositoryProvider = Provider<SaleRepository>((ref) {
   if (AppFeatures.fakeLedgerEnabled) {
-    return FakeSaleRepository(ref.watch(productRepositoryProvider));
+    return FakeSaleRepository(ref.watch(fakeProductRepositoryProvider));
   }
   return LedgerSaleRepository(
     ref.watch(transactionRepositoryProvider),

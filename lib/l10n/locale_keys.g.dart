@@ -191,7 +191,6 @@ abstract class  LocaleKeys {
   static const products_remaining = 'products.remaining';
   static const products_nearestExpiry = 'products.nearestExpiry';
   static const products_latestPrice = 'products.latestPrice';
-  static const products_useStock = 'products.useStock';
   static const products_addLot = 'products.addLot';
   static const products_lotsCount = 'products.lotsCount';
   static const products_oneLot = 'products.oneLot';
@@ -218,13 +217,7 @@ abstract class  LocaleKeys {
   static const products_remainingMovesWithStock = 'products.remainingMovesWithStock';
   static const products_expiryAfterPurchase = 'products.expiryAfterPurchase';
   static const products_priceNotNegative = 'products.priceNotNegative';
-  static const products_consumeTitle = 'products.consumeTitle';
-  static const products_quantityToUse = 'products.quantityToUse';
-  static const products_allocationPreview = 'products.allocationPreview';
-  static const products_expiredWarning = 'products.expiredWarning';
   static const products_notEnoughStock = 'products.notEnoughStock';
-  static const products_useButton = 'products.useButton';
-  static const products_usedSuccess = 'products.usedSuccess';
   static const products_archiveDialogTitle = 'products.archiveDialogTitle';
   static const products_archiveDialogBody = 'products.archiveDialogBody';
   static const products_undo = 'products.undo';

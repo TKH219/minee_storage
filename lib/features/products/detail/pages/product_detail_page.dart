@@ -7,8 +7,10 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
 import 'package:mine_storage/features/products/detail/states/product_detail_state.dart';
-import 'package:mine_storage/features/products/detail/widgets/consume_sheet.dart';
 import 'package:mine_storage/features/products/detail/widgets/lot_sheet.dart';
+import 'package:mine_storage/features/products/detail/widgets/receive_sheet.dart';
+import 'package:mine_storage/features/products/detail/widgets/stock_count_sheet.dart';
+import 'package:mine_storage/features/products/detail/widgets/write_off_sheet.dart';
 import 'package:mine_storage/features/products/detail/widgets/other_stores_section.dart';
 import 'package:mine_storage/features/settings/states/settings_state.dart';
 import 'package:mine_storage/l10n/locale_keys.g.dart';
@@ -44,7 +46,10 @@ class _ProductDetailPageState
   @override
   void initDataFromConstructor() => notifier.load(widget.productId);
 
-  Future<void> _receiveStock({ProductBatchEntity? batch}) async {
+  /// Editing a lot corrects the delivery record; it is not a stock movement,
+  /// which is why it stays on the lot form while receiving goes through the
+  /// ledger like every other movement.
+  Future<void> _editLot(ProductBatchEntity batch) async {
     final product = currentState.product;
     if (product == null) return;
 
@@ -52,14 +57,36 @@ class _ProductDetailPageState
     if (saved == true && mounted) await notifier.load(widget.productId);
   }
 
-  Future<void> _useStock() async {
+  Future<void> _receiveStock() async {
     final product = currentState.product;
     if (product == null) return;
 
-    final used = await ConsumeSheet.show(context, product: product);
-    if (used == true && mounted) {
+    final saved = await ReceiveSheet.show(context, product: product);
+    if (saved == true && mounted) {
       await notifier.load(widget.productId);
-      if (mounted) showSuccessSnack(LocaleKeys.products_usedSuccess.tr());
+      if (mounted) showSuccessSnack(LocaleKeys.products_receiveSuccess.tr());
+    }
+  }
+
+  Future<void> _writeOff() async {
+    final product = currentState.product;
+    if (product == null) return;
+
+    final written = await WriteOffSheet.show(context, product: product);
+    if (written == true && mounted) {
+      await notifier.load(widget.productId);
+      if (mounted) showSuccessSnack(LocaleKeys.products_writeOffSuccess.tr());
+    }
+  }
+
+  Future<void> _countStock() async {
+    final product = currentState.product;
+    if (product == null) return;
+
+    final counted = await StockCountSheet.show(context, product: product);
+    if (counted == true && mounted) {
+      await notifier.load(widget.productId);
+      if (mounted) showSuccessSnack(LocaleKeys.products_countSuccess.tr());
     }
   }
 
@@ -157,17 +184,25 @@ class _ProductDetailPageState
             children: [
               Expanded(
                 child: FilledButton(
-                  key: const Key('use-stock-button'),
-                  onPressed: currentState.canUseStock ? _useStock : null,
-                  child: Text(LocaleKeys.products_useStock.tr()),
+                  key: const Key('write-off-button'),
+                  onPressed: currentState.canUseStock ? _writeOff : null,
+                  child: Text(LocaleKeys.products_writeOffAction.tr()),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton(
                   key: const Key('add-lot-button'),
-                  onPressed: product.archived ? null : () => _receiveStock(),
-                  child: Text(LocaleKeys.products_addLot.tr()),
+                  onPressed: product.archived ? null : _receiveStock,
+                  child: Text(LocaleKeys.products_receiveStock.tr()),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  key: const Key('count-stock-button'),
+                  onPressed: currentState.canUseStock ? _countStock : null,
+                  child: Text(LocaleKeys.products_countAction.tr()),
                 ),
               ),
             ],
@@ -232,7 +267,7 @@ class _ProductDetailPageState
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: GestureDetector(
-                onTap: product.archived ? null : () => _receiveStock(batch: lot),
+                onTap: product.archived ? null : () => _editLot(lot),
                 child: LotCard(
                   lot: lot,
                   isNextOut: nextOut != null && lot.id == nextOut.id,
