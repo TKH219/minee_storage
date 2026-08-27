@@ -257,10 +257,12 @@ Two consequences worth knowing before touching either table:
   would let a caller who owns both file one user's stock against another user's
   shop.
 
-- **`quantity_remaining` is never written from a request body.** A receive
-  seeds it from the delivery; after that it moves only through a stock
-  transaction — `apply_consumption` today, the transaction ledger later. The
-  one exception is `amend_batch`, which corrects a delivery: it shifts the
+- **`quantity_remaining` is never written from a request body.** It moves only
+  through a ledger transaction: a `receive` opens the lot and every later
+  movement is a signed delta against it. The app no longer calls
+  `apply_consumption` or `POST /products/:id/consumptions` — both are dead
+  server-side and are a follow-up to drop. The one exception is `amend_batch`,
+  which corrects a delivery rather than moving stock: it shifts the
   remainder by the same delta as `quantity_received` under a row lock, and
   raises `P0004` rather than let a lot fall below what has been drawn out of
   it. Editing a lot is a correction of what arrived, never a statement about
