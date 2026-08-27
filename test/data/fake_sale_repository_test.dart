@@ -135,7 +135,7 @@ void main() {
 
     test('a confirm that outruns stock deducts nothing at all', () async {
       final draft = await draftForOliveOil('4');
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p1',
         [BatchAllocation(batchId: 'b1', quantity: d('2'))],
         storeId: 'store-a',
@@ -172,7 +172,7 @@ void main() {
         ],
       );
 
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p3',
         [BatchAllocation(batchId: 'b4', quantity: d('2'))],
         storeId: 'store-a',

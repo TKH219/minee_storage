@@ -97,24 +97,6 @@ void main() {
     expect(() => repository.findByBarcode('123', storeId: 'store-a'), throwsA(isA<NetworkException>()));
   });
 
-  test('sends allocations in the order the allocator resolved them', () async {
-    final api = _FakeProductApi(product: ProductModel.fromJson(productJson()));
-    final repository = ProductRepositoryImpl(productApi: api);
-
-    await repository.consume(
-      'p1',
-      [
-        BatchAllocation(batchId: 'b1', quantity: Decimal.parse('1.5')),
-        BatchAllocation(batchId: 'b2', quantity: Decimal.parse('0.5')),
-      ],
-      storeId: 'store-a',
-    );
-
-    final sent = api.lastConsume!.toJson()['allocations'] as List<dynamic>;
-    expect((sent.first as Map)['batchId'], 'b1');
-    expect((sent.first as Map)['quantity'], '1.5');
-  });
-
   test('lets data-layer exceptions propagate untouched', () async {
     final repository = ProductRepositoryImpl(
       productApi: _FakeProductApi(error: const NetworkException(message: 'offline')),
@@ -142,7 +124,6 @@ class _FakeProductApi implements ProductApi {
   int? lastPage;
   int? lastLimit;
   String? lastStoreId;
-  ConsumeRequest? lastConsume;
 
   BaseResponse<T> _envelope<T>(T value) => BaseResponse<T>(code: 'OK', data: value);
 
@@ -166,13 +147,6 @@ class _FakeProductApi implements ProductApi {
     String barcode, {
     required String storeId,
   }) async {
-    if (error != null) throw error!;
-    return _envelope(product!);
-  }
-
-  @override
-  Future<BaseResponse<ProductModel>> consume(String id, ConsumeRequest body) async {
-    lastConsume = body;
     if (error != null) throw error!;
     return _envelope(product!);
   }

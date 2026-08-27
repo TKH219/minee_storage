@@ -121,17 +121,4 @@ class ProductRepositoryImpl implements ProductRepository {
     final response = await productApi.archiveBatch(productId, batchId, storeId: storeId);
     return response.data!.toEntity();
   }
-
-  @override
-  Future<ProductEntity> consume(
-    String productId,
-    List<BatchAllocation> allocations, {
-    required String storeId,
-  }) async {
-    final response = await productApi.consume(
-      productId,
-      ConsumeRequest.fromAllocations(allocations, storeId: storeId),
-    );
-    return response.data!.toEntity();
-  }
 }

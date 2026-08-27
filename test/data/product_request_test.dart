@@ -55,23 +55,6 @@ void main() {
     expect(json.containsKey('remainingQuantity'), isFalse);
   });
 
-  test('serialises allocations in the order given', () {
-    final json = ConsumeRequest.fromAllocations(
-      [
-        BatchAllocation(batchId: 'b1', quantity: Decimal.parse('1.5')),
-        BatchAllocation(batchId: 'b2', quantity: Decimal.parse('0.5')),
-      ],
-      storeId: 'store-a',
-    ).toJson();
-
-    expect(json['storeId'], 'store-a');
-    final allocations = json['allocations'] as List<dynamic>;
-    expect(allocations, hasLength(2));
-    expect((allocations.first as Map)['batchId'], 'b1');
-    expect((allocations.first as Map)['quantity'], '1.5');
-    expect((allocations.last as Map)['quantity'], '0.5');
-  });
-
   test('an undated batch sends no expiry rather than an invented one', () {
     final json = BatchRequest.fromDraft(
       BatchDraft(

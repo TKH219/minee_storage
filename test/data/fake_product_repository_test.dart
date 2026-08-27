@@ -71,7 +71,7 @@ void main() {
     expect(await repository.findByBarcode('0000000000000', storeId: 'store-a'), isNull);
   });
 
-  test('consume deducts from the allocated batches', () async {
+  test('a ledger delta deducts from the allocated batches', () async {
     final repository = FakeProductRepository();
     final product = (await repository.getProducts(storeId: 'store-a', filter: const ProductFilter(), page: 1))
         .items
@@ -79,7 +79,7 @@ void main() {
     final batch = product.availableBatches.first;
     final before = batch.remainingQuantity;
 
-    final updated = await repository.consume(
+    final updated = await repository.applyLedgerDeltas(
       product.id,
       [BatchAllocation(batchId: batch.id, quantity: Decimal.one)],
       storeId: 'store-a',
@@ -126,7 +126,7 @@ void main() {
         ),
       );
       final batch = withLot.batches.last;
-      final consumed = await repository.consume(
+      final consumed = await repository.applyLedgerDeltas(
         seeded.id,
         [BatchAllocation(batchId: batch.id, quantity: Decimal.parse('5'))],
         storeId: 'store-a',

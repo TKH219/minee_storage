@@ -19,6 +19,7 @@ Future<List<Fee>?> showFeesSheet(
   required Decimal itemsSubtotal,
   required List<Fee> fees,
   required Currency currency,
+  List<FeeDirection> directions = FeeDirection.values,
 }) {
   return showModalBottomSheet<List<Fee>>(
     context: context,
@@ -33,6 +34,7 @@ Future<List<Fee>?> showFeesSheet(
       itemsSubtotal: itemsSubtotal,
       fees: fees,
       currency: currency,
+      directions: directions,
     ),
   );
 }
@@ -43,11 +45,16 @@ class FeesSheet extends ConsumerStatefulWidget {
     required this.itemsSubtotal,
     required this.fees,
     required this.currency,
+    this.directions = FeeDirection.values,
   });
 
   final Decimal itemsSubtotal;
   final List<Fee> fees;
   final Currency currency;
+
+  /// Which directions this transaction type can honestly carry. A receive has
+  /// no seller side, so offering one would build a fee the server refuses.
+  final List<FeeDirection> directions;
 
   @override
   ConsumerState<FeesSheet> createState() => _FeesSheetState();
@@ -177,7 +184,7 @@ class _FeesSheetState extends ConsumerState<FeesSheet> {
           top: Radius.circular(FeeMetrics.sheetRadius),
         ),
       ),
-      builder: (_) => const _AddFeeSheet(),
+      builder: (_) => _AddFeeSheet(directions: widget.directions),
     );
     if (fee == null || !mounted) return;
     ref.read(feesStateProvider.notifier).addFee(fee);
@@ -221,7 +228,9 @@ class _DiscountNotice extends StatelessWidget {
 }
 
 class _AddFeeSheet extends StatefulWidget {
-  const _AddFeeSheet();
+  const _AddFeeSheet({required this.directions});
+
+  final List<FeeDirection> directions;
 
   @override
   State<_AddFeeSheet> createState() => _AddFeeSheetState();
@@ -231,7 +240,9 @@ class _AddFeeSheetState extends State<_AddFeeSheet> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _value = TextEditingController();
   FeeKind _kind = FeeKind.fixed;
-  FeeDirection _direction = FeeDirection.buyerCharge;
+  late FeeDirection _direction = widget.directions.contains(FeeDirection.buyerCharge)
+      ? FeeDirection.buyerCharge
+      : widget.directions.first;
 
   @override
   void dispose() {
@@ -307,7 +318,7 @@ class _AddFeeSheetState extends State<_AddFeeSheet> {
                     labelText: LocaleKeys.sales_feeDirection.tr(),
                   ),
                   items: [
-                    for (final direction in FeeDirection.values)
+                    for (final direction in widget.directions)
                       DropdownMenuItem(
                         value: direction,
                         child: Text(_directionLabel(direction)),

@@ -119,7 +119,7 @@ void main() {
 
   group('out of stock', () {
     test('a product holding nothing cannot be picked', () async {
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p3',
         [BatchAllocation(batchId: 'b4', quantity: d('2'))],
         storeId: 'store-a',
@@ -135,7 +135,7 @@ void main() {
     });
 
     test('but it stays visible, so the seller learns it exists', () async {
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p3',
         [BatchAllocation(batchId: 'b4', quantity: d('2'))],
         storeId: 'store-a',

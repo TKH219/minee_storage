@@ -92,7 +92,7 @@ void main() {
   group('out of stock', () {
     setUp(() async {
       products = FakeProductRepository(latency: Duration.zero);
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p3',
         [BatchAllocation(batchId: 'b4', quantity: d('2'))],
         storeId: 'store-a',

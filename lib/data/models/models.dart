@@ -1,6 +1,5 @@
 export 'base_response.dart';
 export 'request/product/batch_request.dart';
-export 'request/product/consume_request.dart';
 export 'request/product/product_request.dart';
 export 'response/post/post_model.dart';
 export 'response/product/paged_products_model.dart';
