@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:mine_storage/app/clock.dart';
+import 'package:mine_storage/app/router/app_routes.dart';
 import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
@@ -195,6 +197,15 @@ class _SalesListPageState
             key: Key('ledger-row-${transaction.id}'),
             transaction: transaction,
             formatter: formatter,
+            onTap: () async {
+              await context.pushNamed(
+                AppRoutes.transactionDetailName,
+                pathParameters: {'id': transaction.id},
+              );
+              // An edit or a delete on the detail screen changes the day
+              // subtotals, so the list is restated rather than left stale.
+              if (context.mounted) await notifier.refresh();
+            },
           ),
         );
       }
