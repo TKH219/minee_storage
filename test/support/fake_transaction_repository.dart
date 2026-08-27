@@ -14,7 +14,9 @@ class FakeTransactionRepository implements TransactionRepository {
 
   final List<TransactionDraft> created = [];
   final List<TransactionDraft> amended = [];
+  final List<DateTime> amendedAt = [];
   final List<String> removed = [];
+  final List<DateTime> removedAt = [];
   final List<TransactionDraft> previewed = [];
 
   AppException? failWith;
@@ -134,6 +136,7 @@ class FakeTransactionRepository implements TransactionRepository {
     amendAttempts++;
     await _wait();
     amended.add(draft);
+    amendedAt.add(expectedUpdatedAt);
     return (build ?? (d) => _echo(d))(draft);
   }
 
@@ -144,6 +147,7 @@ class FakeTransactionRepository implements TransactionRepository {
   }) async {
     await _wait();
     removed.add(id);
+    removedAt.add(expectedUpdatedAt);
     return _echo(created.isEmpty ? _emptyDraft : created.last);
   }
 
