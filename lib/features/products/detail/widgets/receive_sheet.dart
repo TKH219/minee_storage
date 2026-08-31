@@ -19,8 +19,30 @@ import 'package:mine_storage/shared/ui/quantity_format.dart';
 ///
 /// The one movement sheet that carries money in both directions, so the one
 /// that gets a supplier, a payment method and a fee editor.
+/// On a receive the shop is itself the buyer, so "buyer" and "pass-through"
+/// say nothing. What the tag has to answer is whether the charge is folded
+/// into the lot's cost pro-rata or borne by the shop and kept out of stock
+/// value — a plain `buyer_charge` against a pass-through one. `seller_cost` is
+/// absent because a delivery has no seller side and the server refuses it.
+String receiveFeeDirectionLabel(FeeDirection direction) => switch (direction) {
+  FeeDirection.discount => LocaleKeys.sales_detailDiscountTag.tr(),
+  FeeDirection.passThrough => LocaleKeys.sales_detailYourCost.tr(),
+  _ => LocaleKeys.sales_detailIntoCost.tr(),
+};
+
+Map<FeeDirection, String> receiveFeeDirectionLabels() => {
+  for (final direction in ReceiveSheet.feeDirections)
+    direction: receiveFeeDirectionLabel(direction),
+};
+
 class ReceiveSheet extends ConsumerStatefulWidget {
   const ReceiveSheet({super.key, required this.product});
+
+  static const feeDirections = [
+    FeeDirection.buyerCharge,
+    FeeDirection.passThrough,
+    FeeDirection.discount,
+  ];
 
   final ProductEntity product;
 
@@ -104,9 +126,8 @@ class _ReceiveSheetState extends ConsumerState<ReceiveSheet> {
       itemsSubtotal: state.goodsTotal,
       fees: state.fees,
       currency: currency,
-      // A receive has no seller side, so the two directions it can carry are
-      // what folds into the lot's cost and what comes off the invoice.
-      directions: const [FeeDirection.buyerCharge, FeeDirection.discount],
+      directions: ReceiveSheet.feeDirections,
+      directionLabels: receiveFeeDirectionLabels(),
     );
     if (edited != null && mounted) {
       ref.read(receiveStateProvider.notifier).updateFees(edited);
@@ -237,8 +258,7 @@ class _ReceiveSheetState extends ConsumerState<ReceiveSheet> {
                   padding: const EdgeInsets.only(bottom: 6),
                   child: DetailKeyValue(
                     label:
-                        '${fee.name} · '
-                        '${fee.direction == FeeDirection.discount ? LocaleKeys.sales_detailDiscountTag.tr() : LocaleKeys.sales_detailIntoCost.tr()}',
+                        '${fee.name} · ${receiveFeeDirectionLabel(fee.direction)}',
                     value: fee.kind == FeeKind.fixed
                         ? formatter.format(fee.value)
                         : '${fee.value}%',
