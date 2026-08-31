@@ -8,6 +8,7 @@ import 'package:mine_storage/app/theme/theme.dart';
 import 'package:mine_storage/core/base/base_page.dart';
 import 'package:mine_storage/core/exceptions/exceptions.dart';
 import 'package:mine_storage/domain/entities/entities.dart';
+import 'package:mine_storage/features/products/detail/widgets/receive_sheet.dart';
 import 'package:mine_storage/features/sales/detail/states/transaction_detail_state.dart';
 import 'package:mine_storage/features/sales/detail/widgets/detail_notice.dart';
 import 'package:mine_storage/features/sales/detail/widgets/transaction_money_panel.dart';
@@ -319,10 +320,10 @@ class _TransactionDetailPageState
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
           child: DetailKeyValue(
-            label:
-                '${fee.name} · '
-                '${fee.direction == FeeDirection.sellerCost ? LocaleKeys.sales_detailYourCost.tr() : LocaleKeys.sales_detailIntoCost.tr()}',
-            value: '+${formatter.format(fee.computedAmount)}',
+            label: '${fee.name} · ${receiveFeeDirectionLabel(fee.direction)}',
+            value:
+                '${fee.direction.isDiscount ? '−' : '+'}'
+                '${formatter.format(fee.computedAmount)}',
           ),
         ),
     ],

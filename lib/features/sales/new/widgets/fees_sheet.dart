@@ -20,6 +20,7 @@ Future<List<Fee>?> showFeesSheet(
   required List<Fee> fees,
   required Currency currency,
   List<FeeDirection> directions = FeeDirection.values,
+  Map<FeeDirection, String>? directionLabels,
 }) {
   return showModalBottomSheet<List<Fee>>(
     context: context,
@@ -35,6 +36,7 @@ Future<List<Fee>?> showFeesSheet(
       fees: fees,
       currency: currency,
       directions: directions,
+      directionLabels: directionLabels,
     ),
   );
 }
@@ -46,6 +48,7 @@ class FeesSheet extends ConsumerStatefulWidget {
     required this.fees,
     required this.currency,
     this.directions = FeeDirection.values,
+    this.directionLabels,
   });
 
   final Decimal itemsSubtotal;
@@ -55,6 +58,9 @@ class FeesSheet extends ConsumerStatefulWidget {
   /// Which directions this transaction type can honestly carry. A receive has
   /// no seller side, so offering one would build a fee the server refuses.
   final List<FeeDirection> directions;
+
+  /// Wording for each direction when the sale's is wrong for this movement.
+  final Map<FeeDirection, String>? directionLabels;
 
   @override
   ConsumerState<FeesSheet> createState() => _FeesSheetState();
@@ -134,6 +140,7 @@ class _FeesSheetState extends ConsumerState<FeesSheet> {
                         signedAmount: state.amountFor(computed.fee.id),
                         money: money,
                         hasDiscount: state.hasDiscount,
+                        directionLabels: widget.directionLabels,
                         onRemove: () => ref
                             .read(feesStateProvider.notifier)
                             .removeFee(computed.fee.id),
@@ -184,7 +191,10 @@ class _FeesSheetState extends ConsumerState<FeesSheet> {
           top: Radius.circular(FeeMetrics.sheetRadius),
         ),
       ),
-      builder: (_) => _AddFeeSheet(directions: widget.directions),
+      builder: (_) => _AddFeeSheet(
+        directions: widget.directions,
+        directionLabels: widget.directionLabels,
+      ),
     );
     if (fee == null || !mounted) return;
     ref.read(feesStateProvider.notifier).addFee(fee);
@@ -228,9 +238,10 @@ class _DiscountNotice extends StatelessWidget {
 }
 
 class _AddFeeSheet extends StatefulWidget {
-  const _AddFeeSheet({required this.directions});
+  const _AddFeeSheet({required this.directions, this.directionLabels});
 
   final List<FeeDirection> directions;
+  final Map<FeeDirection, String>? directionLabels;
 
   @override
   State<_AddFeeSheet> createState() => _AddFeeSheetState();
@@ -321,7 +332,10 @@ class _AddFeeSheetState extends State<_AddFeeSheet> {
                     for (final direction in widget.directions)
                       DropdownMenuItem(
                         value: direction,
-                        child: Text(_directionLabel(direction)),
+                        child: Text(
+                          widget.directionLabels?[direction] ??
+                              _directionLabel(direction),
+                        ),
                       ),
                   ],
                   onChanged: (value) =>

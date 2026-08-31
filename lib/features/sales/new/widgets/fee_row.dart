@@ -20,6 +20,7 @@ class FeeRow extends StatelessWidget {
     required this.money,
     required this.hasDiscount,
     required this.onRemove,
+    this.directionLabels,
   });
 
   final ComputedFee computed;
@@ -29,6 +30,12 @@ class FeeRow extends StatelessWidget {
   /// Changes the wording of a post-discount base — "on $34.01 after discount"
   /// only makes sense when a discount is actually in play.
   final bool hasDiscount;
+
+  /// Wording for the direction tag when the sale's is wrong for the movement.
+  /// On a receive the shop is itself the buyer, so "buyer" says nothing and
+  /// what the tag has to answer instead is whether the charge enters the lot's
+  /// cost or the shop's own.
+  final Map<FeeDirection, String>? directionLabels;
 
   final VoidCallback onRemove;
 
@@ -71,7 +78,10 @@ class FeeRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: FeeMetrics.rowGap),
-          _DirectionTag(direction: computed.fee.direction),
+          _DirectionTag(
+            direction: computed.fee.direction,
+            labels: directionLabels,
+          ),
           const SizedBox(width: FeeMetrics.rowGap),
           Text(
             '${negative ? '−' : '+'}${money.format(signedAmount.abs())}',
@@ -116,15 +126,16 @@ class FeeRow extends StatelessWidget {
 }
 
 class _DirectionTag extends StatelessWidget {
-  const _DirectionTag({required this.direction});
+  const _DirectionTag({required this.direction, this.labels});
 
   final FeeDirection direction;
+  final Map<FeeDirection, String>? labels;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    final (background, ink, label) = switch (direction) {
+    final (background, ink, defaultLabel) = switch (direction) {
       FeeDirection.discount => (
         colors.green0,
         colors.green5,
@@ -146,6 +157,7 @@ class _DirectionTag extends StatelessWidget {
         LocaleKeys.sales_feeDirBuyer.tr(),
       ),
     };
+    final label = labels?[direction] ?? defaultLabel;
 
     return Container(
       padding: FeeMetrics.tagPadding,
