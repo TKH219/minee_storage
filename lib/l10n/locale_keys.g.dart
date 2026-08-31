@@ -401,6 +401,12 @@ abstract class  LocaleKeys {
   static const sales_detailReason = 'sales.detailReason';
   static const sales_detailQuantity = 'sales.detailQuantity';
   static const sales_detailAppliedDelta = 'sales.detailAppliedDelta';
+  static const sales_detailCounted = 'sales.detailCounted';
+  static const sales_detailPreviously = 'sales.detailPreviously';
+  static const sales_detailDifference = 'sales.detailDifference';
+  static const sales_detailSystemHeld = 'sales.detailSystemHeld';
+  static const sales_detailCountedOnShelf = 'sales.detailCountedOnShelf';
+  static const sales_detailOfHeld = 'sales.detailOfHeld';
   static const sales_detailWhatLeftStock = 'sales.detailWhatLeftStock';
   static const sales_detailLotCounted = 'sales.detailLotCounted';
   static const sales_detailProduct = 'sales.detailProduct';

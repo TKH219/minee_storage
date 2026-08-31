@@ -132,6 +132,74 @@ void main() {
     expect(find.text('Two cartons crushed'), findsOneWidget);
   });
 
+  testWidgets('a stock count draws what was counted against what was held', (
+    tester,
+  ) async {
+    repository.nextById = ledgerTransaction(
+      code: 'A-202608-0003',
+      type: TransactionType.adjust,
+      paymentMethod: null,
+      reasonNote: 'Two cartons crushed',
+      lines: [
+        ledgerLine(
+          quantityBefore: '12.000',
+          quantityDelta: '-2.000',
+          lineCost: '0.00',
+        ),
+      ],
+    );
+
+    await pumpDetail(tester);
+
+    expect(find.text('Counted'), findsOneWidget);
+    expect(find.text('Previously'), findsOneWidget);
+    expect(find.text('Difference'), findsOneWidget);
+    expect(find.text('10.000'), findsWidgets);
+    expect(find.text('12.000'), findsWidgets);
+
+    expect(find.text('System held'), findsOneWidget);
+    expect(find.text('Counted on the shelf'), findsOneWidget);
+    expect(find.text('Applied delta'), findsOneWidget);
+  });
+
+  testWidgets('a stock count with no recorded holding keeps the delta header', (
+    tester,
+  ) async {
+    repository.nextById = ledgerTransaction(
+      code: 'A-202608-0003',
+      type: TransactionType.adjust,
+      paymentMethod: null,
+      lines: [ledgerLine(quantityDelta: '-2.000', lineCost: '0.00')],
+    );
+
+    await pumpDetail(tester);
+
+    expect(find.text('Counted'), findsNothing);
+    expect(find.text('Previously'), findsNothing);
+    expect(find.text('Applied delta'), findsWidgets);
+  });
+
+  testWidgets('a write-off names what the lot held before it left', (tester) async {
+    repository.nextById = ledgerTransaction(
+      code: 'W-202608-0007',
+      type: TransactionType.writeOff,
+      reason: WriteOffReason.expired,
+      paymentMethod: null,
+      lines: [
+        ledgerLine(
+          quantityBefore: '3.000',
+          quantityDelta: '-3.000',
+          unitCostSnapshot: '2.40',
+          lineCost: '7.20',
+        ),
+      ],
+    );
+
+    await pumpDetail(tester);
+
+    expect(find.text('of 3.000 held'), findsOneWidget);
+  });
+
   testWidgets('an edited movement carries its marker', (tester) async {
     repository.nextById = ledgerTransaction(amendedAt: DateTime(2026, 8, 26, 14, 2));
 

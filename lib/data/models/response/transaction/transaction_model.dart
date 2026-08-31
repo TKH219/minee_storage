@@ -21,6 +21,7 @@ class TransactionLineModel {
     required this.quantityDelta,
     required this.unitPrice,
     required this.unitCostSnapshot,
+    this.quantityBefore,
     required this.lineGross,
     required this.lineCost,
     this.batchUnitCost,
@@ -42,6 +43,7 @@ class TransactionLineModel {
   final String productName;
   final String unit;
   final String quantityDelta;
+  final String? quantityBefore;
   final String unitPrice;
   final String unitCostSnapshot;
   final String? batchUnitCost;
@@ -62,6 +64,7 @@ class TransactionLineModel {
     productName: productName,
     unit: ProductUnit.fromCode(unit),
     quantityDelta: Decimal.parse(quantityDelta),
+    quantityBefore: quantityBefore == null ? null : Decimal.parse(quantityBefore!),
     unitPrice: Decimal.parse(unitPrice),
     unitCostSnapshot: Decimal.parse(unitCostSnapshot),
     batchUnitCost: batchUnitCost == null ? null : Decimal.parse(batchUnitCost!),

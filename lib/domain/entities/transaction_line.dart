@@ -20,6 +20,7 @@ class TransactionLine extends Equatable with AuditTimes {
     required this.unit,
     required this.quantityDelta,
     required this.unitPrice,
+    this.quantityBefore,
     required this.unitCostSnapshot,
     required this.lineGross,
     required this.lineCost,
@@ -43,6 +44,11 @@ class TransactionLine extends Equatable with AuditTimes {
   /// a stock count.
   final Decimal quantityDelta;
 
+  /// What the lot held when the line was written, on the types that draw on a
+  /// lot that already exists. Null on a receive, whose lot is created by the
+  /// line itself, and null on any line written before the column existed.
+  final Decimal? quantityBefore;
+
   final Decimal unitPrice;
 
   /// Frozen from the lot when the line was written, and never rewritten. A lot
@@ -65,6 +71,11 @@ class TransactionLine extends Equatable with AuditTimes {
   @override
   final DateTime? deletedTime;
 
+  /// What a stock count found on the shelf, which is the holding it started
+  /// from moved by the delta the server applied.
+  Decimal? get countedQuantity =>
+      quantityBefore == null ? null : quantityBefore! + quantityDelta;
+
   /// What the row shows. The arrow beside it comes from [isOutward].
   Decimal get displayQuantity => quantityDelta.abs();
 
@@ -85,6 +96,7 @@ class TransactionLine extends Equatable with AuditTimes {
     productName,
     unit,
     quantityDelta,
+    quantityBefore,
     unitPrice,
     unitCostSnapshot,
     batchUnitCost,

@@ -95,12 +95,17 @@ class DetailKeyValue extends StatelessWidget {
     super.key,
     required this.label,
     required this.value,
+    this.hint,
     this.emphasise = false,
     this.valueColor,
   });
 
   final String label;
   final String value;
+
+  /// A faint qualifier drawn beside the value, as the frames draw
+  /// "3.000 *of 3.000 held*".
+  final String? hint;
   final bool emphasise;
   final Color? valueColor;
 
@@ -127,6 +132,13 @@ class DetailKeyValue extends StatelessWidget {
               color: valueColor ?? colors.neutral9,
             ),
           ),
+          if (hint != null) ...[
+            const SizedBox(width: 5),
+            Text(
+              hint!,
+              style: styles.sansCaption.copyWith(color: colors.neutral5),
+            ),
+          ],
         ],
       ),
     );
