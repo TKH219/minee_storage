@@ -46,9 +46,6 @@ Deno.serve(async (request: Request) => {
     if (after.length === 4 && after[1] === 'batches' && after[3] === 'archive' && method === 'POST') {
       return await archiveBatch(supabase, id, after[2], url);
     }
-    if (after.length === 2 && after[1] === 'consumptions' && method === 'POST') {
-      return await consume(supabase, id, request);
-    }
     if (after.length === 2 && after[1] === 'holdings' && method === 'GET') {
       return await holdings(supabase, id);
     }
@@ -243,19 +240,6 @@ async function archiveBatch(
   if (error) throw error;
 
   return ok(await productJson(supabase, productId, storeId));
-}
-
-async function consume(supabase: SupabaseClient, productId: string, request: Request) {
-  const body = await request.json();
-  const storeId = requireStoreFromBody(body);
-
-  const { data, error } = await supabase.rpc('apply_consumption', {
-    p_product_id: productId,
-    p_store_id: storeId,
-    p_allocations: body.allocations,
-  });
-  if (error) throw error;
-  return ok(data);
 }
 
 /// What the same product holds in the caller's other shops. Deliberately a

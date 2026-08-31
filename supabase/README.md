@@ -74,7 +74,7 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260822001300` | `batches`, two-parent RLS, the owner-mismatch trigger, `#B-0001` code sequencing |
 | `20260826000100` | `amend_batch` — corrects a delivery, moving the remainder by the same delta |
 | `20260822001400` | the public `product-images` bucket, uid-scoped writes |
-| `20260822001500` | `apply_consumption` and `product_as_json` |
+| `20260822001500` | `apply_consumption` and `product_as_json` — `apply_consumption` dropped again by `20260828000200` |
 | `20260822001600` | `list_products` and `list_product_categories` |
 | `20260822001700` | `product_store_holdings` |
 | `20260827000100` | `transactions` — the ledger header, its check constraints, the partial unique index on `(store_id, code)` and `next_transaction_code` |
@@ -88,6 +88,8 @@ against `information_schema` and by exercising RLS as a real signed-in user.
 | `20260827000900` | `remove_transaction` |
 | `20260827001000` | `list_transactions` — day-grouped, with whole-day subtotals |
 | `20260827001100` | every money and quantity column leaves as a decimal string |
+| `20260828000100` | `transaction_lines.quantity_before` — what the lot held when the line was written, so a stock count can show what was counted against what was there |
+| `20260828000200` | `apply_consumption` dropped, leaving the ledger as the only server-side write path into a lot |
 
 Every migration is idempotent (`create table if not exists`,
 `create or replace function`, `drop … if exists`, `on conflict do nothing`), so
@@ -181,9 +183,9 @@ correctly can still leak someone else's, and only a second token shows that.
 
 ## The ledger
 
-Four tables and four RPCs replace the reasonless `apply_consumption`. **After
-this feature there is exactly one write path into `batches.quantity_remaining`,
-and it is the ledger.** Any other write is a bug.
+Four tables and four RPCs replace the reasonless `apply_consumption`, which
+`20260828000200` drops outright. **There is exactly one write path into
+`batches.quantity_remaining`, and it is the ledger.** Any other write is a bug.
 
 | Table | What it holds |
 | --- | --- |
@@ -259,9 +261,11 @@ Two consequences worth knowing before touching either table:
 
 - **`quantity_remaining` is never written from a request body.** It moves only
   through a ledger transaction: a `receive` opens the lot and every later
-  movement is a signed delta against it. The app no longer calls
-  `apply_consumption` or `POST /products/:id/consumptions` — both are dead
-  server-side and are a follow-up to drop. The one exception is `amend_batch`,
+  movement is a signed delta against it. `apply_consumption` and
+  `POST /products/:id/consumptions` are **gone** — the RPC dropped by
+  `20260828000200`, the route removed from the products Edge Function — so the
+  ledger is the only door, at the server and not only on the device. The one
+  exception is `amend_batch`,
   which corrects a delivery rather than moving stock: it shifts the
   remainder by the same delta as `quantity_received` under a row lock, and
   raises `P0004` rather than let a lot fall below what has been drawn out of
