@@ -246,9 +246,25 @@ class _TransactionDetailPageState
           formatQuantity(transaction.netQuantityDelta),
         ),
       ],
-      // Counted-against-previous is not recoverable from a stored transaction:
-      // only the delta the server applied is kept, so only that is shown.
-      TransactionType.adjust => [
+      TransactionType.adjust => _adjustHeaderStats(transaction, recorded),
+    };
+  }
+
+  /// Counted against previously held, as `#ledger` draws it. A line written
+  /// before `quantity_before` existed cannot answer either question, so those
+  /// fall back to the delta the server applied.
+  List<(String, String)> _adjustHeaderStats(Transaction transaction, String recorded) {
+    final counted = transaction.lines
+        .map((line) => line.countedQuantity)
+        .whereType<Decimal>()
+        .fold<Decimal?>(null, (sum, value) => (sum ?? Decimal.zero) + value);
+    final before = transaction.lines
+        .map((line) => line.quantityBefore)
+        .whereType<Decimal>()
+        .fold<Decimal?>(null, (sum, value) => (sum ?? Decimal.zero) + value);
+
+    if (counted == null || before == null) {
+      return [
         (
           LocaleKeys.sales_detailAppliedDelta.tr(),
           formatQuantity(transaction.netQuantityDelta),
@@ -258,8 +274,17 @@ class _TransactionDetailPageState
           LocaleKeys.sales_detailProduct.tr(),
           transaction.lines.isEmpty ? '—' : transaction.lines.first.productName,
         ),
-      ],
-    };
+      ];
+    }
+
+    return [
+      (LocaleKeys.sales_detailCounted.tr(), formatQuantity(counted)),
+      (LocaleKeys.sales_detailPreviously.tr(), formatQuantity(before)),
+      (
+        LocaleKeys.sales_detailDifference.tr(),
+        formatQuantity(transaction.netQuantityDelta),
+      ),
+    ];
   }
 
   String _paymentLabel(Transaction transaction) => switch (transaction.paymentMethod) {
@@ -331,6 +356,11 @@ class _TransactionDetailPageState
             DetailKeyValue(
               label: LocaleKeys.sales_detailWrittenOff.tr(),
               value: formatQuantity(line.displayQuantity),
+              hint: line.quantityBefore == null
+                  ? null
+                  : LocaleKeys.sales_detailOfHeld.tr(
+                      namedArgs: {'held': formatQuantity(line.quantityBefore!)},
+                    ),
             ),
             DetailKeyValue(
               label: LocaleKeys.sales_detailValueLost.tr(),
@@ -372,10 +402,21 @@ class _TransactionDetailPageState
               label: LocaleKeys.sales_detailProduct.tr(),
               value: line.productName,
             ),
-            DetailKeyValue(
-              label: LocaleKeys.sales_detailUnitCost.tr(),
-              value: formatter.format(line.unitCostSnapshot),
-            ),
+            if (line.quantityBefore != null)
+              DetailKeyValue(
+                label: LocaleKeys.sales_detailSystemHeld.tr(),
+                value: formatQuantity(line.quantityBefore!),
+              )
+            else
+              DetailKeyValue(
+                label: LocaleKeys.sales_detailUnitCost.tr(),
+                value: formatter.format(line.unitCostSnapshot),
+              ),
+            if (line.countedQuantity != null)
+              DetailKeyValue(
+                label: LocaleKeys.sales_detailCountedOnShelf.tr(),
+                value: formatQuantity(line.countedQuantity!),
+              ),
             DetailKeyValue(
               label: LocaleKeys.sales_detailAppliedDelta.tr(),
               value: formatQuantity(line.quantityDelta),
