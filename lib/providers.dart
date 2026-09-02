@@ -28,11 +28,15 @@ import 'package:mine_storage/data/data_sources/remote/post_api.dart';
 import 'package:mine_storage/data/repositories/auth_repository_impl.dart';
 import 'package:mine_storage/data/repositories/post_repository_impl.dart';
 import 'package:mine_storage/data/data_sources/remote/product_api.dart';
+import 'package:mine_storage/data/data_sources/remote/transaction_api.dart';
 import 'package:mine_storage/data/repositories/fake_product_repository.dart';
 import 'package:mine_storage/data/repositories/fake_sale_repository.dart';
+import 'package:mine_storage/data/repositories/ledger_sale_repository.dart';
 import 'package:mine_storage/data/repositories/fake_store_overview_repository.dart';
 import 'package:mine_storage/data/repositories/product_repository_impl.dart';
+import 'package:mine_storage/data/repositories/transaction_repository_impl.dart';
 import 'package:mine_storage/domain/repositories/product_repository.dart';
+import 'package:mine_storage/domain/repositories/transaction_repository.dart';
 import 'package:mine_storage/domain/repositories/sale_repository.dart';
 import 'package:mine_storage/domain/repositories/store_overview_repository.dart';
 import 'package:mine_storage/domain/repositories/store_repository.dart';
@@ -151,16 +155,49 @@ final productApiProvider = Provider<ProductApi>(
 /// [ProductRepositoryImpl] is complete but has no tables behind it yet, so the
 /// in-memory stand-in is what the app actually runs on — see
 /// [AppFeatures.fakeProductsEnabled].
+final fakeProductRepositoryProvider = Provider<FakeProductRepository>(
+  (ref) => FakeProductRepository(),
+);
+
 final productRepositoryProvider = Provider<ProductRepository>((ref) {
-  if (AppFeatures.fakeProductsEnabled) return FakeProductRepository();
+  if (AppFeatures.fakeProductsEnabled) {
+    return ref.watch(fakeProductRepositoryProvider);
+  }
   return ProductRepositoryImpl(productApi: ref.watch(productApiProvider));
 });
 
-/// Sales run entirely in memory until the transaction ledger lands. It draws
-/// stock through [productRepositoryProvider] rather than a copy of its own, so
-/// the two can never disagree about what is left.
-final saleRepositoryProvider = Provider<SaleRepository>(
-  (ref) => FakeSaleRepository(ref.watch(productRepositoryProvider)),
+/// The drawn sale flow, served by the ledger. Flip
+/// [AppFeatures.fakeLedgerEnabled] to run it against the in-memory stand-in
+/// when working offline.
+final saleRepositoryProvider = Provider<SaleRepository>((ref) {
+  if (AppFeatures.fakeLedgerEnabled) {
+    return FakeSaleRepository(ref.watch(fakeProductRepositoryProvider));
+  }
+  return LedgerSaleRepository(
+    ref.watch(transactionRepositoryProvider),
+    ref.watch(productRepositoryProvider),
+  );
+});
+
+final transactionApiProvider = Provider<TransactionApi>(
+  (ref) => TransactionApi(
+    ref.watch(authorizedDioProvider),
+    baseUrl: ref.watch(functionsBaseUrlProvider),
+  ),
+);
+
+/// The ledger, and after this feature the only write path into a lot's
+/// remaining quantity.
+final transactionRepositoryProvider = Provider<TransactionRepository>(
+  (ref) => TransactionRepositoryImpl(
+    transactionApi: ref.watch(transactionApiProvider),
+  ),
+);
+
+final feePresetRepositoryProvider = Provider<FeePresetRepository>(
+  (ref) => FeePresetRepositoryImpl(
+    transactionApi: ref.watch(transactionApiProvider),
+  ),
 );
 
 final onboardingResolverProvider = Provider<OnboardingResolver>(

@@ -14,7 +14,7 @@ import 'package:mine_storage/features/products/states/active_store_state.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_cart_page.dart';
 import 'package:mine_storage/features/sales/new/pages/sale_review_page.dart';
 import 'package:mine_storage/features/sales/new/states/sale_cart_state.dart';
-import 'package:mine_storage/features/sales/pages/sales_list_page.dart';
+import 'package:mine_storage/features/sales/list/pages/sales_list_page.dart';
 import 'package:mine_storage/providers.dart';
 
 import '../../support/active_store_override.dart';

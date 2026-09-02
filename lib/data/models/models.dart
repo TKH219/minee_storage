@@ -1,6 +1,5 @@
 export 'base_response.dart';
 export 'request/product/batch_request.dart';
-export 'request/product/consume_request.dart';
 export 'request/product/product_request.dart';
 export 'response/post/post_model.dart';
 export 'response/product/paged_products_model.dart';
@@ -14,3 +13,5 @@ export 'response/store/store_model.dart';
 export 'response/user/user_model.dart';
 export 'request/user/email_status_request.dart';
 export 'request/user/update_user_request.dart';
+export 'response/transaction/transaction_model.dart';
+export 'request/transaction/transaction_request.dart';

@@ -14,4 +14,11 @@ class ServerErrorCodes {
   static const String emailAlreadyExists = 'EMAIL_ALREADY_EXISTS';
   static const String userNameAlreadyExists = 'USERNAME_ALREADY_EXISTS';
   static const String quantityBelowDrawn = 'QUANTITY_BELOW_DRAWN';
+  static const String insufficientStock = 'INSUFFICIENT_STOCK';
+  static const String occurredBeforeArrival = 'OCCURRED_BEFORE_ARRIVAL';
+  static const String feeNotAllowed = 'FEE_NOT_ALLOWED';
+  static const String reversalBelowZero = 'REVERSAL_BELOW_ZERO';
+  static const String reversalAboveReceived = 'REVERSAL_ABOVE_RECEIVED';
+  static const String batchAlreadyDrawn = 'BATCH_ALREADY_DRAWN';
+  static const String staleTransaction = 'STALE_TRANSACTION';
 }

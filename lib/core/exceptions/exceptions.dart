@@ -177,7 +177,7 @@ class UnknownSupabaseException extends SupabaseException {
 }
 
 /// Raised by the FEFO allocator before any request leaves the device, so a
-/// short consume attempt changes nothing.
+/// short draw against stock changes nothing.
 ///
 /// Deliberately not an [HttpException]: nothing was sent. The quantities are
 /// carried so a feature can word the shortfall itself; [messageKey] stays
@@ -208,10 +208,18 @@ class QuantityBelowDrawnException extends AppException {
 }
 
 class InsufficientStockException extends AppException {
-  const InsufficientStockException({required this.requested, required this.available});
+  const InsufficientStockException({
+    this.requested,
+    this.available,
+    super.message,
+    super.errorCode,
+    super.statusCode,
+  });
 
-  final Decimal requested;
-  final Decimal available;
+  /// Null when the refusal came back from the server, which names the figures
+  /// in its own message rather than in a structured field.
+  final Decimal? requested;
+  final Decimal? available;
 
   @override
   String get messageKey => LocaleKeys.errors_insufficientStock;
@@ -219,4 +227,63 @@ class InsufficientStockException extends AppException {
   @override
   String toString() =>
       'InsufficientStockException: requested $requested, available $available';
+}
+
+/// A reversal the ledger cannot honour: the stock it would return has already
+/// left. Refused whole — no lot moved — so the user's route is to correct the
+/// transactions that consumed it first.
+class ReversalBlockedException extends HttpException {
+  const ReversalBlockedException({
+    super.message,
+    super.errorCode,
+    super.statusCode,
+    this.batchCode,
+    this.remaining,
+    this.shortfall,
+  });
+
+  /// Null when the server named the figures in its message rather than in a
+  /// structured field, which is the usual case.
+  final String? batchCode;
+  final Decimal? remaining;
+  final Decimal? shortfall;
+
+  @override
+  String get messageKey => LocaleKeys.errors_reversalBlocked;
+
+  @override
+  String toString() =>
+      'ReversalBlockedException: lot $batchCode holds $remaining, short by $shortfall';
+}
+
+/// The transaction moved underneath this edit. The answer is to reload and show
+/// what changed — never a blind retry, which would reverse the stock twice.
+class StaleTransactionException extends HttpException {
+  const StaleTransactionException({super.message, super.errorCode, super.statusCode});
+
+  @override
+  String get messageKey => LocaleKeys.errors_staleTransaction;
+}
+
+/// A transaction dated before the stock it draws on arrived. Allocation
+/// resolves against present stock and knows nothing about the header date, so
+/// without this floor the ledger would show goods leaving before they came in.
+class OccurredBeforeArrivalException extends HttpException {
+  const OccurredBeforeArrivalException({
+    super.message,
+    super.errorCode,
+    super.statusCode,
+  });
+
+  @override
+  String get messageKey => LocaleKeys.errors_occurredBeforeArrival;
+}
+
+/// A fee on a movement that carries none — a write-off or a stock count — or a
+/// seller cost on a receive, which has no seller side.
+class FeeNotAllowedException extends HttpException {
+  const FeeNotAllowedException({super.message, super.errorCode, super.statusCode});
+
+  @override
+  String get messageKey => LocaleKeys.errors_feeNotAllowed;
 }

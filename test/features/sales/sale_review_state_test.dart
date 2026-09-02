@@ -124,7 +124,7 @@ void main() {
       final container = containerFor();
       await fillBasket(container);
 
-      await products.consume(
+      await products.applyLedgerDeltas(
         'p1',
         [BatchAllocation(batchId: 'b1', quantity: d('2'))],
         storeId: 'store-a',
@@ -252,7 +252,7 @@ void main() {
       () async {
     final container = containerFor();
     await fillBasket(container);
-    await products.consume(
+    await products.applyLedgerDeltas(
       'p1',
       [BatchAllocation(batchId: 'b1', quantity: d('2'))],
       storeId: 'store-a',

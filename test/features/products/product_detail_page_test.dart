@@ -100,16 +100,20 @@ void main() {
     expect(cards.last.isNextOut, isFalse);
   });
 
-  testWidgets('a depleted product cannot use stock and reads a dash', (tester) async {
+  testWidgets('a depleted product cannot be written off and reads a dash', (tester) async {
     await pump(
       tester,
       _StubRepository(product: _product([batch(id: 'b1', code: '#B-0001', remaining: '0')])),
     );
 
-    final button = tester.widget<FilledButton>(
-      find.byKey(const Key('use-stock-button')),
+    final writeOff = tester.widget<FilledButton>(
+      find.byKey(const Key('write-off-button')),
     );
-    expect(button.onPressed, isNull);
+    final count = tester.widget<OutlinedButton>(
+      find.byKey(const Key('count-stock-button')),
+    );
+    expect(writeOff.onPressed, isNull);
+    expect(count.onPressed, isNull);
     expect(find.text('—'), findsWidgets);
   });
 

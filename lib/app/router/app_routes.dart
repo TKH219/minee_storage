@@ -60,6 +60,13 @@ class AppRoutes {
   static const String saleSuccess = '/sales/:id/success';
   static const String saleSuccessName = 'saleSuccess';
 
+  /// Registered before `/sales/:id` so `edit` is never read as an id.
+  static const String transactionEdit = '/sales/:id/edit';
+  static const String transactionEditName = 'transactionEdit';
+
+  static const String transactionDetail = '/sales/:id';
+  static const String transactionDetailName = 'transactionDetail';
+
   static const String reports = '/reports';
   static const String reportsName = 'reports';
 

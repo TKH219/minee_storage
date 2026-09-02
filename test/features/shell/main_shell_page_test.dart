@@ -80,7 +80,7 @@ void main() {
     expect(find.byType(AppNavBar), findsNothing);
   });
 
-  testWidgets('the centre action starts a sale, covering the nav bar', (tester) async {
+  testWidgets('the centre action offers the four types, then starts a sale', (tester) async {
     SharedPreferences.setMockInitialValues({
       OnboardingResolver.activeStoreKey: 'store-a',
     });
@@ -96,6 +96,16 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('new-sale-circle')));
+    await tester.pumpAndSettle();
+
+    // The centre button is an action, not a tab: it names what can be recorded
+    // before any form loads.
+    expect(find.text('What are you recording?'), findsOneWidget);
+    for (final type in ['sale', 'receive', 'writeOff', 'adjust']) {
+      expect(find.byKey(Key('record-type-$type')), findsOneWidget);
+    }
+
+    await tester.tap(find.byKey(const Key('record-type-sale')));
     await tester.pumpAndSettle();
 
     expect(find.text('Nothing in the basket'), findsOneWidget);
